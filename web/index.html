@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="THUD. Acoustic field notes, on your device.">
+  <meta name="theme-color" content="#f6f7f9">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="THUD">
+  <link rel="manifest" href="manifest.json">
+  <title>THUD · Acoustic fieldwork</title>
+  <style>
+    html, body { margin: 0; background: #f6f7f9; }
+    #loading { position: fixed; inset: 0; display: grid; place-content: center; text-align: center; color: #182028; font-family: system-ui, sans-serif; }
+    #loading strong { font-size: 44px; letter-spacing: -3px; }
+    #loading p { font-size: 12px; color: #657181; }
+  </style>
+</head>
+<body>
+  <div id="loading" role="status"><strong>thud</strong><p>Opening your field notebook.</p></div>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
