@@ -14,7 +14,8 @@ enum SensingIntent {
       'Vessel', 'Liquid inventory', 'Hear how much\nremains.', Module.vessel),
   fruit('Fruit', 'Firmness research', 'A different kind\nof fruit check.',
       Module.scope),
-  devices('Devices', 'Electronics inspection', 'Hear the\nhardware.', Module.scope),
+  devices(
+      'Devices', 'Electronics inspection', 'Hear the\nhardware.', Module.scope),
   scope('Scope', 'Acoustic exploration', 'Every object.\nIts own signature.',
       Module.scope);
 
@@ -144,7 +145,8 @@ class _ChooseObjectScreenState extends State<ChooseObjectScreen> {
                             }
                           },
                           style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
                               minimumSize: const Size(0, 48),
                               foregroundColor:
                                   selected == intent.index ? C.blue : C.muted),
@@ -247,23 +249,34 @@ class MaterialStudy extends CustomPainter {
       }
     } else if (intent == SensingIntent.devices) {
       final body = Rect.fromCenter(center: center, width: 205, height: 142);
-      canvas.drawRRect(RRect.fromRectAndRadius(body, const Radius.circular(14)), ink);
+      canvas.drawRRect(
+          RRect.fromRectAndRadius(body, const Radius.circular(14)), ink);
       final chip = Rect.fromCenter(center: center, width: 66, height: 54);
-      canvas.drawRRect(RRect.fromRectAndRadius(chip, const Radius.circular(6)), blue);
+      canvas.drawRRect(
+          RRect.fromRectAndRadius(chip, const Radius.circular(6)), blue);
       for (var i = 0; i < 5; i++) {
         final y = chip.top + 7 + i * 10;
         canvas.drawLine(Offset(chip.left - 10, y), Offset(chip.left, y), blue);
-        canvas.drawLine(Offset(chip.right, y), Offset(chip.right + 10, y), blue);
+        canvas.drawLine(
+            Offset(chip.right, y), Offset(chip.right + 10, y), blue);
       }
       for (final dx in [-1, 1]) {
         for (final dy in [-1, 1]) {
           canvas.drawCircle(center + Offset(dx * 88.0, dy * 57.0), 3, ink);
         }
       }
-      canvas.drawPath(Path()..moveTo(chip.right + 10, center.dy)
-          ..lineTo(body.right - 28, center.dy)..lineTo(body.right - 28, body.bottom - 20), ink);
-      canvas.drawPath(Path()..moveTo(chip.left - 10, center.dy)
-          ..lineTo(body.left + 28, center.dy)..lineTo(body.left + 28, body.top + 20), ink);
+      canvas.drawPath(
+          Path()
+            ..moveTo(chip.right + 10, center.dy)
+            ..lineTo(body.right - 28, center.dy)
+            ..lineTo(body.right - 28, body.bottom - 20),
+          ink);
+      canvas.drawPath(
+          Path()
+            ..moveTo(chip.left - 10, center.dy)
+            ..lineTo(body.left + 28, center.dy)
+            ..lineTo(body.left + 28, body.top + 20),
+          ink);
     } else {
       final path = Path();
       for (int i = 0; i <= 200; i++) {
@@ -613,15 +626,5 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
                         error = null;
                       }),
               child: const Text('Reset taps')),
-        const SizedBox(height: 24),
-        const ExpansionTile(
-          tilePadding: EdgeInsets.zero,
-          title: Text('Reference limits', style: TextStyle(fontSize: 14)),
-          children: [
-            Text(
-                'A reference describes acoustic repeatability, not safety, ripeness or a verified defect. Vessel estimates need at least three known fill levels on the same container.',
-                style: TextStyle(color: C.muted, height: 1.5))
-          ],
-        ),
       ]));
 }

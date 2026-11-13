@@ -565,7 +565,7 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                                 style: TextStyle(fontSize: 13)),
                             children: [
                               Text(
-                                  'Colors show your inspection marks, not automatic diagnoses. Warning icons indicate flagged audio; S indicates synthetic data. Photos and normalized image pins stay on this device. Findings and supplied recordings save together.',
+                                  'Tap a cell to add a finding. Colors show your marks. Warning icons flag audio; S means demo. Add a photo, then tap it to place a pin.',
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: C.muted,

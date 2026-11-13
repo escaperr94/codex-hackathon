@@ -382,9 +382,11 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
               const SizedBox(height: 12),
               if (m == null)
                 Text(
-                    _recording
-                        ? 'Tap once. Let it ring.'
-                        : 'Touch below to begin',
+                    _intent == SensingIntent.devices
+                        ? 'Power off. Unplug. Tap casing gently.'
+                        : _recording
+                            ? 'Tap once. Let it ring.'
+                            : 'Touch below to begin',
                     style:
                         const TextStyle(color: Colors.white70, fontSize: 16)),
               SizedBox(
@@ -455,7 +457,8 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                                           style: TextButton.styleFrom(
                                               foregroundColor: Colors.white),
                                           child: const Text('Try a sample')),
-                                      if (_intent == SensingIntent.slab)
+                                      if (_intent == SensingIntent.slab ||
+                                          _intent == SensingIntent.devices)
                                         TextButton(
                                             onPressed: _busy
                                                 ? null
@@ -526,14 +529,11 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   const SizedBox(height: 16),
-                  const Text(
-                      'Hold the phone 10–15 cm away. Start listening, wait briefly, then tap once. Stop when the sound fades.',
+                  Text(
+                      _intent == SensingIntent.devices
+                          ? 'Power off and unplug. Gently tap the casing, away from screens and batteries. Hold your phone 10–15 cm away.'
+                          : 'Hold your phone 10–15 cm away. Listen, tap once, then let it ring.',
                       style: _body),
-                  const SizedBox(height: 16),
-                  const Text(
-                      'THUD records acoustic evidence, not a structural diagnosis. Synthetic samples are for exploring the interface.',
-                      style: _body),
-                  const SizedBox(height: 16),
                   TextButton(
                       onPressed: () {
                         Navigator.pop(context);
@@ -761,8 +761,8 @@ class LibraryScreen extends StatelessWidget {
             _small,
             _MenuTile(
                 icon: Icons.settings_outlined,
-                title: 'Settings & privacy',
-                subtitle: 'Feedback, local storage and field guidance',
+                title: 'Settings',
+                subtitle: 'Haptics & sounds',
                 onTap: () => _push(context, SettingsScreen(store: store))),
             _gap,
             const Column(
@@ -1324,15 +1324,7 @@ class CalibrationScreen extends StatelessWidget {
           ..sort((a, b) => b.created.compareTo(a.created));
         return _RoutePage(title: 'Reference & calibration', children: [
           const PageHeading('Reference recording',
-              subtitle: 'A repeatable comparison, not a safety threshold'),
-          _gap,
-          const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Label('Know the limits'),
-            _small,
-            Text(
-                'This is a reference selection, not laboratory microphone calibration. Levels are relative digital dBFS, not calibrated dB SPL. Keep phone, distance, tap tool and surroundings consistent. No reference can establish structural safety or a defect classification.',
-                style: _body)
-          ]),
+              subtitle: 'Keep the same phone, tool and distance.'),
           _gap,
           if (store.reference case final ref?) ...[
             const SectionTitle('Current reference'),
@@ -1348,13 +1340,11 @@ class CalibrationScreen extends StatelessWidget {
           _gap,
           const SectionTitle('Eligible saved recordings'),
           _small,
-          const Text(
-              'Only microphone recordings with a finite frequency peak, a saved trace and no signal-quality flags can be selected. Synthetic samples are excluded.',
-              style: _body),
+          const Text('Clean microphone recordings only.', style: _body),
           _gap,
           if (candidates.isEmpty)
             const _Empty('No eligible reference yet',
-                'Record and save a clean, repeatable tap. Review the signal-quality notes before selecting it as a reference.')
+                'Record and save a clean tap to get started.')
           else
             for (final m in candidates) ...[
               _MeasurementTile(
@@ -1700,74 +1690,29 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: store,
-      builder: (_, __) => _RoutePage(title: 'Settings & privacy', children: [
-            const PageHeading('Settings',
-                subtitle: 'Capture feedback, privacy and field guidance'),
-            _gap,
+      builder: (_, __) => _RoutePage(title: 'Settings', children: [
             Panel(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Column(children: [
                   SwitchListTile.adaptive(
                       title: const Text('Haptic feedback'),
-                      subtitle:
-                          const Text('Tactile feedback for capture controls'),
                       value: store.haptics,
                       onChanged: (v) => _perform(
                           context, () => store.setFeedback(haptics: v))),
                   const Divider(height: 1),
                   SwitchListTile.adaptive(
                       title: const Text('Interface sounds'),
-                      subtitle: const Text(
-                          'A quiet system click after capture closes'),
                       value: store.sounds,
                       onChanged: (v) =>
                           _perform(context, () => store.setFeedback(sounds: v)))
                 ])),
             _gap,
-            const SectionTitle('Privacy by design'),
-            _small,
-            const Panel(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Icon(Icons.phonelink_lock_outlined, color: C.muted, size: 20),
-                  _small,
-                  Text('Your recordings stay local', style: _title),
-                  _small,
-                  Text(
-                      'Microphone access is used only when you start a recording. Saved traces, reference anchors, measurements, projects, notes and attached photos stay on this device. Photo coordinates are relative image positions, not GPS. THUD does not upload evidence or send it to an AI service. Exporting a PDF shares the included evidence through your device. Delete individual recordings in Measurement history. Removing app data removes local records.',
-                      style: _body)
-                ])),
-            _gap,
-            const SectionTitle('A better field recording'),
-            _small,
-            const Panel(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Text('Keep the setup consistent', style: _title),
-                  _small,
-                  Text(
-                      'Use the same phone, tap tool, distance and orientation. Do not strike fragile, energized or unsafe surfaces.',
-                      style: _body),
-                  _gap,
-                  Text('Give the sound room', style: _title),
-                  _small,
-                  Text(
-                      'Start in quiet surroundings. Record a brief baseline, tap once and allow the sound to decay. Review flags and repeat if the trace clips or contains interference.',
-                      style: _body),
-                  _gap,
-                  Text('Record the context', style: _title),
-                  _small,
-                  Text(
-                      'Attach recordings to a project cell and add notes. A different sound can have many causes. No acoustic feature here establishes a defect or structural safety.',
-                      style: _body)
-                ])),
-            _gap,
-            Text(
-                MediaQuery.of(context).disableAnimations
-                    ? 'Reduced motion is enabled by your device. These screens use static plots and no looping decorative animation.'
-                    : 'These screens use static plots with no looping decorative animation. System reduced-motion preferences are respected.',
-                style: _body)
+            const Row(children: [
+              Icon(Icons.phonelink_lock_outlined, color: C.muted, size: 20),
+              SizedBox(width: 12),
+              Expanded(
+                  child: Text('Recordings & photos stay on this device.',
+                      style: _body)),
+            ]),
           ]));
 }

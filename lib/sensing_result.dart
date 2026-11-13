@@ -77,17 +77,17 @@ class _SensingResultState extends State<SensingResult> {
       summary = 'Improve the signal and tap again.';
       explanation =
           '${m.flags.join(' · ')}. Improve the signal before interpreting it.';
-    } else if (widget.intent == SensingIntent.slab || widget.intent == SensingIntent.devices) {
+    } else if (widget.intent == SensingIntent.slab ||
+        widget.intent == SensingIntent.devices) {
       final reference = refs.isNotEmpty ? refs.last.taps : null;
       if (reference == null) {
         title = 'Reference needed.';
         summary = widget.intent == SensingIntent.devices
             ? 'Set a known-good casing reference.'
             : 'Compare with a known solid tile.';
-        explanation =
-            widget.intent == SensingIntent.devices
-                ? 'Compare the same model, casing, support and tap point with a known-good device. Power off and unplug before gentle casing taps. Do not tap screens, exposed circuits, hot or swollen batteries. Sound cannot verify electrical function or safety.'
-                : 'Teach a known solid tile on this floor before comparing. You can still mark a location for review.';
+        explanation = widget.intent == SensingIntent.devices
+            ? 'Compare the same model, casing, support and tap point with a known-good device. Power off and unplug before gentle casing taps. Do not tap screens, exposed circuits, hot or swollen batteries. Sound cannot verify electrical function or safety.'
+            : 'Teach a known solid tile on this floor before comparing. You can still mark a location for review.';
       } else {
         if (m.decayMs <= 0 || reference.any((t) => t.decayMs <= 0)) {
           title = 'Decay could not be measured.';
@@ -123,12 +123,15 @@ class _SensingResultState extends State<SensingResult> {
               ? 'Acoustic difference. Inspect this spot.'
               : 'Acoustically similar. Not a safety verdict.';
           explanation =
-              'Peak shift ${(100 * (m.peakHz / mean - 1)).toStringAsFixed(1)}% · decay Δ ${(m.decayMs - decay).toStringAsFixed(0)} ms versus “$selected”. Regularized deviation ${score.toStringAsFixed(2)}; review threshold 3.0 (unvalidated screening rule, not defect probability). Floors: 5% peak, 10 ms decay, 3 dB HII. A hollow-tile or acceptance verdict still requires inspector verification.';
+              'Peak shift ${(100 * (m.peakHz / mean - 1)).toStringAsFixed(1)}% · decay Δ ${(m.decayMs - decay).toStringAsFixed(0)} ms versus “$selected”. Regularized deviation ${score.toStringAsFixed(2)}; review threshold 3.0 (unvalidated screening rule, not defect probability). Floors: 5% peak, 10 ms decay, 3 dB HII. ${widget.intent == SensingIntent.devices ? "Casing differences need physical inspection, not a component-failure verdict." : "A hollow-tile or acceptance verdict still requires inspector verification."}';
         }
         if (widget.intent == SensingIntent.devices) {
-          title = title == 'Within reference envelope.' ? 'Casing matches reference.' : title;
+          title = title == 'Within reference envelope.'
+              ? 'Casing matches reference.'
+              : title;
           summary = 'Acoustic screening · not an electrical test.';
-          explanation += ' This comparison concerns casing acoustics only. It cannot identify a failed component, certify electrical safety or replace functional diagnostics. Compare the same model, support and tap position with power disconnected.';
+          explanation +=
+              ' This comparison concerns casing acoustics only. It cannot identify a failed component, certify electrical safety or replace functional diagnostics. Compare the same model, support and tap position with power disconnected.';
         }
       }
     } else if (widget.intent == SensingIntent.vessel) {
@@ -249,7 +252,8 @@ class _SensingResultState extends State<SensingResult> {
                         const InputDecoration(labelText: 'Fruit mass (g)'),
                     onChanged: (_) => setState(() {}))),
           if (widget.intent == SensingIntent.slab ||
-              widget.intent == SensingIntent.vessel || widget.intent == SensingIntent.devices) ...[
+              widget.intent == SensingIntent.vessel ||
+              widget.intent == SensingIntent.devices) ...[
             const SizedBox(height: 12),
             if (names.isNotEmpty)
               DropdownButtonFormField<String>(
