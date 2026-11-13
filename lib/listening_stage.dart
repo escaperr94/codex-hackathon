@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:material_ui/material_ui.dart';
-import 'design.dart';
 
 /// Motion describes capture state. Idle settles; recording reacts to PCM level.
 class ListeningStage extends StatefulWidget {
@@ -11,10 +10,12 @@ class ListeningStage extends StatefulWidget {
       required this.busy,
       required this.complete,
       required this.onTap,
+      this.subjectIcon,
       super.key});
   final ValueNotifier<List<double>> live;
   final bool active, busy, complete;
   final VoidCallback? onTap;
+  final IconData? subjectIcon;
   @override
   State<ListeningStage> createState() => _ListeningStageState();
 }
@@ -154,24 +155,39 @@ class _ListeningStageState extends State<ListeningStage>
                                                   curve: Curves.easeOutCubic)),
                                           child: child)),
                               child: widget.busy
-                                  ? const SizedBox(
-                                      key: ValueKey('busy'),
+                                  ? SizedBox(
+                                      key: const ValueKey('busy'),
                                       width: 30,
                                       height: 30,
                                       child: CircularProgressIndicator(
-                                          color: C.blue, strokeWidth: 2))
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          strokeWidth: 2))
                                   : widget.complete
-                                      ? const Icon(Icons.check_rounded,
-                                          key: ValueKey('done'),
-                                          color: C.blue,
+                                      ? Icon(Icons.check_rounded,
+                                          key: const ValueKey('done'),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
                                           size: 54)
                                       : widget.active
-                                          ? const Icon(Icons.stop_rounded,
-                                              key: ValueKey('stop'),
-                                              color: C.blue,
+                                          ? Icon(Icons.stop_rounded,
+                                              key: const ValueKey('stop'),
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
                                               size: 44)
-                                          : const _TapGlyph(
-                                              key: ValueKey('ready')),
+                                          : widget.subjectIcon == null
+                                              ? const _TapGlyph(
+                                                  key: ValueKey('ready'))
+                                              : Icon(widget.subjectIcon,
+                                                  key: ValueKey(
+                                                      widget.subjectIcon),
+                                                  size: 64,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary),
                             )),
                           ),
                         ),
@@ -196,7 +212,8 @@ class _TapGlyph extends StatelessWidget {
               height: height,
               margin: const EdgeInsets.symmetric(horizontal: 4),
               decoration: BoxDecoration(
-                  color: C.blue, borderRadius: BorderRadius.circular(3))))
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(3))))
           .toList());
 }
 

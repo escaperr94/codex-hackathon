@@ -14,10 +14,12 @@ class DefectMapScreen extends StatefulWidget {
       {super.key,
       required this.store,
       required this.project,
-      this.measurement});
+      this.measurement,
+      this.onReport});
   final ThudStore store;
   final Project project;
   final Measurement? measurement;
+  final VoidCallback? onReport;
 
   @override
   State<DefectMapScreen> createState() => _DefectMapScreenState();
@@ -210,8 +212,8 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
         _id = saved.id;
         _baseline = _draft;
       });
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Human annotation saved on this device.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Finding saved on this device.')));
     } catch (error) {
       if (mounted) {
         setState(() => _error =
@@ -256,7 +258,7 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                         subtitle:
                             '${project.room.isEmpty ? 'Inspection grid' : project.room} · ${project.rows} × ${project.columns}'),
                     const SizedBox(height: 20),
-                    const Text('Your marks · not an automatic diagnosis',
+                    const Text('Your findings · select a cell to edit',
                         style: TextStyle(color: C.muted, fontSize: 12)),
                     SizedBox(
                         height: 280,
@@ -296,7 +298,7 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                                           button: true,
                                           selected: selected,
                                           label:
-                                              '${_cellName(cell)}, ${cellMarks.length} human marks${invalid ? ", flagged recording" : ""}${synthetic ? ", synthetic source" : ""}',
+                                              '${_cellName(cell)}, ${cellMarks.length} findings${invalid ? ", flagged recording" : ""}${synthetic ? ", Demo" : ""}',
                                           child: InkWell(
                                             onTap: () => _selectCell(cell),
                                             borderRadius:
@@ -365,7 +367,7 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                                                     Positioned(
                                                         bottom: 3,
                                                         right: 5,
-                                                        child: Text('S',
+                                                        child: Text('D',
                                                             style: TextStyle(
                                                                 fontSize: 10,
                                                                 fontWeight:
@@ -406,7 +408,7 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                               title: Text(_statusName(mark.status)),
                               subtitle: Text(
                                   mark.note.isEmpty
-                                      ? 'Human mark · tap to reopen'
+                                      ? 'Finding · tap to reopen'
                                       : mark.note,
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis),
@@ -456,7 +458,7 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                                   DropdownMenuItem(
                                       value: m.id,
                                       child: Text(
-                                          '${m.source.toLowerCase().contains('synthetic') ? 'Synthetic · ' : ''}${m.label}',
+                                          '${m.source.toLowerCase().contains('synthetic') ? 'Demo · ' : ''}${m.label}',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis))
                               ],
@@ -478,8 +480,7 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                                 .contains('synthetic'))
                               const Padding(
                                   padding: EdgeInsets.only(top: 8),
-                                  child: Text(
-                                      'Demo recording · not field evidence',
+                                  child: Text('Demo recording',
                                       style: TextStyle(
                                           color: C.amber,
                                           fontWeight: FontWeight.w600))),
@@ -559,19 +560,16 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                                   _busy ? 'Saving…' : 'Save finding',
                                   icon: Icons.check_rounded,
                                   onPressed: _busy ? null : _save)),
-                          const ExpansionTile(
-                            tilePadding: EdgeInsets.zero,
-                            title: Text('Map guide',
-                                style: TextStyle(fontSize: 13)),
-                            children: [
-                              Text(
-                                  'Tap a cell to add a finding. Colors show your marks. Warning icons flag audio; S means demo. Add a photo, then tap it to place a pin.',
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: C.muted,
-                                      height: 1.5))
-                            ],
-                          ),
+                          if (_id.isNotEmpty && widget.onReport != null)
+                            SizedBox(
+                                width: double.infinity,
+                                child: TextButton.icon(
+                                    onPressed: _busy || _dirty
+                                        ? null
+                                        : widget.onReport,
+                                    icon:
+                                        const Icon(Icons.description_outlined),
+                                    label: const Text('Handover report'))),
                         ])),
                   ]));
             }),

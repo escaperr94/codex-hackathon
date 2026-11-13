@@ -1,6 +1,6 @@
 # THUD
 
-Flutter acoustic field notebook for capturing taps, reviewing their waveform and spectrum, and associating recordings with inspection grid locations.
+Flutter tap-based inspection app: capture sound, compare object signatures, review key measurements and save findings with photos and PDF reports.
 
 ## Run
 
@@ -22,32 +22,34 @@ Open http://localhost:8091. Microphone use requires localhost or HTTPS. iOS/macO
 
 ## Interface
 
-- Listen: swipeable Slab, Vessel, Fruit, Devices and Scope chooser; native-style edge-swipe routes, tactile press compression, result reveal and sliding dock. Capture uses an 8-second limit with cancellation. GPU interference and rings respond to live PCM; no idle loop. Reduce Motion is supported.
-- Slab: three separate reference taps on the same named object, repeatability checks, regularized acoustic deviation with disclosed unvalidated threshold. A screening anomaly is not a defect diagnosis.
-- Vessel: at least three strictly decreasing known-fill resonance anchors for the exact named container. Piecewise interpolation only inside the measured range; no universal model, extrapolation or fabricated accuracy interval. Known-fill synthetic PCM fixtures support the demo and remain separated from microphone anchors.
-- Fruit: mass input computes the research proxy `peakHz² × massKg^(2/3)`. No ripe/unripe, food-safety or validated quality classification.
-- Devices: power-off casing inspection against three known-good reference taps from the same device/model, support and tap point. Shows acoustic match or deviation, supports saved intent, location marks and photos. Never tap screens, exposed circuits or hot/swollen batteries. This does not test electrical function, identify failed components or certify electrical safety. The comparison threshold is an unvalidated acoustic screening rule.
-- Projects: room grids, notes and multiple human marks per cell (review/defect/accepted), linked acoustic records, local camera/gallery photos and normalized image-coordinate pins. Unsaved edits require discard confirmation. Marks and supplied measurements save in one storage transaction.
+- Listen: direct horizontal swipe across Slab, Vessel, Fruit, Devices, Material and Scope. Each mode has a distinct color, subject glyph, tactile page motion and animated shell transition. Mode selection stays locked during microphone capture. The capture/result column is capped at 540 px on wide displays.
+- Results: one mode-colored status symbol, a short verdict, and at most three main metrics. Retry shows one prioritized reason with Record again and View signal; rejected readings have no save/map action. Reference controls use a compact setup sheet. Demo recordings retain a short Demo label.
+- Slab / Devices / Material: three-tap named references and regularized deviation from peak, ring time and HII. Slab matching/differing results lead to Add to handover; other comparisons lead to save/review. Material compares a sample against an original reference.
+- Vessel: at least three strictly decreasing known-fill anchors for the same container; piecewise interpolation inside the measured range. Other readings show resonance and anchor setup.
+- Fruit: resonance, ring time and mass-based firmness `peakHz² × massKg^(2/3)`. Fruit type and mass remain attached to the saved result.
+- Dossiers: room grids, notes, review/defect/accepted marks, linked readings, camera/gallery photos and normalized pins. Slab result → dossier → cell → saved finding → Handover report. Report summary uses actual inspector marks; export includes results, metrics, references, room map and photos. Saved Slab readings link back to their report.
 - Scope: WAVE / SPECTRUM / DECAY views of stored signal data. DECAY is explicitly a peak-binned absolute envelope, not a reconstructed Schroeder curve or RT60. Stored waveform time is relative because full recording duration is not retained.
 - Reports: coverage, human-marked map, measured evidence, intent/input context, photos and pins embedded in a Unicode-font PDF. Synthetic provenance and human/automatic distinctions carry into reports.
-- Default surfaces keep one result, one short instruction and the primary action visible. Technical metrics/methods are under `Evidence & limits`, scope provenance under `About this signal`, and practical map instructions under `Map guide`. Tap guidance is a single instruction; Settings contains feedback toggles and one local-storage note. Reference screens keep setup instructions without repeated caveat sections. Devices retains the power-off reminder; demo/research and human-mark provenance remain visible.
+- Saved results and history reuse the mode color, concise verdict and essential metrics. Signal plots expand on demand. Capture failures use short action-oriented messages; underlying measurements and flags remain stored. Settings contains feedback toggles and a local-storage note.
 
-The shell uses THUD blue, the white `thud.` wordmark, rounded utility buttons and a capsule navigation dock. Dock icons and labels are vertically centered within the same inset bounds as the sliding selection capsule. Projects/Tools use light content sheets within the blue shell. Nunito is bundled locally under its SIL Open Font License (`assets/fonts/OFL.txt`).
+The shell uses mode-specific color, the white `thud.` wordmark, rounded utility buttons and a capsule navigation dock. Dock icons and labels are vertically centered within the same inset bounds as the sliding selection capsule. Projects/Tools use light content sheets within the blue shell. Nunito is bundled locally under its SIL Open Font License (`assets/fonts/OFL.txt`).
 
-## Measurement limits
+## Measurement and storage
 
-This is an acoustic evidence and human-annotation app, not a validated hollow-tile classifier, fill instrument or structural safety tool. No defect probabilities or confidence scores are fabricated. Reference deviation is an unvalidated screening rule; fill is conditional interpolation; fruit firmness is a research proxy. Synthetic examples are deterministic PCM passed through the analysis path, visibly labeled and excluded from microphone coverage. Demo anchors and microphone anchors are kept separate.
+The microphone drives acoustic metrics. The camera/gallery attaches inspection photos with normalized image pins. Slab, Devices and Material compare recorded signatures against a named reference; Vessel interpolates between known-fill anchors; Fruit computes the mass-based firmness index. Synthetic examples run deterministic PCM through the same analysis path and retain Demo provenance.
 
-Requested microphone configuration is 48 kHz mono PCM16 with processing disabled where supported by the platform/plugin. Hardware behavior still requires device verification. The displayed decay is an observed 20 dB amplitude reduction, not a calibrated reverberation RT60. Levels are digital dBFS, not dB SPL.
+Capture requests 48 kHz mono PCM16 with processing disabled. The analyzer uses a 4096-point Hann FFT, band-energy ratio HII, observed 20 dB ring-down time, estimated SNR and digital dBFS levels.
 
-Derived traces, metadata, projects, marks, compressed photo bytes and notes persist locally using SharedPreferences. References persist separately under `thud.anchors.v1`; marks and records use `thud.store.v1`. Photos are bounded to 2 MB each, and total capacity depends on platform quota; failed writes roll back and show an error. Image pins are normalized coordinates, not GPS or automatic camera localization. Raw full-resolution PCM is not retained after analysis. No server upload is implemented. Clearing app/site data removes local evidence.
+Derived traces, metadata, projects, marks, compressed photos and notes persist locally using SharedPreferences. References use `thud.anchors.v1`; records use `thud.store.v1`. Photos are bounded to 2 MB each. Storage errors roll back writes. Image pins use normalized photo coordinates. Full-resolution PCM is released after analysis. Clearing app/site data removes saved records.
 
 ## Verification
 
 Web smoke at 390×844 exercised touch-swipe selection, Fruit mass proxy/save, Slab three-tap reference and contrast anomaly, Vessel 0/50/100 synthetic anchors with 50% interpolation, all Scope views, map creation, human marking, gallery upload, image pin, persistence after reload and unsaved-edit protection. PDF bytes were captured and parsed: map, synthetic provenance, saved context and photo page present. Browser native download was not observed. Reduce Motion navigation was exercised. Physical microphone accuracy, iPhone frame rate, native camera permissions, haptics and native sharing still require real-device verification. A Flutter web keyboard-event error occurred during automated text entry; subsequent photo/save/report paths completed.
 
+Current compact-result smoke at 390×844: direct mode swipe; Fruit mass/type persistence; Devices reference match/difference; Material three-tap teaching; Slab result-to-handover, accepted cell mark and saved report navigation. An injected steady audio stream exercised the microphone pipeline's noisy retry state, with no metrics/save/map controls in the retry recap. Exported PDF blob (23,823 bytes) was parsed with pdftotext: handover counts, reference match, measured frequency/ring/HII/SNR, map and photo present. Analyzer and release web build passed; final browser run had no reported errors.
+
 ## Design references
 
 The project includes Meng To's `no-ai-design-slop`, `dither-background` and `high-contrast-skeuomorphic-clean` skills.
 
-Interface refinement follows **Unslop by Damir Sokolovsky ([@heydamir](https://x.com/heydamir))**, [heydamir/unslop](https://github.com/heydamir/unslop), licensed CC BY 4.0. The installed skill and original attribution are preserved under `.agents/skills/unslop`. The later user-directed visual adaptation retains a focused cobalt listening scene, large rounded typography and state-driven motion; long explanations remain in help and evidence screens.
+Interface refinement follows **Unslop by Damir Sokolovsky ([@heydamir](https://x.com/heydamir))**, [heydamir/unslop](https://github.com/heydamir/unslop), licensed CC BY 4.0. The installed skill and original attribution are preserved under `.agents/skills/unslop`. The current user-directed adaptation uses mode-specific colors, playful subject glyphs, swipe transitions and result-first typography.

@@ -474,28 +474,42 @@ class ThudStore extends ChangeNotifier {
 
   String reportText(Project p) {
     final out = StringBuffer(
-        'THUD — Acoustic inspection record\n${p.name}\nRoom: ${p.room}\nGrid: ${p.rows} × ${p.columns}\n\nNotes\n${p.notes.isEmpty ? "No notes." : p.notes}\n\n');
+        'THUD / Handover inspection\n${p.name}\nRoom: ${p.room}\nGrid: ${p.rows} × ${p.columns}\n\n${p.notes.isEmpty ? "" : "Notes: ${p.notes}\n\n"}');
     final records = forProject(p.id);
     if (records.isEmpty) out.writeln('No saved measurements.');
     for (final m in records) {
       out.writeln('${m.label} · ${m.created.toIso8601String()}');
       out.writeln('Source: ${m.source}');
       if (m.intent != null) out.writeln('Intent: ${m.intent}');
-      for (final entry in m.context.entries) {
-        out.writeln('Context · ${entry.key}: ${entry.value}');
+      if (m.context['resultVersion'] == '2') {
+        out.writeln('Result: ${m.context['interpretation']}');
+        out.writeln('Comparison: ${m.context['suspicion']}');
+      }
+      const fields = {
+        'fruitType': 'Fruit',
+        'massGrams': 'Mass (g)',
+        'referenceObject': 'Reference object',
+        'estimatedFillPercent': 'Estimated fill (%)',
+        'referencePeakHz': 'Reference peak (Hz)',
+        'referenceDecayMs': 'Reference ring time (ms)',
+        'referenceHiiDb': 'Reference HII (dB)',
+      };
+      for (final field in fields.entries) {
+        if (m.context[field.key] case final value?) {
+          out.writeln('${field.value}: $value');
+        }
       }
       out.writeln(
           'Module: ${m.module.name} · Cell: ${m.cell == null ? "unassigned" : m.cell! + 1}');
       out.writeln(
           'Peak: ${m.peakHz.toStringAsFixed(1)} Hz · HII: ${m.hiiDb.toStringAsFixed(1)} dB');
       out.writeln(
-          '20 dB decay estimate: ${m.decayMs > 0 ? "${m.decayMs.toStringAsFixed(0)} ms" : "not measurable"}');
+          'Ring time: ${m.decayMs > 0 ? "${m.decayMs.toStringAsFixed(0)} ms" : "Retap"}');
       out.writeln(
           'RMS: ${m.rmsDb.toStringAsFixed(1)} dBFS · estimated SNR: ${m.snrDb.toStringAsFixed(1)} dB');
-      out.writeln(
-          'Quality: ${m.flags.isEmpty ? "No automatic flags" : m.flags.join(", ")}\n');
+      out.writeln('Signal: ${m.flags.isEmpty ? "Clear" : "Retap"}\n');
     }
-    out.writeln('\nHuman annotations (not automatic diagnoses)');
+    out.writeln('\nInspection marks');
     final marks = annotationsForProject(p.id);
     if (marks.isEmpty) out.writeln('No human annotations.');
     for (final a in marks) {
@@ -505,8 +519,7 @@ class ThudStore extends ChangeNotifier {
         out.writeln('Linked source: ${a.measurementSource} '
             '(${a.measurementId ?? "record deleted or moved; source retained"})');
         if (a.measurementSource!.toLowerCase().contains('synthetic')) {
-          out.writeln(
-              'Synthetic link: demonstration only, not a field observation.');
+          out.writeln('Demo recording linked.');
         }
       }
       if (a.photoBase64 != null) {
@@ -515,9 +528,7 @@ class ThudStore extends ChangeNotifier {
       }
     }
     out.writeln(
-        'Method: mono PCM at 48 kHz; 4096-point Hann-window FFT around the strongest impulse. HII = 10 log10(E450–2200 Hz / E2200–6500 Hz). Decay is the observed 20 dB amplitude reduction, not an RT60 extrapolation. SNR uses the quietest fifth of 10 ms windows as estimated background. Levels are digital dBFS, not calibrated sound pressure.');
-    out.writeln(
-        'These are acoustic measurements, not a material, structural, defect, or safety diagnosis. Synthetic samples are explicitly identified and are not field observations.');
+        'Method: mono PCM at 48 kHz; 4096-point Hann-window FFT. HII = 10 log10(E450–2200 Hz / E2200–6500 Hz). Ring time = observed 20 dB amplitude reduction. SNR background = quietest fifth of 10 ms windows. Levels in dBFS.');
     if (reference != null) {
       out.writeln(
           'Reference: ${reference!.label} (${reference!.id}); ${reference!.source}.');

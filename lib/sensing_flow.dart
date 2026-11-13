@@ -12,16 +12,36 @@ enum SensingIntent {
       Module.slab),
   vessel(
       'Vessel', 'Liquid inventory', 'Hear how much\nremains.', Module.vessel),
-  fruit('Fruit', 'Firmness research', 'A different kind\nof fruit check.',
-      Module.scope),
+  fruit(
+      'Fruit', 'Fruit firmness', 'Find the\nfruit’s signature.', Module.scope),
   devices(
       'Devices', 'Electronics inspection', 'Hear the\nhardware.', Module.scope),
+  materials('Material', 'Material comparison', 'Meet your\nmaterial match.',
+      Module.scope),
   scope('Scope', 'Acoustic exploration', 'Every object.\nIts own signature.',
       Module.scope);
 
   const SensingIntent(this.title, this.useCase, this.headline, this.module);
   final String title, useCase, headline;
   final Module module;
+
+  Color get color => switch (this) {
+        slab => C.blue,
+        vessel => const Color(0xFF087F83),
+        fruit => const Color(0xFFB84B20),
+        devices => const Color(0xFF7444BE),
+        materials => const Color(0xFFAA3860),
+        scope => const Color(0xFF293A4C),
+      };
+
+  IconData get icon => switch (this) {
+        slab => Icons.grid_view_rounded,
+        vessel => Icons.water_drop_outlined,
+        fruit => Icons.eco_rounded,
+        devices => Icons.memory_rounded,
+        materials => Icons.layers_rounded,
+        scope => Icons.graphic_eq_rounded,
+      };
 }
 
 Route<T> sensingRoute<T>(BuildContext context, Widget child) =>
@@ -117,9 +137,11 @@ class _ChooseObjectScreenState extends State<ChooseObjectScreen> {
                                         SensingIntent.vessel =>
                                           'Estimate fill with local references.',
                                         SensingIntent.fruit =>
-                                          'Firmness proxy. Research only.',
+                                          'Tap. Measure firmness. Compare fruit.',
                                         SensingIntent.devices =>
                                           'Compare the casing. Power off first.',
+                                        SensingIntent.materials =>
+                                          'Compare a sample with your original.',
                                         SensingIntent.scope =>
                                           'Waveform, spectrum and decay.',
                                       },
@@ -148,8 +170,9 @@ class _ChooseObjectScreenState extends State<ChooseObjectScreen> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 4),
                               minimumSize: const Size(0, 48),
-                              foregroundColor:
-                                  selected == intent.index ? C.blue : C.muted),
+                              foregroundColor: selected == intent.index
+                                  ? intent.color
+                                  : C.muted),
                           child: Text(intent.title))),
               ])),
           Padding(
@@ -175,7 +198,7 @@ class MaterialStudy extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.4;
     final blue = Paint()
-      ..color = C.blue
+      ..color = intent.color
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.6;
     final center = size.center(Offset.zero);
@@ -277,6 +300,18 @@ class MaterialStudy extends CustomPainter {
             ..lineTo(body.left + 28, center.dy)
             ..lineTo(body.left + 28, body.top + 20),
           ink);
+    } else if (intent == SensingIntent.materials) {
+      for (var i = 2; i >= 0; i--) {
+        final offset = i * 22.0;
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(
+                Rect.fromCenter(
+                    center: center + Offset(offset - 22, 22 - offset),
+                    width: 150,
+                    height: 100),
+                const Radius.circular(12)),
+            i == 1 ? blue : ink);
+      }
     } else {
       final path = Path();
       for (int i = 0; i <= 200; i++) {
@@ -530,101 +565,109 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(title: Text('${widget.intent.title} reference')),
-      body: AppPage(children: [
-        PageHeading(
-            saved
-                ? 'Reference saved.'
-                : widget.intent == SensingIntent.slab
-                    ? 'First, a solid\nreference.'
-                    : 'Teach this\nexact object.',
-            subtitle: widget.intent == SensingIntent.devices
-                ? 'Power off. Unplug. Three gentle casing taps.'
-                : 'Three taps. Same spot, tool and distance.'),
-        const SizedBox(height: 24),
-        TextField(
-            controller: object,
-            enabled: taps.isEmpty && !recording,
-            decoration: const InputDecoration(labelText: 'Reference name')),
-        if (widget.intent == SensingIntent.vessel)
-          TextField(
-              controller: level,
-              enabled: taps.isEmpty && !recording,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Known fill (%)')),
-        const SizedBox(height: 32),
-        Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(
-                3,
-                (i) => AnimatedContainer(
-                    duration: Duration(
-                        milliseconds:
-                            MediaQuery.disableAnimationsOf(context) ? 0 : 400),
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: i < taps.length ? C.blue : C.pale),
-                    child: Center(
-                        child: Text(
-                            i < taps.length
-                                ? '${taps[i].peakHz.round()}'
-                                : '${i + 1}',
-                            style: TextStyle(
-                                color: i < taps.length ? Colors.white : C.muted,
-                                fontSize: 18)))))),
-        const SizedBox(height: 20),
-        Center(
-            child: Text('${taps.length} / 3 taps',
-                style:
-                    const TextStyle(fontFamily: 'monospace', color: C.muted))),
-        const SizedBox(height: 32),
-        if (synthetic == true)
-          const Text('Demo reference · not a field reading',
-              style: TextStyle(color: C.amber)),
-        if (error != null)
-          Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Text(error!, style: const TextStyle(color: C.red))),
-        if (!saved && taps.length < 3) ...[
-          ActionButton(recording ? 'Stop & analyze tap' : 'Record next tap',
-              onPressed: busy ? null : () => _take(false),
-              icon: recording ? Icons.stop_rounded : Icons.mic_rounded),
-          if (recording)
-            TextButton(
-                onPressed: busy ? null : _cancel,
-                child: const Text('Cancel recording')),
-          if (!recording)
-            TextButton(
-                onPressed: busy ? null : () => _take(true),
-                child: const Text('Use synthetic tap')),
-        ],
-        if (taps.length == 3 && !saved)
-          ActionButton('Save reference', onPressed: busy ? null : _save),
-        if (saved)
-          ActionButton('Back to measurement',
-              onPressed: () => Navigator.pop(context)),
-        if (saved && widget.intent == SensingIntent.vessel)
-          TextButton(
-              onPressed: () => setState(() {
-                    saved = false;
-                    taps.clear();
-                    synthetic = null;
-                    level.clear();
-                    error = null;
-                  }),
-              child: const Text('Teach another fill level')),
-        if (taps.isNotEmpty && !recording && !saved)
-          TextButton(
-              onPressed: busy
-                  ? null
-                  : () => setState(() {
+  Widget build(BuildContext context) => Theme(
+      data: Theme.of(context).copyWith(
+          colorScheme: ColorScheme.fromSeed(seedColor: widget.intent.color)),
+      child: Scaffold(
+          appBar: AppBar(title: Text('${widget.intent.title} reference')),
+          body: AppPage(children: [
+            PageHeading(
+                saved
+                    ? 'Reference saved.'
+                    : widget.intent == SensingIntent.slab
+                        ? 'First, a solid\nreference.'
+                        : 'Teach this\nexact object.',
+                subtitle: widget.intent == SensingIntent.devices
+                    ? 'Power off. Unplug. Three gentle casing taps.'
+                    : 'Three taps. Same spot, tool and distance.'),
+            const SizedBox(height: 24),
+            TextField(
+                controller: object,
+                enabled: taps.isEmpty && !recording,
+                decoration: const InputDecoration(labelText: 'Reference name')),
+            if (widget.intent == SensingIntent.vessel)
+              TextField(
+                  controller: level,
+                  enabled: taps.isEmpty && !recording,
+                  keyboardType: TextInputType.number,
+                  decoration:
+                      const InputDecoration(labelText: 'Known fill (%)')),
+            const SizedBox(height: 32),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(
+                    3,
+                    (i) => AnimatedContainer(
+                        duration: Duration(
+                            milliseconds:
+                                MediaQuery.disableAnimationsOf(context)
+                                    ? 0
+                                    : 400),
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color:
+                                i < taps.length ? widget.intent.color : C.pale),
+                        child: Center(
+                            child: Text(
+                                i < taps.length
+                                    ? '${taps[i].peakHz.round()}'
+                                    : '${i + 1}',
+                                style: TextStyle(
+                                    color: i < taps.length
+                                        ? Colors.white
+                                        : C.muted,
+                                    fontSize: 18)))))),
+            const SizedBox(height: 20),
+            Center(
+                child: Text('${taps.length} / 3 taps',
+                    style: const TextStyle(
+                        fontFamily: 'monospace', color: C.muted))),
+            const SizedBox(height: 32),
+            if (synthetic == true)
+              const Text('Demo reference', style: TextStyle(color: C.amber)),
+            if (error != null)
+              Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Text(error!, style: const TextStyle(color: C.red))),
+            if (!saved && taps.length < 3) ...[
+              ActionButton(recording ? 'Stop & analyze tap' : 'Record next tap',
+                  onPressed: busy ? null : () => _take(false),
+                  icon: recording ? Icons.stop_rounded : Icons.mic_rounded),
+              if (recording)
+                TextButton(
+                    onPressed: busy ? null : _cancel,
+                    child: const Text('Cancel recording')),
+              if (!recording)
+                TextButton(
+                    onPressed: busy ? null : () => _take(true),
+                    child: const Text('Use demo tap')),
+            ],
+            if (taps.length == 3 && !saved)
+              ActionButton('Save reference', onPressed: busy ? null : _save),
+            if (saved)
+              ActionButton('Back to measurement',
+                  onPressed: () => Navigator.pop(context)),
+            if (saved && widget.intent == SensingIntent.vessel)
+              TextButton(
+                  onPressed: () => setState(() {
+                        saved = false;
                         taps.clear();
                         synthetic = null;
+                        level.clear();
                         error = null;
                       }),
-              child: const Text('Reset taps')),
-      ]));
+                  child: const Text('Teach another fill level')),
+            if (taps.isNotEmpty && !recording && !saved)
+              TextButton(
+                  onPressed: busy
+                      ? null
+                      : () => setState(() {
+                            taps.clear();
+                            synthetic = null;
+                            error = null;
+                          }),
+                  child: const Text('Reset taps')),
+          ])));
 }

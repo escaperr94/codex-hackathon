@@ -112,7 +112,9 @@ class _ActionButtonState extends State<ActionButton> {
             icon: Icon(widget.icon, size: 18),
             label: Text(widget.label),
             style: FilledButton.styleFrom(
-                backgroundColor: widget.secondary ? C.pale : C.blue,
+                backgroundColor: widget.secondary
+                    ? C.pale
+                    : Theme.of(context).colorScheme.primary,
                 foregroundColor: widget.secondary ? C.ink : Colors.white,
                 minimumSize: const Size(48, 52),
                 padding:

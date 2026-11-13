@@ -26,29 +26,86 @@ class SensingResult extends StatefulWidget {
 }
 
 class _SensingResultState extends State<SensingResult> {
+  static const fruitTypes = ['Apple', 'Pear', 'Melon'];
   List<ReferenceAnchor> anchors = [];
   String? object, error;
+  String fruit = 'Apple';
+  bool loadingReferences = true;
   late final TextEditingController mass;
+
+  bool get _demo =>
+      widget.measurement.source.toLowerCase().contains('synthetic');
+  bool get _compares =>
+      widget.intent == SensingIntent.slab ||
+      widget.intent == SensingIntent.devices ||
+      widget.intent == SensingIntent.materials;
+  bool get _usesReferences =>
+      _compares || widget.intent == SensingIntent.vessel;
+
   @override
   void initState() {
     super.initState();
     mass = TextEditingController(text: widget.measurement.context['massGrams']);
     object = widget.measurement.context['referenceObject'];
-    _load();
+    final savedFruit = widget.measurement.context['fruitType'];
+    if (fruitTypes.contains(savedFruit)) fruit = savedFruit!;
+    if (_usesReferences) {
+      _load();
+    } else {
+      loadingReferences = false;
+    }
   }
 
-  Future<void> _load() async {
+  List<ReferenceAnchor> _eligible(List<ReferenceAnchor> all) => all
+      .where((a) =>
+          a.intent == widget.intent &&
+          a.synthetic == _demo &&
+          a.object.trim().isNotEmpty &&
+          a.taps.length >= 3 &&
+          a.taps.every((t) =>
+              t.flags.isEmpty &&
+              t.peakHz.isFinite &&
+              t.peakHz > 0 &&
+              t.source.toLowerCase().contains('synthetic') == _demo))
+      .toList();
+
+  Future<void> _load({bool afterTeaching = false}) async {
     try {
       final all = await AnchorRepository.load();
+      if (!mounted) return;
+      final eligible = _eligible(all);
+      final names = eligible.map((a) => a.object).toSet().toList()..sort();
+      String signature(ReferenceAnchor a) =>
+          '${a.object}|${a.level}|${a.taps.map((t) => t.id).join(',')}';
+      final previous = _eligible(anchors).map(signature).toSet();
+      final updatedNames = eligible
+          .where((a) => !previous.contains(signature(a)))
+          .map((a) => a.object)
+          .toSet();
+      setState(() {
+        anchors = all;
+        if (afterTeaching && updatedNames.length == 1) {
+          object = updatedNames.single;
+        } else if (!names.contains(object)) {
+          object = names.length == 1 ? names.single : null;
+        }
+        loadingReferences = false;
+        error = null;
+      });
+    } catch (_) {
       if (mounted) {
         setState(() {
-          anchors = all;
-          error = null;
+          loadingReferences = false;
+          error = 'References could not be loaded.';
         });
       }
-    } catch (e) {
-      if (mounted) setState(() => error = 'Reference storage unavailable: $e');
     }
+  }
+
+  Future<void> _teachReference() async {
+    await Navigator.of(context).push(sensingRoute<void>(context,
+        GuidedReferenceScreen(intent: widget.intent, store: widget.store)));
+    if (mounted) await _load(afterTeaching: true);
   }
 
   @override
@@ -57,290 +114,427 @@ class _SensingResultState extends State<SensingResult> {
     super.dispose();
   }
 
+  String _qualityLabel(Measurement measurement) {
+    final flags = measurement.flags.join(' ').toLowerCase();
+    if (flags.contains('snr') || flags.contains('nois')) return 'Too noisy';
+    if (flags.contains('clip')) return 'Clipped';
+    if (flags.contains('short')) return 'Tap too short';
+    return 'Tap again';
+  }
+
+  void _referenceSetup(List<String> names, String? selected) {
+    showModalBottomSheet<void>(
+        context: context,
+        showDragHandle: true,
+        builder: (sheet) => SafeArea(
+            child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  const SectionTitle('Reference'),
+                  const SizedBox(height: 16),
+                  if (names.length > 1) ...[
+                    DropdownButtonFormField<String>(
+                        initialValue: selected,
+                        isExpanded: true,
+                        decoration: const InputDecoration(
+                            labelText: 'Reference object'),
+                        items: names
+                            .map((name) => DropdownMenuItem(
+                                value: name,
+                                child: Text(name,
+                                    overflow: TextOverflow.ellipsis)))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() => object = value);
+                          Navigator.of(sheet).pop();
+                        }),
+                    const SizedBox(height: 12),
+                  ] else if (selected != null)
+                    Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(selected)),
+                  TextButton.icon(
+                      onPressed: () {
+                        Navigator.of(sheet).pop();
+                        _teachReference();
+                      },
+                      icon: const Icon(Icons.add_rounded),
+                      label: const Text('Record reference')),
+                ]))));
+  }
+
   @override
   Widget build(BuildContext context) {
     final m = widget.measurement;
-    final demo = m.source.toLowerCase().contains('synthetic');
-    final eligible = anchors
-        .where((a) => a.intent == widget.intent && a.synthetic == demo)
-        .toList();
-    final names = eligible.map((a) => a.object).toSet().toList();
+    final accent = widget.intent.color;
+    final eligible = _eligible(anchors);
+    final names = eligible.map((a) => a.object).toSet().toList()..sort();
     final selected = names.contains(object) ? object : null;
     final refs = eligible.where((a) => a.object == selected).toList();
-    var title = 'Acoustic signature captured.';
-    var explanation =
-        'Explore the measured signal. No material diagnosis attached.';
-    double? fill;
-    var summary = 'Explore the captured signal.';
-    if (m.flags.isNotEmpty) {
-      title = 'Reading needs a retry.';
-      summary = 'Improve the signal and tap again.';
-      explanation =
-          '${m.flags.join(' · ')}. Improve the signal before interpreting it.';
-    } else if (widget.intent == SensingIntent.slab ||
-        widget.intent == SensingIntent.devices) {
-      final reference = refs.isNotEmpty ? refs.last.taps : null;
-      if (reference == null) {
-        title = 'Reference needed.';
-        summary = widget.intent == SensingIntent.devices
-            ? 'Set a known-good casing reference.'
-            : 'Compare with a known solid tile.';
-        explanation = widget.intent == SensingIntent.devices
-            ? 'Compare the same model, casing, support and tap point with a known-good device. Power off and unplug before gentle casing taps. Do not tap screens, exposed circuits, hot or swollen batteries. Sound cannot verify electrical function or safety.'
-            : 'Teach a known solid tile on this floor before comparing. You can still mark a location for review.';
-      } else {
-        if (m.decayMs <= 0 || reference.any((t) => t.decayMs <= 0)) {
-          title = 'Decay could not be measured.';
-          summary = 'Retap in a quieter setting.';
-          explanation =
-              'A complete reference comparison needs measurable decay. Retap in a quieter setting; you can still inspect the raw trace.';
-        } else {
-          final mean = reference.map((t) => t.peakHz).reduce((a, b) => a + b) /
-              reference.length;
-          final decay =
-              reference.map((t) => t.decayMs).reduce((a, b) => a + b) /
-                  reference.length;
-          double deviation(double Function(Measurement) read, double floor) {
-            final average =
-                reference.map(read).reduce((a, b) => a + b) / reference.length;
-            final variance = reference
-                    .map((t) => math.pow(read(t) - average, 2))
-                    .reduce((a, b) => a + b) /
-                (reference.length - 1);
-            return (read(m) - average).abs() /
-                math.sqrt(variance + floor * floor);
-          }
+    final reference = _compares && refs.isNotEmpty ? refs.last.taps : null;
+    final hasDecay = m.decayMs.isFinite && m.decayMs > 0;
+    final retry = m.flags.isNotEmpty || !hasDecay;
+    final quality = retry ? _qualityLabel(m) : 'Clean signal';
+    var suspicion = 'Signature recorded';
+    var title = 'Signature captured';
+    var method = 'Peak: Hz · Decay: ms · HII: dB · SNR: dB.';
+    var needsReference = false;
+    var different = false;
+    double? score, peakShift, decayShift, hiiShift;
+    double? referencePeak, referenceDecay, referenceHii;
+    double? fill, firmness;
+    List<ReferenceAnchor> fillPoints = [];
+    var retryReference = false;
+    final grams = double.tryParse(mass.text.trim());
+    final validMass = grams != null && grams.isFinite && grams > 0;
 
-          final score = math.sqrt(
-              (math.pow(deviation((t) => t.peakHz, mean * .05), 2) +
-                      math.pow(deviation((t) => t.decayMs, 10), 2) +
-                      math.pow(deviation((t) => t.hiiDb, 3), 2)) /
-                  3);
-          title = score > 3
-              ? 'Acoustic anomaly · review.'
-              : 'Within reference envelope.';
-          summary = score > 3
-              ? 'Acoustic difference. Inspect this spot.'
-              : 'Acoustically similar. Not a safety verdict.';
-          explanation =
-              'Peak shift ${(100 * (m.peakHz / mean - 1)).toStringAsFixed(1)}% · decay Δ ${(m.decayMs - decay).toStringAsFixed(0)} ms versus “$selected”. Regularized deviation ${score.toStringAsFixed(2)}; review threshold 3.0 (unvalidated screening rule, not defect probability). Floors: 5% peak, 10 ms decay, 3 dB HII. ${widget.intent == SensingIntent.devices ? "Casing differences need physical inspection, not a component-failure verdict." : "A hollow-tile or acceptance verdict still requires inspector verification."}';
+    if (_compares) {
+      method = 'D = √mean((Δ / √(s² + floor²))²), peak / decay / HII. '
+          'Floors: 5% reference peak, 10 ms, 3 dB. Difference: D > 3.';
+      if (reference == null) {
+        needsReference = !loadingReferences;
+        title = loadingReferences ? 'Loading references' : 'Reference needed';
+        suspicion = title;
+      } else if (reference.any((t) => !t.decayMs.isFinite || t.decayMs <= 0)) {
+        retryReference = true;
+        title = 'Refresh reference';
+        suspicion = 'Reference decay missing';
+      } else if (!retry) {
+        double mean(double Function(Measurement) read) =>
+            reference.map(read).reduce((a, b) => a + b) / reference.length;
+        referencePeak = mean((t) => t.peakHz);
+        referenceDecay = mean((t) => t.decayMs);
+        referenceHii = mean((t) => t.hiiDb);
+        double deviation(double Function(Measurement) read, double floor) {
+          final average = mean(read);
+          final variance = reference
+                  .map((t) => math.pow(read(t) - average, 2))
+                  .reduce((a, b) => a + b) /
+              (reference.length - 1);
+          return (read(m) - average).abs() /
+              math.sqrt(variance + floor * floor);
         }
-        if (widget.intent == SensingIntent.devices) {
-          title = title == 'Within reference envelope.'
-              ? 'Casing matches reference.'
-              : title;
-          summary = 'Acoustic screening · not an electrical test.';
-          explanation +=
-              ' This comparison concerns casing acoustics only. It cannot identify a failed component, certify electrical safety or replace functional diagnostics. Compare the same model, support and tap position with power disconnected.';
-        }
+
+        score = math.sqrt(
+            (math.pow(deviation((t) => t.peakHz, referencePeak * .05), 2) +
+                    math.pow(deviation((t) => t.decayMs, 10), 2) +
+                    math.pow(deviation((t) => t.hiiDb, 3), 2)) /
+                3);
+        peakShift = 100 * (m.peakHz / referencePeak - 1);
+        decayShift = m.decayMs - referenceDecay;
+        hiiShift = m.hiiDb - referenceHii;
+        different = score > 3;
+        suspicion = different ? 'Measured difference' : 'Reference match';
+        title = different ? 'Check this spot' : 'Reference match';
       }
     } else if (widget.intent == SensingIntent.vessel) {
-      final points = refs.where((a) => a.level != null).toList()
+      method = 'Fill = L₁ + (f − f₁) / (f₂ − f₁) × (L₂ − L₁). '
+          'L: % · f: Hz. Piecewise interpolation between fill anchors.';
+      fillPoints = refs
+          .where((a) =>
+              a.level != null &&
+              a.level!.isFinite &&
+              a.level! >= 0 &&
+              a.level! <= 100)
+          .toList()
         ..sort((a, b) => a.level!.compareTo(b.level!));
       final distinct =
-          points.map((a) => a.level).toSet().length == points.length;
-      final monotonic = points.length >= 3 &&
+          fillPoints.map((a) => a.level).toSet().length == fillPoints.length;
+      final monotonic = fillPoints.length >= 3 &&
           distinct &&
-          List.generate(points.length - 1,
-              (i) => points[i].peak > points[i + 1].peak + 1).every((v) => v);
-      if (monotonic &&
-          m.peakHz <= points.first.peak &&
-          m.peakHz >= points.last.peak) {
-        for (var i = 0; i < points.length - 1; i++) {
-          final a = points[i], b = points[i + 1];
-          if (m.peakHz <= a.peak && m.peakHz >= b.peak) {
+          List.generate(fillPoints.length - 1,
+                  (i) => fillPoints[i].peak > fillPoints[i + 1].peak + 1)
+              .every((value) => value);
+      if (!retry && monotonic) {
+        for (var i = 0; i < fillPoints.length - 1; i++) {
+          final a = fillPoints[i], b = fillPoints[i + 1];
+          if (m.peakHz >= math.min(a.peak, b.peak) &&
+              m.peakHz <= math.max(a.peak, b.peak)) {
             fill = a.level! +
-                (a.peak - m.peakHz) / (a.peak - b.peak) * (b.level! - a.level!);
+                (m.peakHz - a.peak) / (b.peak - a.peak) * (b.level! - a.level!);
             break;
           }
         }
-        title = '${fill?.round()}% · calibrated estimate';
-        summary = 'Estimated fill · same container only.';
-        explanation =
-            'Piecewise interpolation between known fill anchors for “$selected”. Assumes the same container, liquid, support and tap point. Not a validated accuracy interval.';
+      }
+      if (fill != null) {
+        title = '${fill.round()}% fill';
+        suspicion = 'Within reference range';
       } else {
-        title = '${m.peakHz.round()} Hz · shell resonance';
-        summary = 'Set three known fill references.';
-        explanation = points.length < 3
-            ? 'Teach at least three known fill levels on the exact container. A resonance alone cannot determine a water percentage.'
-            : 'Anchors are not strictly decreasing, or this reading is outside their range. No fill estimate available; recalibrate rather than extrapolate.';
+        title = loadingReferences ? 'Loading references' : 'Reference needed';
+        needsReference = !loadingReferences;
+        suspicion = loadingReferences
+            ? 'Loading references'
+            : monotonic
+                ? 'Outside reference range'
+                : 'Reference setup needed';
+        if (monotonic && !loadingReferences) title = 'Outside range';
       }
     } else if (widget.intent == SensingIntent.fruit) {
-      final grams = double.tryParse(mass.text);
-      if (grams != null && grams.isFinite && grams > 0) {
-        final proxy = m.peakHz * m.peakHz * math.pow(grams / 1000, 2 / 3);
-        title = '${proxy.toStringAsFixed(0)} · firmness proxy';
-        summary = 'Research proxy · not a ripeness verdict.';
-        explanation =
-            'f² × mass^(2/3), Hz²·kg^(2/3). Compare only matched fruit variety, shape, support and tap method. The dominant peak may not be the fruit’s fundamental mode. No ripe/unripe or food-safety classification.';
+      method = 'Firmness index = f² × m^(2/3). f: Hz · m: kg. '
+          'Index: Hz²·kg^(2/3).';
+      if (validMass && !retry) {
+        firmness = m.peakHz * m.peakHz * math.pow(grams / 1000, 2 / 3);
+        title = 'Firmness index';
       } else {
-        title = 'Explore fruit firmness.';
-        summary = 'Enter mass · research only.';
-        explanation =
-            'Enter mass in grams for a resonance-based proxy. This research mode cannot determine ripeness or quality from a tap alone.';
+        title = 'Signature captured';
       }
     }
+
+    if (retry) {
+      title = 'Tap again';
+      suspicion = 'Comparison paused';
+      needsReference = false;
+      retryReference = false;
+    }
+
+    final savedContext = Map<String, String>.from(m.context)
+      ..removeWhere((key, _) => const {
+            'massGrams',
+            'fruitType',
+            'referenceObject',
+            'referenceTapIds',
+            'referencePeakHz',
+            'referenceDecayMs',
+            'referenceHiiDb',
+            'referenceFillAnchors',
+            'estimatedFillPercent',
+            'firmnessIndex',
+            'regularizedDeviation',
+            'peakShiftPercent',
+            'decayShiftMs',
+            'hiiShiftDb',
+            'interpretation',
+            'methodNote',
+            'quality',
+            'suspicion',
+            'resultVersion'
+          }.contains(key));
     final record = m.withIntent(widget.intent.name).withContext({
-      ...(Map<String, String>.from(m.context)
-        ..removeWhere((key, _) => const [
-              'massGrams',
-              'referenceObject',
-              'referenceTapIds',
-              'estimatedFillPercent',
-              'interpretation',
-              'methodNote'
-            ].contains(key))),
-      if (widget.intent == SensingIntent.fruit) 'massGrams': mass.text,
+      ...savedContext,
+      'resultVersion': '2',
+      'quality': quality,
+      'suspicion': suspicion,
+      'interpretation': title,
+      'methodNote': method,
+      if (widget.intent == SensingIntent.fruit) ...{
+        'massGrams': mass.text.trim(),
+        'fruitType': fruit,
+      },
       if (selected != null) 'referenceObject': selected,
       if (refs.isNotEmpty)
         'referenceTapIds':
             refs.expand((a) => a.taps.map((t) => t.id)).join(','),
+      if (referencePeak != null) 'referencePeakHz': '$referencePeak',
+      if (referenceDecay != null) 'referenceDecayMs': '$referenceDecay',
+      if (referenceHii != null) 'referenceHiiDb': '$referenceHii',
+      if (fillPoints.isNotEmpty)
+        'referenceFillAnchors':
+            fillPoints.map((a) => '${a.level}:${a.peak}').join(','),
       if (fill != null) 'estimatedFillPercent': fill.toStringAsFixed(2),
-      'interpretation': title,
-      'methodNote': explanation,
+      if (firmness != null) 'firmnessIndex': '$firmness',
+      if (score != null) 'regularizedDeviation': '$score',
+      if (peakShift != null) 'peakShiftPercent': '$peakShift',
+      if (decayShift != null) 'decayShiftMs': '$decayShift',
+      if (hiiShift != null) 'hiiShiftDb': '$hiiShift',
     });
-    return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(28)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-              '${widget.intent.title.toUpperCase()} / ${demo ? 'DEMO · NOT AN INSPECTION' : 'RECORDED'}',
-              style: const TextStyle(
-                  color: C.muted,
-                  fontFamily: 'monospace',
-                  fontSize: 11,
-                  letterSpacing: .6)),
-          const SizedBox(height: 16),
-          AnimatedSwitcher(
-              duration: Duration(
-                  milliseconds:
-                      MediaQuery.disableAnimationsOf(context) ? 0 : 420),
-              child: Text(title,
-                  key: ValueKey(title),
-                  style: const TextStyle(
-                      color: C.ink,
-                      fontSize: 28,
-                      height: 1.12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -.7))),
-          const SizedBox(height: 12),
-          Text(summary,
-              style:
-                  const TextStyle(color: C.muted, height: 1.5, fontSize: 13)),
-          if (fill != null)
-            Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0, end: fill / 100),
-                    duration: Duration(
-                        milliseconds:
-                            MediaQuery.disableAnimationsOf(context) ? 0 : 650),
-                    curve: Curves.easeOutCubic,
-                    builder: (context, value, _) => SizedBox(
-                        height: 90,
-                        width: double.infinity,
-                        child: CustomPaint(painter: _FillPainter(value))))),
-          if (widget.intent == SensingIntent.fruit)
-            Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: TextField(
-                    controller: mass,
-                    keyboardType: TextInputType.number,
-                    decoration:
-                        const InputDecoration(labelText: 'Fruit mass (g)'),
-                    onChanged: (_) => setState(() {}))),
-          if (widget.intent == SensingIntent.slab ||
-              widget.intent == SensingIntent.vessel ||
-              widget.intent == SensingIntent.devices) ...[
-            const SizedBox(height: 12),
-            if (names.isNotEmpty)
-              DropdownButtonFormField<String>(
-                  key: ValueKey(names.join('|')),
-                  initialValue: selected,
-                  decoration:
-                      const InputDecoration(labelText: 'Reference object'),
-                  items: names
-                      .map((n) => DropdownMenuItem(value: n, child: Text(n)))
-                      .toList(),
-                  onChanged: (v) => setState(() => object = v)),
-            TextButton(
-                onPressed: () async {
-                  await Navigator.of(context).push(sensingRoute<void>(
-                      context,
-                      GuidedReferenceScreen(
-                          intent: widget.intent, store: widget.store)));
-                  await _load();
-                },
-                child: const Text('Set reference')),
-          ],
-          if (error != null) Text(error!, style: const TextStyle(color: C.red)),
-          ExpansionTile(
-              tilePadding: EdgeInsets.zero,
-              title: const Text('Evidence & limits',
-                  style: TextStyle(color: C.ink, fontSize: 14)),
-              children: [
-                Text(explanation,
-                    style: const TextStyle(
-                        color: C.muted, height: 1.5, fontSize: 13)),
-                const SizedBox(height: 12),
+    final setup = needsReference || retryReference;
+    final mapPrimary =
+        !retry && !setup && (widget.intent == SensingIntent.slab || different);
+    final tracePrimary = !retry && widget.intent == SensingIntent.scope;
+    final primaryLabel = retry
+        ? 'Record again'
+        : setup
+            ? (retryReference ? 'Refresh reference' : 'Set reference')
+            : mapPrimary
+                ? widget.intent == SensingIntent.slab
+                    ? 'Add to handover'
+                    : 'Mark for review'
+                : tracePrimary
+                    ? 'View signal'
+                    : (widget.saved ? 'Update result' : 'Save result');
+    final primaryIcon = retry
+        ? Icons.refresh_rounded
+        : setup
+            ? Icons.add_rounded
+            : mapPrimary
+                ? Icons.location_on_outlined
+                : tracePrimary
+                    ? Icons.graphic_eq_rounded
+                    : Icons.check_rounded;
+    final VoidCallback primaryAction = retry
+        ? widget.onAgain
+        : setup
+            ? (selected == null && names.length > 1
+                ? () => _referenceSetup(names, selected)
+                : _teachReference)
+            : mapPrimary
+                ? () => widget.onMap(record)
+                : tracePrimary
+                    ? () => widget.onTrace(record)
+                    : () => widget.onSave(record);
+    final statusIcon = retry
+        ? Icons.refresh_rounded
+        : setup
+            ? Icons.add_rounded
+            : different
+                ? Icons.location_on_outlined
+                : widget.intent == SensingIntent.scope
+                    ? Icons.graphic_eq_rounded
+                    : Icons.check_rounded;
+    final theme = Theme.of(context);
+
+    return Theme(
+        data: theme.copyWith(
+            colorScheme: theme.colorScheme
+                .copyWith(primary: accent, onPrimary: Colors.white)),
+        child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(28)),
+            child: Column(children: [
+              if (_demo || (!retry && _usesReferences))
                 Row(children: [
-                  Metric('Peak', '${m.peakHz.round()} Hz', accent: C.blue),
-                  Metric(
-                      'Decay',
-                      m.decayMs > 0
-                          ? '${m.decayMs.round()} ms'
-                          : 'Unavailable'),
+                  if (_demo)
+                    const Text('Demo',
+                        style: TextStyle(color: C.muted, fontSize: 12)),
+                  const Spacer(),
+                  if (!retry && _usesReferences)
+                    IconButton(
+                        tooltip: selected == null
+                            ? 'Reference setup'
+                            : 'Reference: $selected',
+                        onPressed: loadingReferences
+                            ? null
+                            : () => _referenceSetup(names, selected),
+                        icon:
+                            Icon(Icons.tune_rounded, color: accent, size: 20)),
                 ]),
-                Text(
-                    'HII ${m.hiiDb.toStringAsFixed(1)} dB · estimated SNR ${m.snrDb.toStringAsFixed(1)} dB\n${m.flags.isEmpty ? 'No automated quality flags. Not a quality certificate.' : m.flags.join(', ')}',
-                    style: const TextStyle(color: C.muted, height: 1.5)),
-                TextButton(
-                    onPressed: () => widget.onTrace(record),
-                    child: const Text('View signal')),
+              const SizedBox(height: 8),
+              Container(
+                  width: 108,
+                  height: 108,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: accent.withValues(alpha: .1)),
+                  child: Icon(statusIcon, color: accent, size: 56)),
+              const SizedBox(height: 20),
+              AnimatedSwitcher(
+                  duration: Duration(
+                      milliseconds:
+                          MediaQuery.disableAnimationsOf(context) ? 0 : 240),
+                  child: Text(title,
+                      key: ValueKey(title),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: accent,
+                          fontSize: 30,
+                          height: 1.12,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -.7))),
+              if (retry) ...[
+                const SizedBox(height: 10),
+                Text(quality == 'Tap again' ? 'No clear ring' : quality,
+                    style: const TextStyle(color: C.muted, fontSize: 15)),
+              ] else ...[
+                if (firmness != null) ...[
+                  const SizedBox(height: 8),
+                  Text(firmness.toStringAsFixed(0),
+                      style: TextStyle(
+                          color: accent,
+                          fontSize: 52,
+                          height: 1.1,
+                          fontWeight: FontWeight.w600)),
+                ],
+                const SizedBox(height: 16),
+                Row(children: [
+                  Metric('Frequency', '${m.peakHz.round()} Hz', accent: accent),
+                  Metric('Ring time', '${m.decayMs.round()} ms',
+                      accent: accent),
+                  if (score != null)
+                    Metric('Deviation', score.toStringAsFixed(1),
+                        accent: accent),
+                  if (widget.intent == SensingIntent.scope)
+                    Metric('SNR', '${m.snrDb.toStringAsFixed(0)} dB',
+                        accent: accent),
+                ]),
+                if (widget.intent == SensingIntent.fruit) ...[
+                  const SizedBox(height: 8),
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(
+                        child: DropdownButtonFormField<String>(
+                            initialValue: fruit,
+                            isExpanded: true,
+                            decoration: const InputDecoration(
+                                labelText: 'Fruit', isDense: true),
+                            items: fruitTypes
+                                .map((type) => DropdownMenuItem(
+                                    value: type, child: Text(type)))
+                                .toList(),
+                            onChanged: (value) {
+                              if (value != null) setState(() => fruit = value);
+                            })),
+                    const SizedBox(width: 12),
+                    Expanded(
+                        child: TextField(
+                            controller: mass,
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            decoration: InputDecoration(
+                                labelText: 'Mass',
+                                suffixText: 'g',
+                                isDense: true,
+                                errorText:
+                                    mass.text.trim().isNotEmpty && !validMass
+                                        ? 'Positive mass required'
+                                        : null),
+                            onChanged: (_) => setState(() {}))),
+                  ]),
+                  if (!validMass && mass.text.trim().isEmpty)
+                    const Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: Text('Add mass for firmness',
+                            style: TextStyle(color: C.muted, fontSize: 12))),
+                ],
+                if (error != null)
+                  Row(children: [
+                    Expanded(
+                        child: Text(error!,
+                            style:
+                                const TextStyle(color: C.red, fontSize: 12))),
+                    TextButton(
+                        onPressed: () => _load(), child: const Text('Reload')),
+                  ]),
+              ],
+              const SizedBox(height: 24),
+              SizedBox(
+                  width: double.infinity,
+                  child: ActionButton(primaryLabel,
+                      icon: primaryIcon,
+                      onPressed: _usesReferences && loadingReferences && !retry
+                          ? null
+                          : primaryAction)),
+              const SizedBox(height: 6),
+              Wrap(alignment: WrapAlignment.center, spacing: 8, children: [
+                if (!tracePrimary)
+                  TextButton(
+                      onPressed: () => widget.onTrace(record),
+                      child: const Text('View signal')),
+                if (!retry) ...[
+                  TextButton(
+                      onPressed: widget.onAgain,
+                      child: const Text('Record again')),
+                  if (!setup && !mapPrimary && !tracePrimary)
+                    TextButton(
+                        onPressed: () => widget.onMap(record),
+                        child: const Text('Mark location')),
+                  if (tracePrimary)
+                    TextButton(
+                        onPressed: () => widget.onSave(record),
+                        child: Text(
+                            widget.saved ? 'Update result' : 'Save result')),
+                ],
               ]),
-          const SizedBox(height: 16),
-          SizedBox(
-              width: double.infinity,
-              child: ActionButton('Mark location',
-                  icon: Icons.location_on_outlined,
-                  onPressed: () => widget.onMap(record))),
-          const SizedBox(height: 8),
-          Row(children: [
-            Expanded(
-                child: TextButton(
-                    onPressed: () => widget.onSave(record),
-                    child: Text(widget.saved ? 'Update' : 'Save'))),
-            Expanded(
-                child: TextButton(
-                    onPressed: widget.onAgain, child: const Text('Retap')))
-          ]),
-        ]));
+            ])));
   }
-}
-
-class _FillPainter extends CustomPainter {
-  const _FillPainter(this.value);
-  final double value;
-  @override
-  void paint(Canvas c, Size s) {
-    final rect = Rect.fromLTWH(0, 4, s.width, s.height - 8);
-    c.save();
-    c.clipRRect(RRect.fromRectAndRadius(rect, const Radius.circular(16)));
-    c.drawRect(rect, Paint()..color = C.pale);
-    c.drawRect(
-        Rect.fromLTRB(
-            0, rect.bottom - rect.height * value, s.width, rect.bottom),
-        Paint()..color = C.blue.withValues(alpha: .2));
-    c.restore();
-    c.drawRRect(
-        RRect.fromRectAndRadius(rect, const Radius.circular(16)),
-        Paint()
-          ..color = C.line
-          ..style = PaintingStyle.stroke);
-  }
-
-  @override
-  bool shouldRepaint(covariant _FillPainter old) => old.value != value;
 }

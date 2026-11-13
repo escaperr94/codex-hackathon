@@ -19,11 +19,6 @@ import 'scope_view.dart';
 typedef MeasureAction = void Function(
     Module module, String? projectId, int? cell);
 
-String _moduleName(Module m) => switch (m) {
-      Module.slab => 'Slab',
-      Module.vessel => 'Vessel',
-      Module.scope => 'Scope'
-    };
 String _date(DateTime d) =>
     '${d.toLocal().year}-${d.toLocal().month.toString().padLeft(2, '0')}-${d.toLocal().day.toString().padLeft(2, '0')} ${d.toLocal().hour.toString().padLeft(2, '0')}:${d.toLocal().minute.toString().padLeft(2, '0')}';
 String _number(double n, [int digits = 1]) =>
@@ -69,7 +64,8 @@ class _RoutePage extends StatelessWidget {
           backgroundColor: C.bg,
           actions: actions),
       body: SafeArea(
-          child: Center(
+          child: Align(
+              alignment: Alignment.topCenter,
               child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 900),
                   child: AppPage(children: children)))));
@@ -101,12 +97,16 @@ class ScopeScreen extends StatefulWidget {
       required this.onModule,
       this.projectId,
       this.cell,
+      this.onIntent,
+      this.initialIntent,
       super.key});
   final ThudStore store;
   final Module initialModule;
   final String? projectId;
   final int? cell;
   final ValueChanged<Module> onModule;
+  final ValueChanged<SensingIntent>? onIntent;
+  final SensingIntent? initialIntent;
   @override
   State<ScopeScreen> createState() => _ScopeScreenState();
 }
@@ -117,6 +117,8 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
   Timer? _limit, _clock;
   late Module _module;
   late SensingIntent _intent;
+  late final PageController _modes;
+  final Map<SensingIntent, String> _profiles = {};
   Measurement? _result;
   String? _error;
   bool _busy = false, _recording = false, _saved = false;
@@ -124,11 +126,13 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _module = widget.initialModule;
-    _intent = switch (_module) {
-      Module.slab => SensingIntent.slab,
-      Module.vessel => SensingIntent.vessel,
-      Module.scope => SensingIntent.scope,
-    };
+    _intent = widget.initialIntent ??
+        switch (_module) {
+          Module.slab => SensingIntent.slab,
+          Module.vessel => SensingIntent.vessel,
+          Module.scope => SensingIntent.scope,
+        };
+    _modes = PageController(initialPage: _intent.index);
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -142,8 +146,20 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
         Module.vessel => SensingIntent.vessel,
         Module.scope => SensingIntent.scope,
       };
+      if (_modes.hasClients) _modes.jumpToPage(_intent.index);
     }
   }
+
+  Future<void> _chooseProfile(SensingIntent intent) async {
+    final selected = await Navigator.of(context).push<String>(sensingRoute<String>(context,
+        ReferenceLibraryScreen(intent: intent, store: widget.store)));
+    if (mounted && selected != null) setState(() => _profiles[intent] = selected);
+  }
+
+  Measurement _profiled(Measurement measurement) => measurement.withIntent(_intent.name).withContext({
+    ...measurement.context,
+    if (_profiles[_intent] case final name?) 'referenceObject': name,
+  });
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -194,6 +210,17 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     _elapsed.stop();
   }
 
+  String _captureError(String error) {
+    final value = error.toLowerCase();
+    if (value.contains('permission')) return 'Enable microphone access';
+    if (value.contains('no usable audio')) return 'No sound · tap again';
+    if (value.contains('too short')) return 'Tap too short';
+    if (value.contains('format') || value.contains('pcm16')) {
+      return 'Reconnect microphone';
+    }
+    return 'Recording failed · try again';
+  }
+
   Future<void> _stop() async {
     if (_busy || !_recording) return;
     _stopTimers();
@@ -204,7 +231,7 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     try {
       final result = await _capture.stop(_module);
       if (mounted) {
-        setState(() => _result = result.withIntent(_intent.name));
+        setState(() => _result = _profiled(result));
         _feedback();
       }
     } catch (e) {
@@ -246,7 +273,7 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
           fillFraction: _module == Module.vessel ? .5 : null);
       if (mounted) {
         setState(() {
-          _result = m.withIntent(_intent.name);
+          _result = _profiled(m);
           _saved = false;
         });
       }
@@ -271,20 +298,35 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _chooseIntent() async {
-    final intent = await Navigator.of(context).push<SensingIntent>(
-        sensingRoute<SensingIntent>(
-            context,
-            ChooseObjectScreen(
-                initial: _intent, haptics: widget.store.haptics)));
-    if (intent == null || !mounted) return;
+  void _selectIntent(int index) {
+    if (_busy || _recording) return;
+    final intent = SensingIntent.values[index];
     setState(() {
       _intent = intent;
       _module = intent.module;
       _result = null;
       _saved = false;
+      _error = null;
     });
+    if (widget.store.haptics) HapticFeedback.selectionClick();
     widget.onModule(_module);
+    widget.onIntent?.call(intent);
+  }
+
+  void _goMode(int index) {
+    if (_busy ||
+        _recording ||
+        index < 0 ||
+        index >= SensingIntent.values.length) {
+      return;
+    }
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _modes.jumpToPage(index);
+    } else {
+      _modes.animateToPage(index,
+          duration: const Duration(milliseconds: 460),
+          curve: Curves.easeOutCubic);
+    }
   }
 
   Future<void> _map(Measurement m) async {
@@ -297,14 +339,16 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                 child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const PageHeading('Place this finding.'),
+                PageHeading(m.intent == 'slab'
+                    ? 'Add to handover'
+                    : 'Add to inspection'),
                 _gap,
                 for (final p in widget.store.projects)
                   ListTile(
                       title: Text(p.name),
                       subtitle: Text('${p.room} · ${p.rows} × ${p.columns}'),
                       onTap: () => Navigator.pop(sheet, p)),
-                ActionButton('Create inspection map', icon: Icons.add_rounded,
+                ActionButton('New dossier', icon: Icons.add_rounded,
                     onPressed: () async {
                   final created = await showDialog<Project>(
                       context: sheet,
@@ -316,8 +360,15 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
               ]),
             )));
     if (!mounted || project == null) return;
-    _push(context,
-        DefectMapScreen(store: widget.store, project: project, measurement: m));
+    final destination = project;
+    _push(
+        context,
+        DefectMapScreen(
+            store: widget.store,
+            project: destination,
+            measurement: m,
+            onReport: () => _push(context,
+                ReportScreen(store: widget.store, project: destination))));
   }
 
   @override
@@ -325,181 +376,281 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _stopTimers();
     _capture.dispose();
+    _modes.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) =>
       LayoutBuilder(builder: (context, bounds) {
-        final m = _result;
-        final reduced = MediaQuery.disableAnimationsOf(context);
-        final stageHeight = (bounds.maxHeight * .45).clamp(240.0, 340.0);
-        return SingleChildScrollView(
-            child: Container(
-          constraints: BoxConstraints(minHeight: bounds.maxHeight),
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-            decoration: BoxDecoration(
-                color: C.blue, borderRadius: BorderRadius.circular(36)),
-            child: Column(children: [
-              Row(children: [
-                Expanded(
-                    child: TextButton.icon(
-                  onPressed: _busy || _recording ? null : _chooseIntent,
-                  style: TextButton.styleFrom(foregroundColor: Colors.white),
-                  icon: const Icon(Icons.swap_horiz_rounded),
-                  label: Text(_intent.title),
-                )),
-                IconButton(
-                    tooltip: 'How to tap',
-                    onPressed: _instructions,
-                    icon: const Icon(Icons.help_outline_rounded,
-                        color: Colors.white70, size: 20)),
-              ]),
-              const SizedBox(height: 32),
-              AnimatedSwitcher(
-                duration:
-                    reduced ? Duration.zero : const Duration(milliseconds: 320),
-                transitionBuilder: _sceneTransition,
-                child: Text(
-                    _busy
-                        ? 'Getting ready'
-                        : _recording
-                            ? 'Listening…'
-                            : m == null
-                                ? 'Tap. Listen.\nKnow.'
-                                : 'Got it.',
-                    key: ValueKey('$_busy-$_recording-${m == null}'),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontWeight: FontWeight.w600,
-                        height: 1.05,
-                        letterSpacing: -1)),
-              ),
-              const SizedBox(height: 12),
-              if (m == null)
-                Text(
-                    _intent == SensingIntent.devices
-                        ? 'Power off. Unplug. Tap casing gently.'
-                        : _recording
-                            ? 'Tap once. Let it ring.'
-                            : 'Touch below to begin',
-                    style:
-                        const TextStyle(color: Colors.white70, fontSize: 16)),
-              SizedBox(
-                  height: m == null ? stageHeight : 96,
-                  width: double.infinity,
-                  child: ListeningStage(
-                    live: _capture.live,
-                    active: _recording,
-                    busy: _busy,
-                    complete: m != null,
-                    onTap: _busy
-                        ? null
-                        : _recording
-                            ? _stop
-                            : _start,
-                  )),
-              AnimatedSwitcher(
-                duration:
-                    reduced ? Duration.zero : const Duration(milliseconds: 360),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
-                transitionBuilder: _sceneTransition,
-                child: m != null
-                    ? SensingResult(
-                        key: ValueKey('result-${m.id}-${_intent.name}'),
-                        measurement: m,
-                        intent: _intent,
-                        store: widget.store,
-                        saved: _saved,
-                        onSave: _save,
-                        onMap: _map,
-                        onTrace: (record) => _push(
-                            context,
-                            MeasurementScreen(
-                                store: widget.store, measurement: record)),
-                        onAgain: () => setState(() {
-                          _result = null;
-                          _saved = false;
-                        }),
-                      )
-                    : SizedBox(
-                        key: ValueKey(_recording ? 'recording' : 'ready'),
-                        height: 64,
-                        child: Center(
-                          child: _recording
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                      Text(
-                                          '${(_elapsed.elapsedMilliseconds / 1000).toStringAsFixed(1)} / 8s',
-                                          style: const TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 14)),
-                                      const SizedBox(width: 16),
-                                      TextButton(
-                                          onPressed: _busy ? null : _cancel,
-                                          style: TextButton.styleFrom(
-                                              foregroundColor: Colors.white),
-                                          child: const Text('Cancel')),
-                                    ])
-                              : Wrap(
-                                  alignment: WrapAlignment.center,
-                                  spacing: 8,
-                                  children: [
-                                      TextButton(
-                                          onPressed:
-                                              _busy ? null : () => _sample(),
-                                          style: TextButton.styleFrom(
-                                              foregroundColor: Colors.white),
-                                          child: const Text('Try a sample')),
-                                      if (_intent == SensingIntent.slab ||
-                                          _intent == SensingIntent.devices)
-                                        TextButton(
-                                            onPressed: _busy
-                                                ? null
-                                                : () => _sample(resonant: true),
-                                            style: TextButton.styleFrom(
-                                                foregroundColor:
-                                                    Colors.white70),
-                                            child:
-                                                const Text('Long-ring sample')),
-                                    ]),
-                        )),
-              ),
-              if (widget.projectId != null)
-                Padding(
-                    padding: const EdgeInsets.only(top: 12),
-                    child: Text('Project · point ${(widget.cell ?? 0) + 1}',
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 12))),
-              if (_error != null)
-                Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20)),
-                      child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(Icons.info_outline_rounded,
-                                color: C.red, size: 20),
-                            const SizedBox(width: 12),
+        return PageView.builder(
+          controller: _modes,
+          physics: _busy || _recording
+              ? const NeverScrollableScrollPhysics()
+              : const PageScrollPhysics(parent: BouncingScrollPhysics()),
+          itemCount: SensingIntent.values.length,
+          onPageChanged: _selectIntent,
+          itemBuilder: (context, index) {
+            final intent = SensingIntent.values[index];
+            final selected = intent == _intent;
+            final m = selected ? _result : null;
+            final reduced = MediaQuery.disableAnimationsOf(context);
+            return Theme(
+              data: Theme.of(context).copyWith(
+                  colorScheme: ColorScheme.fromSeed(seedColor: intent.color)
+                      .copyWith(primary: intent.color)),
+              child: AnimatedBuilder(
+                animation: _modes,
+                builder: (context, child) {
+                  final distance =
+                      _modes.hasClients && _modes.position.haveDimensions
+                          ? ((_modes.page ?? _intent.index.toDouble()) - index)
+                              .clamp(-1.0, 1.0)
+                          : 0.0;
+                  return Transform.scale(
+                      scale: reduced ? 1 : 1 - distance.abs() * .045,
+                      child: Transform.translate(
+                          offset: Offset(reduced ? 0 : distance * 24, 0),
+                          child: child));
+                },
+                child: SingleChildScrollView(
+                  child: Center(
+                      child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxWidth: 540, minHeight: bounds.maxHeight),
+                    child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+                        child: Column(children: [
+                          Row(children: [
+                            IconButton(
+                                tooltip: 'Previous mode',
+                                onPressed: index > 0 && !_busy && !_recording
+                                    ? () => _goMode(index - 1)
+                                    : null,
+                                icon: Icon(Icons.chevron_left_rounded,
+                                    color: index > 0
+                                        ? Colors.white
+                                        : Colors.white30)),
                             Expanded(
-                                child: Text(_error!,
-                                    style: const TextStyle(
-                                        color: C.ink, fontSize: 13)))
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                  Icon(intent.icon,
+                                      color: Colors.white, size: 20),
+                                  const SizedBox(width: 8),
+                                  Text(intent.title,
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700)),
+                                ])),
+                            IconButton(
+                                tooltip: 'Next mode',
+                                onPressed:
+                                    index < SensingIntent.values.length - 1 &&
+                                            !_busy &&
+                                            !_recording
+                                        ? () => _goMode(index + 1)
+                                        : null,
+                                icon: Icon(Icons.chevron_right_rounded,
+                                    color:
+                                        index < SensingIntent.values.length - 1
+                                            ? Colors.white
+                                            : Colors.white30)),
                           ]),
-                    )),
-            ]),
-          ),
-        ));
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                for (final mode in SensingIntent.values)
+                                  Semantics(
+                                      label: '${mode.title} mode',
+                                      selected: mode == intent,
+                                      child: GestureDetector(
+                                          onTap: () => _goMode(mode.index),
+                                          child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 3,
+                                                      vertical: 10),
+                                              child: AnimatedContainer(
+                                                  duration: Duration(
+                                                      milliseconds:
+                                                          reduced ? 0 : 250),
+                                                  width:
+                                                      mode == intent ? 24 : 6,
+                                                  height: 6,
+                                                  decoration: BoxDecoration(
+                                                      color: mode == intent
+                                                          ? Colors.white
+                                                          : Colors.white38,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4)))))),
+                              ]),
+                          if (m == null && (intent == SensingIntent.slab || intent == SensingIntent.materials || intent == SensingIntent.devices))
+                            TextButton.icon(
+                              onPressed: _busy || _recording ? null : () => _chooseProfile(intent),
+                              style: TextButton.styleFrom(foregroundColor: Colors.white),
+                              icon: const Icon(Icons.library_books_outlined, size: 18),
+                              label: Text(_profiles[intent] ?? (intent == SensingIntent.slab ? 'Tile library' : 'Reference library'),
+                                  maxLines: 1, overflow: TextOverflow.ellipsis)),
+                          const SizedBox(height: 12),
+                          AnimatedSwitcher(
+                              duration:
+                                  Duration(milliseconds: reduced ? 0 : 360),
+                              transitionBuilder: _sceneTransition,
+                              child: m != null
+                                  ? SensingResult(
+                                      key: ValueKey(
+                                          'result-${m.id}-${intent.name}'),
+                                      measurement: m,
+                                      intent: intent,
+                                      store: widget.store,
+                                      saved: _saved,
+                                      onSave: _save,
+                                      onMap: _map,
+                                      onTrace: (record) => _push(
+                                          context,
+                                          MeasurementScreen(
+                                              store: widget.store,
+                                              measurement: record)),
+                                      onAgain: () => setState(() {
+                                            _result = null;
+                                            _saved = false;
+                                          }))
+                                  : Column(
+                                      key: ValueKey('capture-${intent.name}'),
+                                      children: [
+                                          Text(
+                                              selected && _busy
+                                                  ? 'Getting ready'
+                                                  : selected && _recording
+                                                      ? 'Listening…'
+                                                      : intent.headline,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 38,
+                                                  fontWeight: FontWeight.w700,
+                                                  height: 1.08,
+                                                  letterSpacing: -1.2)),
+                                          const SizedBox(height: 12),
+                                          Text(intent.useCase,
+                                              style: const TextStyle(
+                                                  color: Colors.white70,
+                                                  fontSize: 15)),
+                                          SizedBox(
+                                              height: (bounds.maxHeight * .4)
+                                                  .clamp(200.0, 300.0),
+                                              width: double.infinity,
+                                              child: ListeningStage(
+                                                  live: _capture.live,
+                                                  active:
+                                                      selected && _recording,
+                                                  busy: selected && _busy,
+                                                  complete: false,
+                                                  subjectIcon: intent.icon,
+                                                  onTap: !selected || _busy
+                                                      ? null
+                                                      : _recording
+                                                          ? _stop
+                                                          : _start)),
+                                          Text(
+                                              selected && _recording
+                                                  ? 'Tap once. Let it ring.'
+                                                  : 'Tap to listen. Tap your object.',
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600)),
+                                          const SizedBox(height: 12),
+                                          if (selected && _recording)
+                                            Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                      '${(_elapsed.elapsedMilliseconds / 1000).toStringAsFixed(1)} / 8s',
+                                                      style: const TextStyle(
+                                                          color:
+                                                              Colors.white70)),
+                                                  TextButton(
+                                                      onPressed: _busy
+                                                          ? null
+                                                          : _cancel,
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                              foregroundColor:
+                                                                  Colors.white),
+                                                      child:
+                                                          const Text('Cancel')),
+                                                ])
+                                          else
+                                            Wrap(
+                                                alignment: WrapAlignment.center,
+                                                children: [
+                                                  TextButton(
+                                                      onPressed: _busy
+                                                          ? null
+                                                          : _sample,
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                              foregroundColor:
+                                                                  Colors.white),
+                                                      child: const Text(
+                                                          'Try demo')),
+                                                  if (intent ==
+                                                          SensingIntent.slab ||
+                                                      intent ==
+                                                          SensingIntent.devices)
+                                                    TextButton(
+                                                        onPressed: _busy
+                                                            ? null
+                                                            : () => _sample(
+                                                                resonant: true),
+                                                        style: TextButton
+                                                            .styleFrom(
+                                                                foregroundColor:
+                                                                    Colors
+                                                                        .white70),
+                                                        child: const Text(
+                                                            'Long-ring demo')),
+                                                  IconButton(
+                                                      tooltip: 'How to tap',
+                                                      onPressed: _instructions,
+                                                      icon: const Icon(
+                                                          Icons
+                                                              .help_outline_rounded,
+                                                          color:
+                                                              Colors.white70)),
+                                                ]),
+                                        ])),
+                          if (widget.projectId != null)
+                            Padding(
+                                padding: const EdgeInsets.only(top: 12),
+                                child: Text(
+                                    'Project · point ${(widget.cell ?? 0) + 1}',
+                                    style: const TextStyle(
+                                        color: Colors.white70))),
+                          if (selected && _error != null)
+                            Padding(
+                                padding: const EdgeInsets.only(top: 16),
+                                child: Panel(
+                                    child: Row(children: [
+                                  Icon(Icons.refresh_rounded,
+                                      color: intent.color),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                      child: Text(_captureError(_error!),
+                                          style: _body)),
+                                ]))),
+                        ])),
+                  )),
+                ),
+              ),
+            );
+          },
+        );
       });
 
   Widget _sceneTransition(Widget child, Animation<double> animation) =>
@@ -646,66 +797,180 @@ class _Evidence extends StatelessWidget {
   const _Evidence({required this.m, this.reference});
   final Measurement m;
   final Measurement? reference;
+
+  static SensingIntent intentOf(Measurement m) {
+    for (final intent in SensingIntent.values) {
+      if (intent.name == m.intent) return intent;
+    }
+    return switch (m.module) {
+      Module.slab => SensingIntent.slab,
+      Module.vessel => SensingIntent.vessel,
+      Module.scope => SensingIntent.scope,
+    };
+  }
+
+  static bool needsRetry(Measurement m) =>
+      m.flags.isNotEmpty ||
+      !m.peakHz.isFinite ||
+      m.peakHz <= 0 ||
+      !m.decayMs.isFinite ||
+      m.decayMs <= 0;
+
+  static String headline(Measurement m) {
+    if (needsRetry(m)) return 'Tap again';
+    if (m.context['resultVersion'] != '2') return 'Signature captured';
+    final result = (m.context['interpretation'] ?? '').toLowerCase();
+    final comparison = m.context['suspicion'];
+    if (comparison == 'Measured difference' || result.contains('different')) {
+      return 'Check this spot';
+    }
+    if (comparison == 'Reference match' ||
+        result.contains('matches reference')) {
+      return 'Reference match';
+    }
+    if (result.contains('refresh reference') ||
+        comparison == 'Reference decay missing') {
+      return 'Refresh reference';
+    }
+    if (comparison == 'Loading references') return 'Loading references';
+    if (comparison == 'Reference needed' ||
+        comparison == 'Reference setup needed') {
+      return 'Reference needed';
+    }
+    if (comparison == 'Outside reference range') return 'Outside range';
+    if (intentOf(m) == SensingIntent.vessel) {
+      final fill = double.tryParse(m.context['estimatedFillPercent'] ?? '');
+      if (fill != null && fill.isFinite) return '${fill.round()}% fill';
+    }
+    if (intentOf(m) == SensingIntent.fruit) {
+      final firmness = double.tryParse(m.context['firmnessIndex'] ?? '');
+      if (firmness != null && firmness.isFinite) return 'Firmness index';
+    }
+    return 'Signature captured';
+  }
+
+  static String displayLabel(Measurement m) {
+    final label = m.label.trim();
+    final isDefault = label.isEmpty ||
+        Module.values
+            .any((module) => label.toLowerCase() == '${module.name} capture');
+    return isDefault ? intentOf(m).title : label;
+  }
+
+  String get _retryReason {
+    if (m.flags.any((flag) => flag.toLowerCase().contains('clipping'))) {
+      return 'Tap a little softer';
+    }
+    if (m.flags.any((flag) => flag.toLowerCase().contains('snr'))) {
+      return 'Find a quieter spot';
+    }
+    if (m.flags.any((flag) => flag.toLowerCase().contains('short'))) {
+      return 'Let the tap ring';
+    }
+    if (!m.decayMs.isFinite || m.decayMs <= 0) {
+      return 'Let the tap ring';
+    }
+    return 'Make one clean tap';
+  }
+
   @override
-  Widget build(BuildContext context) =>
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Icon(
-                _synthetic(m) ? Icons.science_outlined : Icons.mic_none_rounded,
-                color: C.muted,
-                size: 20),
-            const SizedBox(width: 8),
-            Expanded(
-                child: Text(
-                    _synthetic(m)
-                        ? 'Synthetic sample · not an inspection'
-                        : 'Recorded acoustic evidence',
-                    style: _title))
-          ]),
-          _small,
-          Text(m.source, style: _body),
-          if (m.flags.isNotEmpty) ...[
-            _small,
-            Text('Signal review: ${m.flags.join(' · ')}',
-                style:
-                    const TextStyle(color: C.amber, fontSize: 14, height: 1.5))
-          ] else ...[
-            _small,
-            const Text(
-                'No automated signal-quality flags. This is not a material assessment.',
-                style: _body)
-          ]
-        ]),
-        _small,
-        Row(children: [
-          Metric('Peak frequency', '${_number(m.peakHz, 0)} Hz',
-              accent: C.blue),
-          const SizedBox(width: 8),
-          Metric('20 dB decay', '${_number(m.decayMs, 0)} ms')
-        ]),
-        _small,
-        Row(children: [
-          Metric('RMS level', '${_number(m.rmsDb)} dBFS'),
-          const SizedBox(width: 8),
-          Metric('Est. signal/noise', '${_number(m.snrDb)} dB')
-        ]),
-        _small,
-        Row(children: [
-          Metric('Band energy ratio', '${_number(m.hiiDb)} dB'),
-          const SizedBox(width: 8),
-          const Expanded(
-              child: Text(
-                  '450–2200 Hz / 2200–6500 Hz energy. Descriptive only.',
-                  style: _body))
-        ]),
-        if (reference != null && reference!.id != m.id) ...[
-          _small,
-          Text(
-              'Compared with your reference: peak frequency Δ ${_number(m.peakHz - reference!.peakHz, 0)} Hz; decay Δ ${_number(m.decayMs - reference!.decayMs, 0)} ms. Differences are descriptive only, not a defect threshold.',
-              style: _body)
-        ],
-      ]);
+  Widget build(BuildContext context) {
+    final intent = intentOf(m);
+    final retry = needsRetry(m);
+    final readings = <(String, String)>[];
+    void add(String label, double value, String unit, [int digits = 0]) {
+      if (value.isFinite && readings.length < 3) {
+        readings.add((label, '${_number(value, digits)}$unit'));
+      }
+    }
+
+    if (!retry && intent == SensingIntent.fruit) {
+      final firmness = double.tryParse(m.context['firmnessIndex'] ?? '');
+      if (firmness != null && firmness > 0) add('Firmness index', firmness, '');
+    }
+    if (m.peakHz > 0) add('Peak', m.peakHz, ' Hz');
+    if (m.decayMs > 0) add('Ring', m.decayMs, ' ms');
+    add('SNR', m.snrDb, ' dB', 1);
+    add('Level', m.rmsDb, ' dBFS', 1);
+
+    final chips = <String>[
+      if (_synthetic(m)) 'Demo recording',
+      if (reference?.id == m.id) 'Current reference',
+      if (m.context['fruitType'] case final fruit? when fruit.trim().isNotEmpty)
+        fruit,
+      if (double.tryParse(m.context['massGrams'] ?? '') case final mass?
+          when mass.isFinite && mass > 0)
+        '${_number(mass, 0)} g',
+      if (m.context['referenceObject'] case final name?
+          when name.trim().isNotEmpty)
+        'Reference · $name',
+    ];
+    return Panel(
+      color: intent.color.withValues(alpha: .045),
+      child: SizedBox(
+          width: double.infinity,
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                    color: intent.color.withValues(alpha: .1),
+                    shape: BoxShape.circle),
+                child: Icon(retry ? Icons.refresh_rounded : intent.icon,
+                    color: intent.color, size: 44)),
+            _gap,
+            Text(headline(m),
+                style: const TextStyle(
+                    color: C.ink,
+                    fontSize: 32,
+                    height: 1.1,
+                    letterSpacing: -.8,
+                    fontWeight: FontWeight.w600)),
+            if (retry) ...[
+              _small,
+              Text(_retryReason, style: _body),
+            ],
+            if (!retry && readings.isNotEmpty) ...[
+              _gap,
+              Wrap(spacing: 24, runSpacing: 16, children: [
+                for (final reading in readings)
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(reading.$1,
+                            style:
+                                const TextStyle(color: C.muted, fontSize: 12)),
+                        const SizedBox(height: 4),
+                        Text(reading.$2,
+                            style: TextStyle(
+                                color: intent.color,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                fontFeatures: const [
+                                  FontFeature.tabularFigures()
+                                ])),
+                      ]),
+              ]),
+            ],
+            if (chips.isNotEmpty) ...[
+              _gap,
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                for (final chip in chips)
+                  Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                          color: intent.color.withValues(alpha: .07),
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Text(chip,
+                          style:
+                              const TextStyle(color: C.muted, fontSize: 12))),
+              ]),
+            ],
+          ])),
+    );
+  }
 }
 
 class LibraryScreen extends StatelessWidget {
@@ -720,6 +985,10 @@ class LibraryScreen extends StatelessWidget {
             const PageHeading('Field library',
                 subtitle: 'Saved recordings, references and field guidance'),
             _gap,
+            _MenuTile(icon: Icons.library_books_outlined,
+                title: 'Tile & material database', subtitle: 'Choose a profile · import · teach',
+                onTap: () => _push(context, ReferenceLibraryScreen(intent: SensingIntent.slab, store: store))),
+            _small,
             _MenuTile(
                 icon: Icons.history_rounded,
                 title: 'Measurement history',
@@ -826,8 +1095,8 @@ class ProjectsScreen extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: store,
       builder: (_, __) => AppPage(children: [
-            PageHeading('Projects',
-                subtitle: 'Organize recordings by room and grid',
+            PageHeading('Handover dossiers',
+                subtitle: 'Rooms · findings · reports',
                 trailing: IconButton(
                     tooltip: 'Create project',
                     onPressed: () => _create(context),
@@ -835,10 +1104,9 @@ class ProjectsScreen extends StatelessWidget {
                         color: C.muted, size: 20))),
             _gap,
             if (store.projects.isEmpty)
-              _Empty('No projects yet',
-                  'Create a project, define its grid, then attach real recordings to each inspection point.',
+              _Empty('Your first handover', 'Add a room to start.',
                   icon: Icons.grid_view_rounded,
-                  action: ActionButton('Create project',
+                  action: ActionButton('Create dossier',
                       icon: Icons.add_rounded,
                       onPressed: () => _create(context)))
             else ...[
@@ -855,7 +1123,7 @@ class ProjectsScreen extends StatelessWidget {
                 _small
               ],
               _small,
-              ActionButton('New project',
+              ActionButton('New dossier',
                   icon: Icons.add_rounded, onPressed: () => _create(context))
             ]
           ]));
@@ -917,7 +1185,7 @@ class _NewProjectDialogState extends State<_NewProjectDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-          title: const Text('Create a project'),
+          title: const Text('New dossier'),
           content: SizedBox(
               width: 400,
               child: SingleChildScrollView(
@@ -927,7 +1195,7 @@ class _NewProjectDialogState extends State<_NewProjectDialog> {
                         TextFormField(
                             controller: _name,
                             decoration: const InputDecoration(
-                                labelText: 'Project name'),
+                                labelText: 'Apartment or project'),
                             validator: _required,
                             maxLength: 80,
                             textCapitalization: TextCapitalization.sentences),
@@ -1021,7 +1289,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
           const SectionTitle('Inspection grid'),
           _small,
           const Text(
-              'Select a cell to review its latest recording or make a new capture. A recorded cell is not a material assessment.',
+              'Select a cell to review its latest recording or capture another tap.',
               style: _body),
           _small,
           LayoutBuilder(builder: (_, constraints) {
@@ -1115,14 +1383,18 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       : p.notes,
                   style: _body)),
           _gap,
-          ActionButton('Defect map & photos',
+          ActionButton('Findings & photos',
               icon: Icons.location_on_outlined,
               onPressed: () => _push(
                   context,
                   DefectMapScreen(
-                      store: widget.store, project: p, measurement: active))),
+                      store: widget.store,
+                      project: p,
+                      measurement: active,
+                      onReport: () => _push(context,
+                          ReportScreen(store: widget.store, project: p))))),
           _small,
-          ActionButton('Project report',
+          ActionButton('Handover report',
               icon: Icons.description_outlined,
               secondary: true,
               onPressed: () => _push(
@@ -1189,7 +1461,7 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  Module? module;
+  SensingIntent? intent;
   String query = '';
   bool microphoneOnly = false;
   @override
@@ -1198,9 +1470,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
       builder: (_, __) {
         final entries = widget.store.measurements
             .where((m) =>
-                (module == null || module == m.module) &&
+                (intent == null || intent == _Evidence.intentOf(m)) &&
                 (!microphoneOnly || !_synthetic(m)) &&
-                '${m.label} ${m.source} ${_moduleName(m.module)}'
+                '${m.label} ${m.source} ${_Evidence.intentOf(m).title} ${_Evidence.headline(m)}'
                     .toLowerCase()
                     .contains(query.toLowerCase()))
             .toList()
@@ -1219,14 +1491,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
           _small,
           Wrap(spacing: 8, runSpacing: 8, children: [
             ChoiceChip(
-                label: const Text('All modules'),
-                selected: module == null,
-                onSelected: (_) => setState(() => module = null)),
-            for (final m in Module.values)
+                label: const Text('All modes'),
+                selected: intent == null,
+                onSelected: (_) => setState(() => intent = null)),
+            for (final mode in SensingIntent.values)
               ChoiceChip(
-                  label: Text(_moduleName(m)),
-                  selected: module == m,
-                  onSelected: (_) => setState(() => module = m))
+                  avatar: Icon(mode.icon, size: 16, color: mode.color),
+                  label: Text(mode.title),
+                  selectedColor: mode.color.withValues(alpha: .12),
+                  selected: intent == mode,
+                  onSelected: (_) => setState(() => intent = mode))
           ]),
           SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
@@ -1237,7 +1511,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           _small,
           if (entries.isEmpty)
             const _Empty('No matching recordings',
-                'Save a capture from the field scope, or adjust your filters.')
+                'Save a recording, or adjust your filters.')
           else
             for (final m in entries) ...[
               _MeasurementTile(
@@ -1261,28 +1535,41 @@ class _MeasurementTile extends StatelessWidget {
   final VoidCallback onTap;
   final Widget? trailing;
   @override
-  Widget build(BuildContext context) => Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      child: ListTile(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: const BorderSide(color: C.line)),
-          leading: Icon(
-              _synthetic(m) ? Icons.science_outlined : Icons.graphic_eq_rounded,
-              color: C.muted,
-              size: 20),
-          title: Text(m.label,
-              style:
-                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-          subtitle: Text(
-              '${m.intent ?? _moduleName(m.module)} · ${_number(m.peakHz, 0)} Hz\n${_date(m.created)}${_synthetic(m) ? ' · Synthetic' : ''}',
-              style:
-                  const TextStyle(color: C.muted, height: 1.5, fontSize: 12)),
-          isThreeLine: true,
-          trailing: trailing ??
-              const Icon(Icons.chevron_right_rounded, size: 20, color: C.muted),
-          onTap: onTap));
+  Widget build(BuildContext context) {
+    final intent = _Evidence.intentOf(m);
+    final label = _Evidence.displayLabel(m);
+    return Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        child: ListTile(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: C.line)),
+            leading: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                    color: intent.color.withValues(alpha: .08),
+                    borderRadius: BorderRadius.circular(12)),
+                child: Icon(
+                    _Evidence.needsRetry(m)
+                        ? Icons.refresh_rounded
+                        : intent.icon,
+                    color: intent.color,
+                    size: 24)),
+            title: Text(label,
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+            subtitle: Text(
+                '${label == intent.title ? '' : '${intent.title} · '}${_Evidence.headline(m)}\n${_date(m.created)}${_synthetic(m) ? ' · Demo' : ''}',
+                style:
+                    const TextStyle(color: C.muted, height: 1.5, fontSize: 12)),
+            isThreeLine: true,
+            trailing: trailing ??
+                const Icon(Icons.chevron_right_rounded,
+                    size: 20, color: C.muted),
+            onTap: onTap));
+  }
 }
 
 Future<bool> _delete(
@@ -1382,78 +1669,89 @@ class MeasurementScreen extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: store,
       builder: (_, __) {
-        final m = measurement;
-        final saved = store.measurements.any((entry) => entry.id == m.id);
-        return _RoutePage(title: 'Measurement', actions: [
-          if (saved)
-            IconButton(
-                tooltip: 'Delete recording',
-                icon: const Icon(Icons.delete_outline_rounded),
-                onPressed: () async {
-                  if (await _delete(context, store, m) && context.mounted) {
-                    Navigator.pop(context);
-                  }
-                })
-        ], children: [
-          PageHeading(m.label,
-              subtitle:
-                  '${m.intent ?? _moduleName(m.module)} · ${_date(m.created)}'),
-          _gap,
-          if (m.context.isNotEmpty) ...[
-            Text(m.context['interpretation'] ?? 'Saved inspection context',
-                style: _title),
-            _small,
-            for (final entry in m.context.entries)
-              Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text('${entry.key}: ${entry.value}', style: _body)),
+        var m = measurement;
+        var saved = false;
+        for (final entry in store.measurements) {
+          if (entry.id == measurement.id) {
+            m = entry;
+            saved = true;
+            break;
+          }
+        }
+        final intent = _Evidence.intentOf(m);
+        final retry = _Evidence.needsRetry(m);
+        Project? project;
+        for (final entry in store.projects) {
+          if (entry.id == m.projectId) {
+            project = entry;
+            break;
+          }
+        }
+        final linkedProject = project;
+        return Theme(
+          data: Theme.of(context).copyWith(
+              colorScheme: Theme.of(context)
+                  .colorScheme
+                  .copyWith(primary: intent.color, onPrimary: Colors.white)),
+          child: _RoutePage(title: intent.title, actions: [
+            if (saved)
+              IconButton(
+                  tooltip: 'Delete recording',
+                  icon: const Icon(Icons.delete_outline_rounded),
+                  onPressed: () async {
+                    if (await _delete(context, store, m) && context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  })
+          ], children: [
+            PageHeading(_Evidence.displayLabel(m), subtitle: _date(m.created)),
             _gap,
-          ],
-          _Evidence(m: m, reference: store.reference),
-          _gap,
-          SignalExplorer(measurement: m),
-          _gap,
-          Panel(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                const Label('Recording provenance'),
-                _small,
-                SelectableText(
-                    'Source: ${m.source}\nCaptured: ${_date(m.created)}\nModule: ${_moduleName(m.module)}\nSignal flags: ${m.flags.isEmpty ? 'None detected' : m.flags.join(', ')}\nRecord ID: ${m.id}',
-                    style: _body),
-                _small,
-                const Text(
-                    'Decay is an estimated 20 dB amplitude decay duration, not RT60. Signal-to-noise is an algorithmic estimate. Ambient sound, microphone processing and tap strength can change every metric.',
-                    style: _body)
-              ])),
-          _gap,
-          if (!saved)
-            ActionButton('Save measurement',
-                icon: Icons.bookmark_add_outlined,
-                onPressed: () => _perform(context, () async {
-                      if (await _saveMeasurement(context, store, m) &&
-                          context.mounted) {
-                        _notice(context, 'Saved locally.');
-                      }
-                    })),
-          if (saved && _validReference(m)) ...[
+            _Evidence(m: m, reference: store.reference),
             _small,
-            ActionButton(
-                store.reference?.id == m.id
-                    ? 'Current reference'
-                    : 'Use as reference',
-                icon: Icons.tune_rounded,
-                secondary: true,
-                onPressed: store.reference?.id == m.id
-                    ? null
-                    : () => _perform(context, () => store.setReference(m)))
-          ],
-          _gap,
-          const Text(
-              'Acoustic screening only. Vessel interpolation requires matched reference anchors; fruit firmness is a research proxy. Human map marks are inspection notes, not automatic defect or safety certification.',
-              style: _body)
-        ]);
+            SignalExplorer(measurement: m),
+            _gap,
+            if (!retry && m.intent == 'slab' && linkedProject != null) ...[
+              ActionButton('Handover report',
+                  icon: Icons.description_outlined,
+                  onPressed: () => _push(context,
+                      ReportScreen(store: store, project: linkedProject))),
+              _small,
+            ] else if (!retry && intent == SensingIntent.slab) ...[
+              ActionButton('Add to handover',
+                  icon: Icons.playlist_add_rounded,
+                  onPressed: () => _perform(context, () async {
+                        if (await _saveMeasurement(context, store, m) &&
+                            context.mounted) {
+                          _notice(context, 'Saved locally.');
+                        }
+                      })),
+              _small,
+            ],
+            if (!retry && !saved && intent != SensingIntent.slab) ...[
+              ActionButton('Save measurement',
+                  icon: Icons.bookmark_add_outlined,
+                  onPressed: () => _perform(context, () async {
+                        if (await _saveMeasurement(context, store, m) &&
+                            context.mounted) {
+                          _notice(context, 'Saved locally.');
+                        }
+                      })),
+              _small,
+            ],
+            if (saved && _validReference(m)) ...[
+              ActionButton(
+                  store.reference?.id == m.id
+                      ? 'Current reference'
+                      : 'Use as reference',
+                  icon: Icons.tune_rounded,
+                  secondary: true,
+                  onPressed: store.reference?.id == m.id
+                      ? null
+                      : () => _perform(context, () => store.setReference(m))),
+              _small,
+            ],
+          ]),
+        );
       });
 }
 
@@ -1487,7 +1785,7 @@ class _ReportScreenState extends State<ReportScreen> {
           margin: const pw.EdgeInsets.all(40),
           header: (_) => pw.Padding(
               padding: const pw.EdgeInsets.only(bottom: 18),
-              child: pw.Text('THUD / ACOUSTIC FIELD RECORD',
+              child: pw.Text('THUD / HANDOVER INSPECTION',
                   style: pw.TextStyle(
                       fontSize: 10,
                       color: PdfColors.blue800,
@@ -1502,7 +1800,16 @@ class _ReportScreenState extends State<ReportScreen> {
                     style: pw.TextStyle(
                         fontSize: 26, fontWeight: pw.FontWeight.bold)),
                 pw.SizedBox(height: 12),
-                pw.Text('Human-marked inspection map',
+                pw.Text('Room: ${widget.project.room}'),
+                pw.Text(
+                    'Findings: ${marks.length} · Review: ${marks.where((m) => m.status == AnnotationStatus.review).length} · Defects: ${marks.where((m) => m.status == AnnotationStatus.defect).length} · Accepted: ${marks.where((m) => m.status == AnnotationStatus.accepted).length}'),
+                pw.SizedBox(height: 14),
+                ...text.split('\n').map((line) => pw.Padding(
+                    padding: const pw.EdgeInsets.only(bottom: 5),
+                    child: pw.Text(line,
+                        style:
+                            const pw.TextStyle(fontSize: 10, lineSpacing: 3)))),
+                pw.Text('Inspection map & findings',
                     style: pw.TextStyle(
                         fontSize: 16, fontWeight: pw.FontWeight.bold)),
                 pw.SizedBox(height: 10),
@@ -1529,19 +1836,13 @@ class _ReportScreenState extends State<ReportScreen> {
                                 style: const pw.TextStyle(fontSize: 7))),
                     ]),
                 ]),
-                pw.SizedBox(height: 14),
-                ...text.split('\n').map((line) => pw.Padding(
-                    padding: const pw.EdgeInsets.only(bottom: 5),
-                    child: pw.Text(line,
-                        style:
-                            const pw.TextStyle(fontSize: 10, lineSpacing: 3)))),
                 for (final mark in marks.where((a) => a.photoBase64 != null))
                   pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
                         pw.SizedBox(height: 16),
                         pw.Text(
-                            'Photo / ${_cellName(mark.cell, widget.project.columns)} / human ${mark.status.name}',
+                            'Photo / ${_cellName(mark.cell, widget.project.columns)} / ${mark.status.name}',
                             style: const pw.TextStyle(fontSize: 10)),
                         pw.SizedBox(height: 8),
                         pw.Container(
@@ -1566,10 +1867,6 @@ class _ReportScreenState extends State<ReportScreen> {
                         pw.Text(mark.note,
                             style: const pw.TextStyle(fontSize: 10)),
                       ]),
-                pw.SizedBox(height: 16),
-                pw.Text(
-                    'Disclosure: Recorded airborne acoustic evidence only. No material classification, confidence score, structural safety determination or calibrated dB SPL measurement is provided. Synthetic samples, when present, are demonstration data and must not be treated as inspection evidence.',
-                    style: const pw.TextStyle(fontSize: 10))
               ]));
       final bytes = await document.save();
       await Printing.sharePdf(
@@ -1592,94 +1889,123 @@ class _ReportScreenState extends State<ReportScreen> {
         for (final m in all) {
           if (m.cell != null) latest.putIfAbsent(m.cell!, () => m);
         }
+        final marks = widget.store.annotationsForProject(p.id);
+        final review =
+            marks.where((m) => m.status == AnnotationStatus.review).length;
+        final defects =
+            marks.where((m) => m.status == AnnotationStatus.defect).length;
+        final accepted =
+            marks.where((m) => m.status == AnnotationStatus.accepted).length;
         final actual = latest.values.where((m) => !_synthetic(m)).length;
-        return _RoutePage(title: 'Project report', children: [
-          PageHeading(p.name, subtitle: '${p.room} · acoustic field record'),
+        return _RoutePage(title: 'Handover report', children: [
+          PageHeading(p.name, subtitle: p.room),
           _gap,
           Row(children: [
-            Metric('Mic coverage', '$actual / ${p.rows * p.columns}',
-                accent: C.blue),
-            const SizedBox(width: 8),
-            Metric('All recordings', '${all.length}')
+            Metric('Review', '$review', accent: C.amber),
+            Metric('Defects', '$defects', accent: C.red),
+            Metric('Accepted', '$accepted', accent: C.green),
           ]),
           _small,
-          const Text(
-              'Coverage counts cells whose latest recording came from the microphone. It does not indicate material condition or quality.',
-              style: _body),
+          ActionButton(_exporting ? 'Preparing…' : 'Export handover PDF',
+              icon: Icons.ios_share_rounded,
+              onPressed: _exporting ? null : _export),
           _gap,
-          Panel(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                const Label('Field notes'),
-                _small,
-                Text(p.notes.isEmpty ? 'No field notes supplied.' : p.notes,
-                    style: _body)
-              ])),
-          _gap,
-          SectionTitle('Human-marked findings',
+          SectionTitle('Room map',
               trailing: TextButton(
                   onPressed: () => _push(context,
                       DefectMapScreen(store: widget.store, project: p)),
-                  child: const Text('Open defect map'))),
+                  child: const Text('Edit findings'))),
           _small,
-          for (final mark in widget.store.annotationsForProject(p.id)) ...[
-            Text(
-                '${_cellName(mark.cell, p.columns)} · ${mark.status.name} · human annotation',
-                style: _title),
-            Text(
-                '${mark.note}\n${mark.measurementSource ?? "No linked acoustic recording"}',
-                style: _body),
-            if (mark.photoBase64 != null)
-              Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Image.memory(base64Decode(mark.photoBase64!),
-                      height: 160, fit: BoxFit.contain)),
-            if (mark.x != null)
-              Text(
-                  'Photo pin: x=${mark.x!.toStringAsFixed(3)}, y=${mark.y!.toStringAsFixed(3)} (relative image coordinates)',
-                  style: _body),
-            _gap,
-          ],
-          const SectionTitle('Latest evidence by cell'),
+          GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: p.columns,
+                  mainAxisSpacing: 6,
+                  crossAxisSpacing: 6),
+              itemCount: p.rows * p.columns,
+              itemBuilder: (context, i) {
+                final cellMarks = marks.where((m) => m.cell == i);
+                final status =
+                    cellMarks.isEmpty ? null : cellMarks.first.status;
+                final color = switch (status) {
+                  AnnotationStatus.review => C.amber,
+                  AnnotationStatus.defect => C.red,
+                  AnnotationStatus.accepted => C.green,
+                  null => C.muted,
+                };
+                final icon = switch (status) {
+                  AnnotationStatus.review => Icons.search_rounded,
+                  AnnotationStatus.defect => Icons.close_rounded,
+                  AnnotationStatus.accepted => Icons.check_rounded,
+                  null => Icons.crop_square_rounded,
+                };
+                return Semantics(
+                    label:
+                        '${_cellName(i, p.columns)} ${status?.name ?? "Unmarked"}',
+                    child: Container(
+                        decoration: BoxDecoration(
+                            color: color.withValues(alpha: .09),
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(icon, color: color, size: 24),
+                              Text('${i + 1}', style: TextStyle(color: color)),
+                            ])));
+              }),
           _small,
-          for (var i = 0; i < p.rows * p.columns; i++)
-            Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Panel(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                              width: 80,
-                              child: Text(_cellName(i, p.columns),
-                                  style: const TextStyle(
-                                      fontFamily: 'monospace',
-                                      color: C.ink,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500))),
-                          Expanded(
-                              child: Text(
-                                  latest[i] == null
-                                      ? 'Not recorded'
-                                      : '${_number(latest[i]!.peakHz, 0)} Hz · ${_number(latest[i]!.decayMs, 0)} ms\n${latest[i]!.source}\n${_date(latest[i]!.created)}${latest[i]!.flags.isEmpty ? '' : '\nFlags: ${latest[i]!.flags.join(', ')}'}',
-                                  style: _body))
-                        ]))),
-          if (all.any((m) => m.cell == null)) ...[
-            _small,
-            Text(
-                '${all.where((m) => m.cell == null).length} project recording(s) are not assigned to a grid cell.',
-                style: _body)
-          ],
-          _gap,
-          const Text(
-              'Disclosure: This report documents measured airborne sound and user notes. It is not a structural inspection, material classifier or safety certificate. Synthetic recordings are explicitly identified and excluded from microphone coverage. Relative digital levels are not calibrated dB SPL.',
+          Text(
+              '$actual / ${p.rows * p.columns} microphone points · ${all.length} recordings',
               style: _body),
           _gap,
-          ActionButton(_exporting ? 'Preparing PDF…' : 'Export PDF',
-              icon: Icons.ios_share_rounded,
-              onPressed: _exporting ? null : _export)
+          for (final mark in marks) ...[
+            Panel(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  Row(children: [
+                    Icon(
+                        mark.status == AnnotationStatus.accepted
+                            ? Icons.check_circle_outline_rounded
+                            : Icons.location_on_outlined,
+                        color: mark.status == AnnotationStatus.accepted
+                            ? C.green
+                            : C.amber),
+                    const SizedBox(width: 8),
+                    Expanded(
+                        child: Text(
+                            '${_cellName(mark.cell, p.columns)} · ${mark.status.name}',
+                            style: _title)),
+                  ]),
+                  if (mark.note.isNotEmpty) ...[
+                    _small,
+                    Text(mark.note, style: _body)
+                  ],
+                  if (mark.photoBase64 != null) ...[
+                    _small,
+                    Image.memory(base64Decode(mark.photoBase64!),
+                        height: 160, fit: BoxFit.contain)
+                  ],
+                ])),
+            _small,
+          ],
+          if (latest.isNotEmpty)
+            ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                title: const Text('Measured results'),
+                children: [
+                  for (final entry in latest.entries) ...[
+                    Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(_cellName(entry.key, p.columns),
+                            style: _title)),
+                    _Evidence(
+                        m: entry.value, reference: widget.store.reference),
+                    _gap,
+                  ],
+                ]),
+          if (p.notes.isNotEmpty) ...[_gap, Text(p.notes, style: _body)],
         ]);
       });
 }

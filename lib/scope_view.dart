@@ -28,221 +28,130 @@ class _SignalExplorerState extends State<SignalExplorer> {
     final problem = _dataProblem(values, spectrum: spectrum);
     final reducedMotion = MediaQuery.disableAnimationsOf(context) ||
         MediaQuery.accessibleNavigationOf(context);
-    final synthetic = measurement.source.toLowerCase().contains('synthetic');
-    final peak = measurement.peakHz;
-    final hasPeak = peak.isFinite && peak > 0;
-    final decay = measurement.decayMs;
+    final accent = Theme.of(context).colorScheme.primary;
 
     return Panel(
-      padding: const EdgeInsets.all(16),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Expanded(
-            child: Text('Signal explorer',
-                style: TextStyle(
-                    color: C.ink, fontSize: 18, fontWeight: FontWeight.w600)),
-          ),
-          if (synthetic)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-              decoration: BoxDecoration(
-                  color: C.pale, borderRadius: BorderRadius.circular(8)),
-              child: const Text('Synthetic sample',
-                  style: TextStyle(
-                      color: C.muted,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600)),
-            ),
-        ]),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(3),
-          decoration: BoxDecoration(
-              color: C.pale, borderRadius: BorderRadius.circular(14)),
-          child: Row(children: [
-            for (final view in _SignalView.values)
-              Expanded(
-                child: Semantics(
-                  selected: _view == view,
-                  child: TextButton(
-                    onPressed: () => setState(() => _view = view),
-                    style: TextButton.styleFrom(
-                      backgroundColor:
-                          _view == view ? Colors.white : Colors.transparent,
-                      foregroundColor: _view == view ? C.ink : C.muted,
-                      minimumSize: const Size(0, 48),
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(11)),
-                      textStyle: const TextStyle(
-                          fontSize: 12,
-                          letterSpacing: .6,
-                          fontWeight: FontWeight.w600),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ExpansionTile(
+        initiallyExpanded: false,
+        tilePadding: EdgeInsets.zero,
+        childrenPadding: const EdgeInsets.only(bottom: 16),
+        title: const Text('Signal',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        leading: Icon(Icons.graphic_eq_rounded, color: accent, size: 22),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+                color: C.pale, borderRadius: BorderRadius.circular(14)),
+            child: Row(children: [
+              for (final view in _SignalView.values)
+                Expanded(
+                  child: Semantics(
+                    selected: _view == view,
+                    child: TextButton(
+                      onPressed: () => setState(() => _view = view),
+                      style: TextButton.styleFrom(
+                        backgroundColor:
+                            _view == view ? Colors.white : Colors.transparent,
+                        foregroundColor: _view == view ? accent : C.muted,
+                        minimumSize: const Size(0, 48),
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(11)),
+                        textStyle: const TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                      child: Text(
+                          switch (view) {
+                            _SignalView.wave => 'Wave',
+                            _SignalView.spectrum => 'Spectrum',
+                            _SignalView.decay => 'Ring',
+                          },
+                          maxLines: 1),
                     ),
-                    child: Text(view.name.toUpperCase(), maxLines: 1),
                   ),
                 ),
-              ),
-          ]),
-        ),
-        const SizedBox(height: 20),
-        Text(
-          switch (_view) {
-            _SignalView.wave => 'Signed peak waveform',
-            _SignalView.spectrum => 'Frequency spectrum',
-            _SignalView.decay => 'Peak-binned absolute envelope',
-          },
-          style: const TextStyle(
-              color: C.ink, fontSize: 15, fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          spectrum
-              ? 'Digital level · dBFS'
-              : _view == _SignalView.wave
-                  ? 'Signed amplitude · full scale (FS)'
-                  : 'Absolute amplitude · full scale (FS)',
-          style: const TextStyle(color: C.muted, fontSize: 12),
-        ),
-        const SizedBox(height: 10),
-        if (problem != null)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 36),
-            decoration: BoxDecoration(
-                color: C.bg, borderRadius: BorderRadius.circular(14)),
-            child: Column(children: [
-              const Icon(Icons.show_chart_rounded, color: C.muted, size: 28),
-              const SizedBox(height: 12),
-              Text(problem,
-                  textAlign: TextAlign.center,
-                  style:
-                      const TextStyle(color: C.ink, fontSize: 14, height: 1.4)),
-              const SizedBox(height: 6),
-              const Text('Capture another tap to obtain a usable trace.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: C.muted, fontSize: 12, height: 1.4)),
             ]),
-          )
-        else
-          Semantics(
-            label: _chartDescription(measurement, _view),
-            image: true,
-            child: ExcludeSemantics(
-              child: RepaintBoundary(
-                child: TweenAnimationBuilder<double>(
-                  key: ValueKey((measurement, _view)),
-                  tween: Tween(begin: 0, end: 1),
-                  duration: reducedMotion
-                      ? Duration.zero
-                      : const Duration(milliseconds: 460),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, reveal, _) => SizedBox(
-                    height: 244 +
-                        24 *
-                            (MediaQuery.textScalerOf(context).scale(12) / 12 -
-                                1),
-                    width: double.infinity,
-                    child: CustomPaint(
-                      painter: _SignalPainter(
-                        values: values,
-                        view: _view,
-                        peakHz: peak,
-                        reveal: reveal,
-                        textScaler: MediaQuery.textScalerOf(context),
-                        textDirection: Directionality.of(context),
+          ),
+          const SizedBox(height: 16),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Text(
+              spectrum
+                  ? 'Level · dBFS'
+                  : _view == _SignalView.wave
+                      ? 'Amplitude · FS'
+                      : 'Envelope · FS',
+              style: const TextStyle(color: C.muted, fontSize: 12),
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (problem != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 32),
+              decoration: BoxDecoration(
+                  color: C.bg, borderRadius: BorderRadius.circular(14)),
+              child: Column(children: [
+                const Icon(Icons.show_chart_rounded, color: C.muted, size: 28),
+                const SizedBox(height: 12),
+                Text(problem,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: C.muted, fontSize: 14)),
+              ]),
+            )
+          else
+            Semantics(
+              label: _chartDescription(measurement, _view),
+              image: true,
+              child: ExcludeSemantics(
+                child: RepaintBoundary(
+                  child: TweenAnimationBuilder<double>(
+                    key: ValueKey((measurement, _view)),
+                    tween: Tween(begin: 0, end: 1),
+                    duration: reducedMotion
+                        ? Duration.zero
+                        : const Duration(milliseconds: 460),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, reveal, _) => SizedBox(
+                      height: 244 +
+                          24 *
+                              (MediaQuery.textScalerOf(context).scale(12) / 12 -
+                                  1),
+                      width: double.infinity,
+                      child: CustomPaint(
+                        painter: _SignalPainter(
+                          values: values,
+                          view: _view,
+                          peakHz: measurement.peakHz,
+                          reveal: reveal,
+                          accent: accent,
+                          textScaler: MediaQuery.textScalerOf(context),
+                          textDirection: Directionality.of(context),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        const SizedBox(height: 14),
-        if (spectrum) ...[
-          _Reading(
-            label: 'Measured peak',
-            value: hasPeak ? _frequency(peak) : 'Not available',
-          ),
-          if (hasPeak && (peak < 20 || peak > 24000))
-            const Padding(
-              padding: EdgeInsets.only(top: 6),
-              child: Text('Peak is outside the displayed 20 Hz–24 kHz range.',
-                  style: TextStyle(color: C.muted, fontSize: 12, height: 1.4)),
-            ),
         ],
-        if (_view == _SignalView.decay) ...[
-          _Reading(
-            label: 'Observed 20 dB decay',
-            value: decay.isFinite && decay > 0
-                ? '${decay.toStringAsFixed(0)} ms'
-                : 'Not measurable',
-          ),
-        ],
-        ExpansionTile(
-          tilePadding: EdgeInsets.zero,
-          title:
-              const Text('About this signal', style: TextStyle(fontSize: 13)),
-          children: [
-            if (_view == _SignalView.decay) ...[
-              const SizedBox(height: 8),
-              const Text(
-                'This trace is the absolute value of each stored waveform peak, '
-                'not a Schroeder energy-decay curve or RT60. The observed 20 dB '
-                'decay above is a separate analysis result, not fitted to this plot.',
-                style: TextStyle(color: C.muted, fontSize: 12, height: 1.5),
-              ),
-            ],
-            if (!spectrum) ...[
-              if (_view == _SignalView.decay) const SizedBox(height: 8),
-              const Text(
-                'Time is relative to the full capture. Its duration is not stored; '
-                'these bins cannot resolve individual oscillations.',
-                style: TextStyle(color: C.muted, fontSize: 12, height: 1.5),
-              ),
-            ],
-            if (spectrum) ...[
-              const SizedBox(height: 8),
-              const Text(
-                'Stored logarithmic bins: 20 Hz–24 kHz. Normalized levels are '
-                'mapped to −100…0 dBFS, not calibrated sound pressure (SPL). '
-                'The marker uses the measured peak frequency.',
-                style: TextStyle(color: C.muted, fontSize: 12, height: 1.5),
-              ),
-            ],
-            const SizedBox(height: 16),
-            const Divider(height: 1, color: C.line),
-            const SizedBox(height: 12),
-            Text(
-              'Source: ${measurement.source.trim().isEmpty ? "Not recorded" : measurement.source}',
-              style: const TextStyle(color: C.muted, fontSize: 12, height: 1.5),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              spectrum
-                  ? '${values.length} stored frequency bins · no interpolation of missing data'
-                  : '${values.length} stored signed peak-preserving bins · ${_view == _SignalView.decay ? "absolute values displayed" : "original sign retained"}',
-              style: const TextStyle(color: C.muted, fontSize: 12, height: 1.5),
-            ),
-          ],
-        ),
-      ]),
+      ),
     );
   }
 }
 
 String? _dataProblem(List<double> values, {required bool spectrum}) {
   if (values.isEmpty) {
-    return spectrum ? 'No spectrum was saved.' : 'No waveform was saved.';
+    return spectrum ? 'No saved spectrum' : 'No saved waveform';
   }
   if (spectrum ? values.length != 256 : values.length > 256) {
-    return spectrum
-        ? 'The stored spectrum does not contain the expected 256 bins.'
-        : 'The stored waveform has an unsupported bin count.';
+    return 'Trace unavailable';
   }
   for (final value in values) {
     if (!value.isFinite || value < (spectrum ? 0 : -1) || value > 1) {
-      return 'The stored trace contains invalid levels and cannot be plotted.';
+      return 'Trace unavailable';
     }
   }
   return null;
@@ -262,31 +171,7 @@ String _chartDescription(Measurement measurement, _SignalView view) {
   return '${view == _SignalView.wave ? "Signed waveform" : "Absolute peak envelope"}, '
       '${measurement.waveform.length} peak-preserving bins. '
       '${view == _SignalView.wave ? "Minus one to plus one" : "Zero to one"} '
-      'full-scale amplitude. Horizontal axis is 0 to 100 percent of the '
-      'capture, not milliseconds.';
-}
-
-class _Reading extends StatelessWidget {
-  const _Reading({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Wrap(
-        spacing: 12,
-        runSpacing: 4,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Text(label, style: const TextStyle(color: C.muted, fontSize: 12)),
-          Text(value,
-              style: const TextStyle(
-                  color: C.ink,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  fontFeatures: [FontFeature.tabularFigures()])),
-        ],
-      );
+      'full-scale amplitude. Horizontal axis is 0 to 100 percent of the capture.';
 }
 
 class _SignalPainter extends CustomPainter {
@@ -295,6 +180,7 @@ class _SignalPainter extends CustomPainter {
     required this.view,
     required this.peakHz,
     required this.reveal,
+    required this.accent,
     required this.textScaler,
     required this.textDirection,
   });
@@ -303,6 +189,7 @@ class _SignalPainter extends CustomPainter {
   final _SignalView view;
   final double peakHz;
   final double reveal;
+  final Color accent;
   final TextScaler textScaler;
   final TextDirection textDirection;
 
@@ -369,7 +256,7 @@ class _SignalPainter extends CustomPainter {
     }
     _label(
       canvas,
-      spectrum ? 'Frequency · Hz (log)' : 'Relative capture time · %',
+      spectrum ? 'Frequency · Hz' : 'Capture · %',
       Offset(plot.center.dx, size.height),
       horizontal: .5,
       vertical: 1,
@@ -402,7 +289,7 @@ class _SignalPainter extends CustomPainter {
       }
       lastX = x;
       if (values.length == 1) {
-        canvas.drawCircle(Offset(x, y), 2.5, Paint()..color = C.blue);
+        canvas.drawCircle(Offset(x, y), 2.5, Paint()..color = accent);
       }
     }
     if (!signed) {
@@ -410,12 +297,12 @@ class _SignalPainter extends CustomPainter {
         ..lineTo(lastX, plot.bottom)
         ..lineTo(firstX, plot.bottom)
         ..close();
-      canvas.drawPath(fill, Paint()..color = C.blue.withValues(alpha: .07));
+      canvas.drawPath(fill, Paint()..color = accent.withValues(alpha: .07));
     }
     canvas.drawPath(
         trace,
         Paint()
-          ..color = C.blue
+          ..color = accent
           ..strokeWidth = 1.8
           ..strokeJoin = StrokeJoin.round
           ..style = PaintingStyle.stroke);
@@ -429,7 +316,7 @@ class _SignalPainter extends CustomPainter {
             Offset(x, plot.top),
             Offset(x, plot.bottom),
             Paint()
-              ..color = C.blue.withValues(alpha: .5)
+              ..color = accent.withValues(alpha: .5)
               ..strokeWidth = 1);
         _label(canvas, 'Peak ${_frequency(peakHz)}',
             Offset(x.clamp(plot.left, plot.right).toDouble(), plot.top - 8),
@@ -439,7 +326,7 @@ class _SignalPainter extends CustomPainter {
                     ? 1
                     : .5,
             vertical: 1,
-            color: C.blue);
+            color: accent);
       }
     }
   }
@@ -470,6 +357,7 @@ class _SignalPainter extends CustomPainter {
       oldDelegate.view != view ||
       oldDelegate.peakHz != peakHz ||
       oldDelegate.reveal != reveal ||
+      oldDelegate.accent != accent ||
       oldDelegate.textScaler != textScaler ||
       oldDelegate.textDirection != textDirection;
 }
