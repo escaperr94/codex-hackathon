@@ -4,6 +4,10 @@
 <dict>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>THUD records short taps to show acoustic evidence for your inspection.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>THUD uses your camera to attach a local photo to a human inspection annotation.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>THUD lets you choose a photo for a local inspection annotation and place a location pin on it.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

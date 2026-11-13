@@ -24,7 +24,9 @@ class Measurement {
       required this.spectrum,
       required this.flags,
       this.projectId,
-      this.cell});
+      this.cell,
+      this.intent,
+      this.context = const {}});
 
   final String id, label, source;
   final DateTime created;
@@ -34,6 +36,13 @@ class Measurement {
   final List<String> flags;
   final String? projectId;
   final int? cell;
+  final String? intent;
+  final Map<String, String> context;
+
+  Measurement withIntent(String value) =>
+      _assigned(projectId, cell, intent: value);
+  Measurement withContext(Map<String, String> value) =>
+      _assigned(projectId, cell, context: Map.unmodifiable(value));
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -51,6 +60,8 @@ class Measurement {
         'flags': flags,
         'projectId': projectId,
         'cell': cell,
+        'intent': intent,
+        'context': context,
       };
 
   factory Measurement.fromJson(Map<String, dynamic> value) => Measurement(
@@ -72,9 +83,14 @@ class Measurement {
             List<String>.unmodifiable((value['flags'] as List).cast<String>()),
         projectId: value['projectId'] as String?,
         cell: value['cell'] as int?,
+        intent: value['intent'] as String?,
+        context: Map<String, String>.unmodifiable(
+            (value['context'] as Map?)?.cast<String, String>() ?? const {}),
       );
 
-  Measurement _assigned(String? projectId, int? cell) => Measurement(
+  Measurement _assigned(String? projectId, int? cell,
+          {String? intent, Map<String, String>? context}) =>
+      Measurement(
         id: id,
         label: label,
         source: source,
@@ -90,7 +106,75 @@ class Measurement {
         flags: flags,
         projectId: projectId,
         cell: cell,
+        intent: intent ?? this.intent,
+        context: context ?? this.context,
       );
+}
+
+enum AnnotationStatus { review, defect, accepted }
+
+/// A person's observation, never an automated acoustic diagnosis.
+class DefectAnnotation {
+  const DefectAnnotation(
+      {required this.id,
+      required this.projectId,
+      required this.cell,
+      required this.status,
+      this.note = '',
+      this.measurementId,
+      this.measurementSource,
+      this.photoBase64,
+      this.x,
+      this.y});
+
+  static const maxPhotoBytes = 2 * 1024 * 1024;
+  final String id, projectId, note;
+  final int cell;
+  final AnnotationStatus status;
+  final String? measurementId, measurementSource, photoBase64;
+  final double? x, y;
+  String get provenance => 'Human annotation';
+
+  DefectAnnotation _linked(
+          String id, String? measurementId, String? measurementSource) =>
+      DefectAnnotation(
+          id: id,
+          projectId: projectId,
+          cell: cell,
+          status: status,
+          note: note,
+          measurementId: measurementId,
+          measurementSource: measurementSource,
+          photoBase64: photoBase64,
+          x: x,
+          y: y);
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'projectId': projectId,
+        'cell': cell,
+        'status': status.name,
+        'note': note,
+        'measurementId': measurementId,
+        'measurementSource': measurementSource,
+        'photoBase64': photoBase64,
+        'x': x,
+        'y': y,
+        'provenance': provenance,
+      };
+
+  factory DefectAnnotation.fromJson(Map<String, dynamic> value) =>
+      DefectAnnotation(
+          id: value['id'] as String,
+          projectId: value['projectId'] as String,
+          cell: value['cell'] as int,
+          status: AnnotationStatus.values.byName(value['status'] as String),
+          note: value['note'] as String? ?? '',
+          measurementId: value['measurementId'] as String?,
+          measurementSource: value['measurementSource'] as String?,
+          photoBase64: value['photoBase64'] as String?,
+          x: (value['x'] as num?)?.toDouble(),
+          y: (value['y'] as num?)?.toDouble());
 }
 
 class Project {
@@ -127,6 +211,7 @@ class ThudStore extends ChangeNotifier {
   static const _key = 'thud.store.v1';
   List<Project> projects = [];
   List<Measurement> measurements = [];
+  List<DefectAnnotation> annotations = [];
   bool haptics = true, sounds = false;
   Measurement? reference;
   SharedPreferences? _prefs;
@@ -155,8 +240,13 @@ class ThudStore extends ChangeNotifier {
             ? null
             : Measurement.fromJson(
                 Map<String, dynamic>.from(data['reference'] as Map));
+        final savedAnnotations = (data['annotations'] as List? ?? const [])
+            .map((e) =>
+                DefectAnnotation.fromJson(Map<String, dynamic>.from(e as Map)))
+            .toList();
         projects = savedProjects;
         measurements = savedMeasurements;
+        annotations = savedAnnotations;
         reference = savedReference;
         haptics = data['haptics'] as bool? ?? true;
         sounds = data['sounds'] as bool? ?? false;
@@ -175,6 +265,7 @@ class ThudStore extends ChangeNotifier {
       if (_disposed) throw Exception('The project store is closed.');
       final oldProjects = List<Project>.of(projects);
       final oldMeasurements = List<Measurement>.of(measurements);
+      final oldAnnotations = List<DefectAnnotation>.of(annotations);
       final oldNotes = {for (final p in projects) p.id: p.notes};
       final oldReference = reference;
       final oldHaptics = haptics, oldSounds = sounds;
@@ -185,6 +276,7 @@ class ThudStore extends ChangeNotifier {
             jsonEncode({
               'projects': projects.map((p) => p.toJson()).toList(),
               'measurements': measurements.map((m) => m.toJson()).toList(),
+              'annotations': annotations.map((a) => a.toJson()).toList(),
               'reference': reference?.toJson(),
               'haptics': haptics,
               'sounds': sounds,
@@ -195,6 +287,7 @@ class ThudStore extends ChangeNotifier {
       } catch (error) {
         projects = oldProjects;
         measurements = oldMeasurements;
+        annotations = oldAnnotations;
         for (final p in projects) {
           p.notes = oldNotes[p.id]!;
         }
@@ -252,12 +345,118 @@ class ThudStore extends ChangeNotifier {
         } else if (targetCell != null) {
           throw Exception('A grid cell requires a project.');
         }
-        measurements.removeWhere((m) => m.id == value.id);
-        measurements.insert(0, value._assigned(target, targetCell));
+        _putMeasurement(value._assigned(target, targetCell));
+      });
+
+  void _putMeasurement(Measurement value) {
+    // Moving a record cannot silently move a person's separate observation.
+    annotations = annotations
+        .map((a) => a.measurementId == value.id &&
+                (a.projectId != value.projectId || a.cell != value.cell)
+            ? a._linked(a.id, null, a.measurementSource)
+            : a)
+        .toList();
+    measurements.removeWhere((m) => m.id == value.id);
+    measurements.insert(0, value);
+  }
+
+  List<DefectAnnotation> annotationsForProject(String id) =>
+      annotations.where((a) => a.projectId == id).toList(growable: false);
+
+  /// One storage transaction for a human mark and its optional captured record.
+  Future<DefectAnnotation> upsertAnnotation(DefectAnnotation value,
+          {Measurement? measurement}) =>
+      _change(() {
+        final projectsAtId = projects.where((p) => p.id == value.projectId);
+        if (projectsAtId.isEmpty) {
+          throw Exception('Select an existing project.');
+        }
+        final project = projectsAtId.first;
+        if (value.cell < 0 || value.cell >= project.rows * project.columns) {
+          throw Exception('Choose a cell inside this project.');
+        }
+        if (value.note.length > 10000) {
+          throw Exception('Keep the annotation note under 10,000 characters.');
+        }
+        final previous = annotations.where((a) => a.id == value.id).firstOrNull;
+        if (previous != null && previous.projectId != value.projectId) {
+          throw Exception('An annotation cannot move between projects.');
+        }
+        final photo = value.photoBase64;
+        if (photo != null) {
+          if (photo.length > ((DefectAnnotation.maxPhotoBytes + 2) ~/ 3) * 4) {
+            throw Exception('Photo is too large. Choose an image below 2 MB.');
+          }
+          final bytes = base64Decode(photo);
+          final jpeg = bytes.length >= 3 &&
+              bytes[0] == 255 &&
+              bytes[1] == 216 &&
+              bytes[2] == 255;
+          final png = bytes.length >= 8 &&
+              bytes[0] == 137 &&
+              bytes[1] == 80 &&
+              bytes[2] == 78 &&
+              bytes[3] == 71 &&
+              bytes[4] == 13 &&
+              bytes[5] == 10 &&
+              bytes[6] == 26 &&
+              bytes[7] == 10;
+          final webp = bytes.length >= 12 &&
+              ascii.decode(bytes.sublist(0, 4), allowInvalid: true) == 'RIFF' &&
+              ascii.decode(bytes.sublist(8, 12), allowInvalid: true) == 'WEBP';
+          if (bytes.isEmpty ||
+              bytes.length > DefectAnnotation.maxPhotoBytes ||
+              !(jpeg || png || webp)) {
+            throw Exception('Use a JPEG, PNG or WebP photo below 2 MB.');
+          }
+        }
+        if ((value.x == null) != (value.y == null) ||
+            (value.x != null &&
+                (photo == null ||
+                    !value.x!.isFinite ||
+                    !value.y!.isFinite ||
+                    value.x! < 0 ||
+                    value.x! > 1 ||
+                    value.y! < 0 ||
+                    value.y! > 1))) {
+          throw Exception(
+              'A photo pin needs an image and coordinates from 0 to 1.');
+        }
+        if (measurement != null &&
+            value.measurementId != null &&
+            value.measurementId != measurement.id) {
+          throw Exception(
+              'The linked measurement does not match this capture.');
+        }
+        final linkedId = measurement?.id ?? value.measurementId;
+        final linked = measurement ??
+            measurements.where((m) => m.id == linkedId).firstOrNull;
+        if (linkedId != null && linked == null) {
+          throw Exception('This measurement is no longer available.');
+        }
+        if (measurement == null &&
+            linked != null &&
+            (linked.projectId != value.projectId ||
+                linked.cell != value.cell)) {
+          throw Exception('Choose a measurement saved in this grid cell.');
+        }
+        if (measurement != null) {
+          _putMeasurement(measurement._assigned(value.projectId, value.cell));
+        }
+        final saved = value._linked(value.id.isEmpty ? _id() : value.id,
+            linkedId, linked?.source ?? previous?.measurementSource);
+        annotations.removeWhere((a) => a.id == saved.id);
+        annotations.insert(0, saved);
+        return saved;
       });
 
   Future<void> deleteMeasurement(String id) => _change(() {
         measurements.removeWhere((m) => m.id == id);
+        annotations = annotations
+            .map((a) => a.measurementId == id
+                ? a._linked(a.id, null, a.measurementSource)
+                : a)
+            .toList();
         if (reference?.id == id) reference = null;
       });
 
@@ -281,6 +480,10 @@ class ThudStore extends ChangeNotifier {
     for (final m in records) {
       out.writeln('${m.label} · ${m.created.toIso8601String()}');
       out.writeln('Source: ${m.source}');
+      if (m.intent != null) out.writeln('Intent: ${m.intent}');
+      for (final entry in m.context.entries) {
+        out.writeln('Context · ${entry.key}: ${entry.value}');
+      }
       out.writeln(
           'Module: ${m.module.name} · Cell: ${m.cell == null ? "unassigned" : m.cell! + 1}');
       out.writeln(
@@ -291,6 +494,25 @@ class ThudStore extends ChangeNotifier {
           'RMS: ${m.rmsDb.toStringAsFixed(1)} dBFS · estimated SNR: ${m.snrDb.toStringAsFixed(1)} dB');
       out.writeln(
           'Quality: ${m.flags.isEmpty ? "No automatic flags" : m.flags.join(", ")}\n');
+    }
+    out.writeln('\nHuman annotations (not automatic diagnoses)');
+    final marks = annotationsForProject(p.id);
+    if (marks.isEmpty) out.writeln('No human annotations.');
+    for (final a in marks) {
+      out.writeln('${a.provenance} · Cell ${a.cell + 1} · ${a.status.name}');
+      out.writeln('Note: ${a.note.isEmpty ? "No note." : a.note}');
+      if (a.measurementSource != null) {
+        out.writeln('Linked source: ${a.measurementSource} '
+            '(${a.measurementId ?? "record deleted or moved; source retained"})');
+        if (a.measurementSource!.toLowerCase().contains('synthetic')) {
+          out.writeln(
+              'Synthetic link: demonstration only, not a field observation.');
+        }
+      }
+      if (a.photoBase64 != null) {
+        out.writeln(
+            'Local photo attached${a.x == null ? "" : "; pin x=${a.x!.toStringAsFixed(4)}, y=${a.y!.toStringAsFixed(4)} (normalized image coordinates)"}.');
+      }
     }
     out.writeln(
         'Method: mono PCM at 48 kHz; 4096-point Hann-window FFT around the strongest impulse. HII = 10 log10(E450–2200 Hz / E2200–6500 Hz). Decay is the observed 20 dB amplitude reduction, not an RT60 extrapolation. SNR uses the quietest fifth of 10 ms windows as estimated background. Levels are digital dBFS, not calibrated sound pressure.');
@@ -669,20 +891,38 @@ class CaptureService {
   }
 
   /// Explicit demo source, never an inferred material or defect prediction.
-  Future<Measurement> sample(Module module, {bool resonant = false}) =>
+  Future<Measurement> sample(Module module,
+          {bool resonant = false, double? fillFraction}) =>
       _serial(() async {
         if (_closing) throw Exception('The microphone service is closed.');
+        if (fillFraction != null &&
+            (module != Module.vessel ||
+                !fillFraction.isFinite ||
+                fillFraction < 0 ||
+                fillFraction > 1)) {
+          throw Exception(
+              'Known fill must be a finite fraction from 0 to 1, for vessel samples only.');
+        }
         if (_hasTake) {
           throw Exception(
               'Stop or cancel microphone capture before opening a sample.');
         }
         final pcm = Float64List(_sampleRate * 2);
-        final random =
-            math.Random(715 + module.index * 31 + (resonant ? 1 : 0));
-        final base = module == Module.vessel
-            ? (resonant ? 690.0 : 1030.0)
-            : (resonant ? 330.0 : 840.0);
-        final tau = resonant ? .19 : .055;
+        final random = math.Random(715 +
+            module.index * 31 +
+            (fillFraction == null
+                ? (resonant ? 1 : 0)
+                : (fillFraction * 1000000).round()));
+        final base = fillFraction != null
+            ? 1030 / math.sqrt(1 + 1.2 * math.pow(fillFraction, 1.15))
+            : module == Module.vessel
+                ? (resonant ? 690.0 : 1030.0)
+                : (resonant ? 330.0 : 840.0);
+        final tau = fillFraction != null
+            ? .055 + .135 * fillFraction
+            : resonant
+                ? .19
+                : .055;
         for (var i = 0; i < pcm.length; i++) {
           final t = i / _sampleRate;
           var value = (random.nextDouble() * 2 - 1) * .0008;
@@ -703,8 +943,9 @@ class CaptureService {
           pcm[i] = (value.clamp(-1.0, .999969) * 32768).round() / 32768;
         }
         return analyzePcm(pcm, module,
-            source:
-                'Synthetic · deterministic ${module.name} ${resonant ? "long" : "short"}-decay PCM16 sample');
+            source: fillFraction == null
+                ? 'Synthetic · deterministic ${module.name} ${resonant ? "long" : "short"}-decay PCM16 sample'
+                : 'Synthetic · known fill ${(fillFraction * 100).toStringAsFixed(1)}% · deterministic vessel PCM16 sample');
       });
 
   Future<void> cancel() {

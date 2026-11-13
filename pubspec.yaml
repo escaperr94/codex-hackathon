@@ -14,10 +14,21 @@ dependencies:
   pdf: ^3.13.1
   printing: ^5.15.1
   record: ^7.2.0
+  image_picker: ^1.1.2
   shared_preferences: ^2.5.6
 
   material_ui: any
+  cupertino_ui: ^1.1.6
 flutter:
   uses-material-design: true
+  shaders:
+    - shaders/acoustic_field.frag
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Nunito-SemiBold.ttf
+          weight: 600
 dev_dependencies:
   flutter_lints: ^6.0.0

@@ -1,31 +1,34 @@
 import 'package:material_ui/material_ui.dart';
 
 abstract final class C {
-  static const bg = Color(0xFFF6F7F9);
-  static const ink = Color(0xFF182028);
-  static const muted = Color(0xFF657181);
-  static const line = Color(0xFFE2E6ED);
-  static const blue = Color(0xFF2454E6);
-  static const pale = Color(0xFFEBF0FF);
+  static const bg = Color(0xFFF7F7F2);
+  static const ink = Color(0xFF20211F);
+  static const muted = Color(0xFF646760);
+  static const line = Color(0xFFE5E6DF);
+  static const blue = Color(0xFF4265E8);
+  static const pale = Color(0xFFF0F1EC);
   static const green = Color(0xFF207660);
   static const amber = Color(0xFF99651C);
   static const red = Color(0xFFAD4B4B);
-  static const black = Color(0xFF0D151C);
+  static const black = Color(0xFF151A20);
 }
 
 class Label extends StatelessWidget {
-  const Label(this.text, {super.key, this.color = C.muted, this.fontSize = 10});
+  const Label(this.text, {super.key, this.color = C.muted, this.fontSize = 12});
   final String text;
   final Color color;
   final double fontSize;
   @override
-  Widget build(BuildContext context) => Text(text.toUpperCase(),
-      style: TextStyle(
-          color: color,
-          fontFamily: 'monospace',
-          fontSize: fontSize,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.2));
+  Widget build(BuildContext context) {
+    final value = text == text.toUpperCase() && text.length > 2
+        ? '${text[0]}${text.substring(1).toLowerCase()}'
+        : text;
+    return Text(value,
+        style: TextStyle(
+            color: color,
+            fontSize: fontSize < 12 ? 12 : fontSize,
+            fontWeight: FontWeight.w500));
+  }
 }
 
 class PageHeading extends StatelessWidget {
@@ -42,18 +45,18 @@ class PageHeading extends StatelessWidget {
           Text(title,
               style: const TextStyle(
                   color: C.ink,
-                  fontSize: 31,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -1.4,
-                  height: 1.02)),
+                  fontSize: 34,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -.6,
+                  height: 1.1)),
           if (subtitle != null) ...[
             const SizedBox(height: 8),
             Text(subtitle!,
                 style:
-                    const TextStyle(color: C.muted, fontSize: 14, height: 1.35))
-          ]
+                    const TextStyle(color: C.muted, fontSize: 14, height: 1.45))
+          ],
         ])),
-        if (trailing != null) trailing!
+        if (trailing != null) trailing!,
       ]);
 }
 
@@ -72,11 +75,11 @@ class Panel extends StatelessWidget {
       decoration: BoxDecoration(
           color: color,
           border: Border.all(color: C.line),
-          borderRadius: BorderRadius.circular(22)),
+          borderRadius: BorderRadius.circular(24)),
       child: child);
 }
 
-class ActionButton extends StatelessWidget {
+class ActionButton extends StatefulWidget {
   const ActionButton(this.label,
       {required this.onPressed,
       super.key,
@@ -87,25 +90,47 @@ class ActionButton extends StatelessWidget {
   final IconData icon;
   final bool secondary;
   @override
-  Widget build(BuildContext context) => FilledButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 18),
-      label: Text(label),
-      style: FilledButton.styleFrom(
-          backgroundColor: secondary ? C.pale : C.blue,
-          foregroundColor: secondary ? C.blue : Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          textStyle:
-              const TextStyle(fontSize: 13, fontWeight: FontWeight.w800)));
+  State<ActionButton> createState() => _ActionButtonState();
+}
+
+class _ActionButtonState extends State<ActionButton> {
+  bool pressed = false;
+  @override
+  Widget build(BuildContext context) => Listener(
+        onPointerDown: (_) {
+          if (widget.onPressed != null) setState(() => pressed = true);
+        },
+        onPointerUp: (_) => setState(() => pressed = false),
+        onPointerCancel: (_) => setState(() => pressed = false),
+        child: AnimatedScale(
+          scale: pressed ? .97 : 1,
+          duration: Duration(
+              milliseconds: MediaQuery.disableAnimationsOf(context) ? 0 : 130),
+          curve: Curves.easeOutCubic,
+          child: FilledButton.icon(
+            onPressed: widget.onPressed,
+            icon: Icon(widget.icon, size: 18),
+            label: Text(widget.label),
+            style: FilledButton.styleFrom(
+                backgroundColor: widget.secondary ? C.pale : C.blue,
+                foregroundColor: widget.secondary ? C.ink : Colors.white,
+                minimumSize: const Size(48, 52),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(26)),
+                textStyle:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          ),
+        ),
+      );
 }
 
 class AppPage extends StatelessWidget {
   const AppPage(
       {required this.children,
       super.key,
-      this.padding = const EdgeInsets.fromLTRB(22, 14, 22, 20)});
+      this.padding = const EdgeInsets.fromLTRB(24, 16, 24, 24)});
   final List<Widget> children;
   final EdgeInsets padding;
   @override
@@ -122,8 +147,10 @@ class SectionTitle extends StatelessWidget {
   final Widget? trailing;
   @override
   Widget build(BuildContext context) => Row(children: [
-        Label(title),
-        const Spacer(),
+        Expanded(
+            child: Text(title,
+                style: const TextStyle(
+                    color: C.ink, fontSize: 16, fontWeight: FontWeight.w500))),
         if (trailing != null) trailing!
       ]);
 }
@@ -135,27 +162,23 @@ class Metric extends StatelessWidget {
   final Color accent;
   @override
   Widget build(BuildContext context) => Expanded(
-      child: Container(
-          padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: C.line),
-              borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Label(label, fontSize: 8),
+            Label(label),
             const SizedBox(height: 8),
             Text(value,
                 style: TextStyle(
                     color: accent,
-                    fontFamily: 'monospace',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800))
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500,
+                    fontFeatures: const [FontFeature.tabularFigures()])),
           ])));
 }
 
 class StatusDot extends StatelessWidget {
-  const StatusDot({super.key, this.color = C.green, this.size = 7});
+  const StatusDot({super.key, this.color = C.green, this.size = 8});
   final Color color;
   final double size;
   @override
@@ -173,6 +196,6 @@ class MiniAction extends StatelessWidget {
   Widget build(BuildContext context) => IconButton(
       onPressed: onPressed,
       icon: Icon(icon, size: 20),
-      color: C.ink,
+      color: C.muted,
       tooltip: 'Action');
 }

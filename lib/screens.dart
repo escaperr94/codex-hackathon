@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
@@ -9,6 +10,11 @@ import 'package:printing/printing.dart';
 
 import 'design.dart';
 import 'store.dart';
+import 'listening_stage.dart';
+import 'sensing_flow.dart';
+import 'sensing_result.dart';
+import 'defect_map.dart';
+import 'scope_view.dart';
 
 typedef MeasureAction = void Function(
     Module module, String? projectId, int? cell);
@@ -32,7 +38,7 @@ bool _validReference(Measurement m) =>
     m.peakHz > 0 &&
     m.waveform.isNotEmpty;
 void _push(BuildContext context, Widget page) =>
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+    Navigator.of(context).push(sensingRoute<void>(context, page));
 void _notice(BuildContext context, Object error) =>
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(error.toString().replaceFirst('Exception: ', ''))));
@@ -46,13 +52,10 @@ Future<void> _perform(
 }
 
 const _gap = SizedBox(height: 20);
-const _small = SizedBox(height: 10);
-const _body = TextStyle(color: C.muted, height: 1.5, fontSize: 13);
-const _title = TextStyle(
-    color: C.ink,
-    fontWeight: FontWeight.w800,
-    fontSize: 18,
-    letterSpacing: -.4);
+const _small = SizedBox(height: 12);
+const _body = TextStyle(color: C.muted, height: 1.5, fontSize: 14);
+const _title =
+    TextStyle(color: C.ink, fontWeight: FontWeight.w500, fontSize: 18);
 
 class _RoutePage extends StatelessWidget {
   const _RoutePage({required this.title, required this.children, this.actions});
@@ -82,7 +85,7 @@ class _Empty extends StatelessWidget {
   Widget build(BuildContext context) => Panel(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Icon(icon, size: 32, color: C.blue),
+        Icon(icon, size: 20, color: C.muted),
         _gap,
         Text(title, style: _title),
         _small,
@@ -113,6 +116,7 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
   final Stopwatch _elapsed = Stopwatch();
   Timer? _limit, _clock;
   late Module _module;
+  late SensingIntent _intent;
   Measurement? _result;
   String? _error;
   bool _busy = false, _recording = false, _saved = false;
@@ -120,14 +124,24 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _module = widget.initialModule;
+    _intent = switch (_module) {
+      Module.slab => SensingIntent.slab,
+      Module.vessel => SensingIntent.vessel,
+      Module.scope => SensingIntent.scope,
+    };
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void didUpdateWidget(covariant ScopeScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!_recording && oldWidget.initialModule != widget.initialModule) {
+    if (!_recording && _module != widget.initialModule) {
       _module = widget.initialModule;
+      _intent = switch (_module) {
+        Module.slab => SensingIntent.slab,
+        Module.vessel => SensingIntent.vessel,
+        Module.scope => SensingIntent.scope,
+      };
     }
   }
 
@@ -147,6 +161,7 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
       _busy = true;
       _error = null;
     });
+    if (widget.store.haptics) HapticFeedback.selectionClick();
     try {
       await _capture.start();
       if (!mounted) {
@@ -160,7 +175,6 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
         _result = null;
         _saved = false;
       });
-      _feedback();
       _limit = Timer(const Duration(seconds: 8), _stop);
       _clock = Timer.periodic(const Duration(milliseconds: 100), (_) {
         if (mounted) setState(() {});
@@ -190,7 +204,7 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     try {
       final result = await _capture.stop(_module);
       if (mounted) {
-        setState(() => _result = result);
+        setState(() => _result = result.withIntent(_intent.name));
         _feedback();
       }
     } catch (e) {
@@ -204,6 +218,10 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
 
   Future<void> _cancel() async {
     _stopTimers();
+    if (!mounted) {
+      await _capture.cancel();
+      return;
+    }
     setState(() {
       _busy = true;
       _recording = false;
@@ -217,17 +235,18 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _sample() async {
+  Future<void> _sample({bool resonant = false}) async {
     setState(() {
       _busy = true;
       _error = null;
     });
     try {
-      final m =
-          await _capture.sample(_module, resonant: _module == Module.vessel);
+      final m = await _capture.sample(_module,
+          resonant: resonant || _module == Module.vessel,
+          fillFraction: _module == Module.vessel ? .5 : null);
       if (mounted) {
         setState(() {
-          _result = m;
+          _result = m.withIntent(_intent.name);
           _saved = false;
         });
       }
@@ -238,9 +257,8 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _save() async {
-    final m = _result;
-    if (m == null) return;
+  Future<void> _save(Measurement m) async {
+    if (_result == null) return;
     try {
       final saved = await _saveMeasurement(context, widget.store, m,
           projectId: widget.projectId, cell: widget.cell);
@@ -253,6 +271,55 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     }
   }
 
+  Future<void> _chooseIntent() async {
+    final intent = await Navigator.of(context).push<SensingIntent>(
+        sensingRoute<SensingIntent>(
+            context,
+            ChooseObjectScreen(
+                initial: _intent, haptics: widget.store.haptics)));
+    if (intent == null || !mounted) return;
+    setState(() {
+      _intent = intent;
+      _module = intent.module;
+      _result = null;
+      _saved = false;
+    });
+    widget.onModule(_module);
+  }
+
+  Future<void> _map(Measurement m) async {
+    final linked = widget.store.projects.where((p) => p.id == widget.projectId);
+    Project? project = linked.isEmpty ? null : linked.first;
+    project ??= await showModalBottomSheet<Project>(
+        context: context,
+        showDragHandle: true,
+        builder: (sheet) => SafeArea(
+                child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                const PageHeading('Place this finding.'),
+                _gap,
+                for (final p in widget.store.projects)
+                  ListTile(
+                      title: Text(p.name),
+                      subtitle: Text('${p.room} · ${p.rows} × ${p.columns}'),
+                      onTap: () => Navigator.pop(sheet, p)),
+                ActionButton('Create inspection map', icon: Icons.add_rounded,
+                    onPressed: () async {
+                  final created = await showDialog<Project>(
+                      context: sheet,
+                      builder: (_) => _NewProjectDialog(store: widget.store));
+                  if (sheet.mounted && created != null) {
+                    Navigator.pop(sheet, created);
+                  }
+                }),
+              ]),
+            )));
+    if (!mounted || project == null) return;
+    _push(context,
+        DefectMapScreen(store: widget.store, project: project, measurement: m));
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -262,193 +329,222 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
   }
 
   @override
-  Widget build(BuildContext context) => AppPage(children: [
-        PageHeading('Listen to the material.',
-            subtitle: 'A short tap. A measurable acoustic trace.',
-            trailing: IconButton(
-                tooltip: 'Settings',
-                icon: const Icon(Icons.tune_rounded),
-                onPressed: _busy || _recording
-                    ? null
-                    : () =>
-                        _push(context, SettingsScreen(store: widget.store)))),
-        _gap,
-        SizedBox(
-            width: double.infinity,
-            child: SegmentedButton<Module>(
-                segments: const [
-                  ButtonSegment(
-                      value: Module.slab,
-                      label: Text('Slab'),
-                      icon: Icon(Icons.layers_outlined)),
-                  ButtonSegment(
-                      value: Module.vessel,
-                      label: Text('Vessel'),
-                      icon: Icon(Icons.water_drop_outlined)),
-                  ButtonSegment(
-                      value: Module.scope,
-                      label: Text('Scope'),
-                      icon: Icon(Icons.graphic_eq_rounded))
-                ],
-                selected: {
-                  _module
-                },
-                onSelectionChanged: _busy || _recording
-                    ? null
-                    : (values) {
-                        _feedback();
-                        setState(() {
-                          _module = values.first;
-                          _result = null;
-                          _saved = false;
-                        });
-                        widget.onModule(_module);
-                      })),
-        _gap,
-        Panel(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Icon(_recording ? Icons.mic_rounded : Icons.touch_app_outlined,
-                color: C.blue, size: 22),
-            const SizedBox(width: 9),
-            Expanded(
-                child: Label(
-                    _recording
-                        ? 'Microphone recording'
-                        : '${_moduleName(_module)} · ready to capture',
-                    color: C.blue)),
-            if (_recording)
-              Text(
-                  '${(_elapsed.elapsedMilliseconds / 1000).toStringAsFixed(1)} / 8s',
-                  style: const TextStyle(
-                      fontFamily: 'monospace', fontWeight: FontWeight.bold))
-          ]),
-          _gap,
-          Text(
-              _recording
-                  ? 'Tap once. Let it ring.'
-                  : switch (_module) {
-                      Module.slab => 'Map the sound of a surface.',
-                      Module.vessel => 'Hear the resonance.',
-                      Module.scope => 'See the signal, clearly.'
-                    },
-              style: const TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w800,
-                  color: C.ink,
-                  letterSpacing: -.8)),
-          _small,
-          Text(
-              _recording
-                  ? 'Keep the phone still. Stop after the sound decays; capture ends automatically at 8 seconds.'
-                  : 'Keep the microphone close without touching the material. Record a quiet baseline, then make one gentle, consistent tap.',
-              style: _body),
-          _gap,
-          ValueListenableBuilder<List<double>>(
-              valueListenable: _capture.live,
-              builder: (_, values, __) => _SignalPlot(
-                  values: values,
-                  height: 120,
-                  label: _recording
-                      ? 'LIVE PCM · RELATIVE AMPLITUDE'
-                      : 'MICROPHONE TRACE',
-                  empty: 'Your recording will appear here')),
-          _gap,
-          Wrap(spacing: 10, runSpacing: 8, children: [
-            ActionButton(
-                _busy
-                    ? 'Please wait'
-                    : _recording
-                        ? 'Stop capture'
-                        : 'Start recording',
-                icon: _recording ? Icons.stop_rounded : Icons.mic_rounded,
-                onPressed: _busy
-                    ? null
-                    : _recording
-                        ? _stop
-                        : _start),
-            if (_recording)
-              TextButton(
-                  onPressed: _busy ? null : _cancel,
-                  child: const Text('Cancel'))
-            else
-              TextButton(
-                  onPressed: _busy ? null : _sample,
-                  child: const Text('Try synthetic sample'))
-          ]),
-          if (widget.projectId != null) ...[
-            _small,
-            Text(
-                'Project capture${widget.cell == null ? '' : ' · cell ${widget.cell! + 1}'}',
-                style: _body)
-          ],
-        ])),
-        if (_error != null) ...[
-          _gap,
-          Panel(
-              color: const Color(0xFFFFF4ED),
-              child:
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Icon(Icons.info_outline_rounded, color: C.amber),
-                const SizedBox(width: 12),
+  Widget build(BuildContext context) =>
+      LayoutBuilder(builder: (context, bounds) {
+        final m = _result;
+        final reduced = MediaQuery.disableAnimationsOf(context);
+        final stageHeight = (bounds.maxHeight * .45).clamp(240.0, 340.0);
+        return SingleChildScrollView(
+            child: Container(
+          constraints: BoxConstraints(minHeight: bounds.maxHeight),
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+            decoration: BoxDecoration(
+                color: C.blue, borderRadius: BorderRadius.circular(36)),
+            child: Column(children: [
+              Row(children: [
                 Expanded(
-                    child: Text(
-                        'Capture unavailable\n$_error\n\nIf permission was denied, enable microphone access in your device settings and try again.',
-                        style: _body))
-              ]))
-        ],
-        _gap,
-        if (_result case final m?) ...[
-          SectionTitle('Acoustic evidence',
-              trailing: TextButton(
-                  onPressed: () => _push(context,
-                      MeasurementScreen(store: widget.store, measurement: m)),
-                  child: const Text('Full trace'))),
-          _small,
-          _Evidence(m: m, reference: widget.store.reference),
-          _small,
-          Wrap(spacing: 10, children: [
-            ActionButton(_saved ? 'Saved' : 'Save measurement',
-                icon:
-                    _saved ? Icons.check_rounded : Icons.bookmark_add_outlined,
-                onPressed: _saved ? null : _save),
-            TextButton(
-                onPressed: _busy
-                    ? null
-                    : () => setState(() {
+                    child: TextButton.icon(
+                  onPressed: _busy || _recording ? null : _chooseIntent,
+                  style: TextButton.styleFrom(foregroundColor: Colors.white),
+                  icon: const Icon(Icons.swap_horiz_rounded),
+                  label: Text(_intent.title),
+                )),
+                IconButton(
+                    tooltip: 'How to tap',
+                    onPressed: _instructions,
+                    icon: const Icon(Icons.help_outline_rounded,
+                        color: Colors.white70, size: 20)),
+              ]),
+              const SizedBox(height: 32),
+              AnimatedSwitcher(
+                duration:
+                    reduced ? Duration.zero : const Duration(milliseconds: 320),
+                transitionBuilder: _sceneTransition,
+                child: Text(
+                    _busy
+                        ? 'Getting ready'
+                        : _recording
+                            ? 'Listening…'
+                            : m == null
+                                ? 'Tap. Listen.\nKnow.'
+                                : 'Got it.',
+                    key: ValueKey('$_busy-$_recording-${m == null}'),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 40,
+                        fontWeight: FontWeight.w600,
+                        height: 1.05,
+                        letterSpacing: -1)),
+              ),
+              const SizedBox(height: 12),
+              if (m == null)
+                Text(
+                    _recording
+                        ? 'Tap once. Let it ring.'
+                        : 'Touch below to begin',
+                    style:
+                        const TextStyle(color: Colors.white70, fontSize: 16)),
+              SizedBox(
+                  height: m == null ? stageHeight : 96,
+                  width: double.infinity,
+                  child: ListeningStage(
+                    live: _capture.live,
+                    active: _recording,
+                    busy: _busy,
+                    complete: m != null,
+                    onTap: _busy
+                        ? null
+                        : _recording
+                            ? _stop
+                            : _start,
+                  )),
+              AnimatedSwitcher(
+                duration:
+                    reduced ? Duration.zero : const Duration(milliseconds: 360),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                transitionBuilder: _sceneTransition,
+                child: m != null
+                    ? SensingResult(
+                        key: ValueKey('result-${m.id}-${_intent.name}'),
+                        measurement: m,
+                        intent: _intent,
+                        store: widget.store,
+                        saved: _saved,
+                        onSave: _save,
+                        onMap: _map,
+                        onTrace: (record) => _push(
+                            context,
+                            MeasurementScreen(
+                                store: widget.store, measurement: record)),
+                        onAgain: () => setState(() {
                           _result = null;
                           _saved = false;
                         }),
-                child: const Text('Discard'))
-          ]),
-          _gap,
-        ],
-        Panel(
-            color: C.pale,
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Label('Evidence, not a diagnosis', color: C.blue),
-              _small,
-              const Text(
-                  'THUD measures airborne sound. It does not classify hollowness, defects, fill level or structural safety. Compare repeatable taps under the same conditions.',
-                  style: _body),
-              TextButton(
-                  onPressed: _recording || _busy
-                      ? null
-                      : () => _push(
-                          context,
-                          CalibrationScreen(
-                              store: widget.store,
-                              onRecord: () {
-                                Navigator.of(context).pop();
-                                _start();
-                              })),
-                  child: Text(widget.store.reference == null
-                      ? 'Set a reference recording →'
-                      : 'Review reference recording →'))
-            ])),
-      ]);
+                      )
+                    : SizedBox(
+                        key: ValueKey(_recording ? 'recording' : 'ready'),
+                        height: 64,
+                        child: Center(
+                          child: _recording
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                      Text(
+                                          '${(_elapsed.elapsedMilliseconds / 1000).toStringAsFixed(1)} / 8s',
+                                          style: const TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 14)),
+                                      const SizedBox(width: 16),
+                                      TextButton(
+                                          onPressed: _busy ? null : _cancel,
+                                          style: TextButton.styleFrom(
+                                              foregroundColor: Colors.white),
+                                          child: const Text('Cancel')),
+                                    ])
+                              : Wrap(
+                                  alignment: WrapAlignment.center,
+                                  spacing: 8,
+                                  children: [
+                                      TextButton(
+                                          onPressed:
+                                              _busy ? null : () => _sample(),
+                                          style: TextButton.styleFrom(
+                                              foregroundColor: Colors.white),
+                                          child: const Text('Try a sample')),
+                                      if (_intent == SensingIntent.slab)
+                                        TextButton(
+                                            onPressed: _busy
+                                                ? null
+                                                : () => _sample(resonant: true),
+                                            style: TextButton.styleFrom(
+                                                foregroundColor:
+                                                    Colors.white70),
+                                            child:
+                                                const Text('Long-ring sample')),
+                                    ]),
+                        )),
+              ),
+              if (widget.projectId != null)
+                Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text('Project · point ${(widget.cell ?? 0) + 1}',
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 12))),
+              if (_error != null)
+                Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.info_outline_rounded,
+                                color: C.red, size: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                                child: Text(_error!,
+                                    style: const TextStyle(
+                                        color: C.ink, fontSize: 13)))
+                          ]),
+                    )),
+            ]),
+          ),
+        ));
+      });
+
+  Widget _sceneTransition(Widget child, Animation<double> animation) =>
+      FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+            position: Tween<Offset>(
+                    begin: MediaQuery.disableAnimationsOf(context)
+                        ? Offset.zero
+                        : const Offset(0, .06),
+                    end: Offset.zero)
+                .animate(CurvedAnimation(
+                    parent: animation, curve: Curves.easeOutCubic)),
+            child: child),
+      );
+
+  void _instructions() => showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (_) => Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('One clean tap',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                  const SizedBox(height: 16),
+                  const Text(
+                      'Hold the phone 10–15 cm away. Start listening, wait briefly, then tap once. Stop when the sound fades.',
+                      style: _body),
+                  const SizedBox(height: 16),
+                  const Text(
+                      'THUD records acoustic evidence, not a structural diagnosis. Synthetic samples are for exploring the interface.',
+                      style: _body),
+                  const SizedBox(height: 16),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _push(
+                            context,
+                            GuidedReferenceScreen(
+                                intent: _intent, store: widget.store));
+                      },
+                      child: const Text('Set reference')),
+                ]),
+          ));
 }
 
 Future<bool> _saveMeasurement(
@@ -496,7 +592,7 @@ class _DestinationSheetState extends State<_DestinationSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Keep this evidence.', style: _title),
+                  const Text('Save recording', style: _title),
                   _small,
                   const Text(
                       'Save to history, or attach the recording to a project cell.',
@@ -553,14 +649,13 @@ class _Evidence extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Panel(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Icon(
                 _synthetic(m) ? Icons.science_outlined : Icons.mic_none_rounded,
-                color: C.blue),
-            const SizedBox(width: 10),
+                color: C.muted,
+                size: 20),
+            const SizedBox(width: 8),
             Expanded(
                 child: Text(
                     _synthetic(m)
@@ -574,14 +669,14 @@ class _Evidence extends StatelessWidget {
             _small,
             Text('Signal review: ${m.flags.join(' · ')}',
                 style:
-                    const TextStyle(color: C.amber, fontSize: 13, height: 1.4))
+                    const TextStyle(color: C.amber, fontSize: 14, height: 1.5))
           ] else ...[
             _small,
             const Text(
                 'No automated signal-quality flags. This is not a material assessment.',
                 style: _body)
           ]
-        ])),
+        ]),
         _small,
         Row(children: [
           Metric('Peak frequency', '${_number(m.peakHz, 0)} Hz',
@@ -606,95 +701,11 @@ class _Evidence extends StatelessWidget {
         ]),
         if (reference != null && reference!.id != m.id) ...[
           _small,
-          Panel(
-              color: C.pale,
-              child: Text(
-                  'Compared with your reference: peak frequency Δ ${_number(m.peakHz - reference!.peakHz, 0)} Hz; decay Δ ${_number(m.decayMs - reference!.decayMs, 0)} ms. Differences are descriptive only, not a defect threshold.',
-                  style: _body))
+          Text(
+              'Compared with your reference: peak frequency Δ ${_number(m.peakHz - reference!.peakHz, 0)} Hz; decay Δ ${_number(m.decayMs - reference!.decayMs, 0)} ms. Differences are descriptive only, not a defect threshold.',
+              style: _body)
         ],
       ]);
-}
-
-class _SignalPlot extends StatelessWidget {
-  const _SignalPlot(
-      {required this.values,
-      required this.label,
-      this.height = 150,
-      this.empty = 'No recorded samples',
-      this.spectrum = false});
-  final List<double> values;
-  final String label, empty;
-  final double height;
-  final bool spectrum;
-  @override
-  Widget build(BuildContext context) => Container(
-      height: height,
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-          color: C.bg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: C.line)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Label(label, fontSize: 8),
-        const SizedBox(height: 12),
-        Expanded(
-            child: values.isEmpty
-                ? Center(child: Text(empty, style: _body))
-                : SizedBox.expand(
-                    child: CustomPaint(
-                        painter: _TracePainter(values, spectrum: spectrum))))
-      ]));
-}
-
-class _TracePainter extends CustomPainter {
-  _TracePainter(this.values, {required this.spectrum});
-  final List<double> values;
-  final bool spectrum;
-  @override
-  void paint(Canvas canvas, Size size) {
-    final grid = Paint()
-      ..color = C.line
-      ..strokeWidth = 1;
-    for (var i = 0; i <= 4; i++) {
-      final y = size.height * i / 4;
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), grid);
-    }
-    for (var i = 0; i <= 8; i++) {
-      final x = size.width * i / 8;
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), grid);
-    }
-    if (values.isEmpty) return;
-    var maxValue = 0.0;
-    for (final value in values) {
-      if (value.isFinite) maxValue = math.max(maxValue, value.abs());
-    }
-    final path = Path();
-    final range = math.max(maxValue, .000001);
-    for (var i = 0; i < values.length; i++) {
-      final v = values[i].isFinite ? values[i] : 0.0;
-      final x = values.length == 1 ? 0.0 : size.width * i / (values.length - 1);
-      final y = spectrum
-          ? size.height * (1 - v.clamp(0.0, 1.0))
-          : size.height / 2 - v / range * size.height * .45;
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    canvas.drawPath(
-        path,
-        Paint()
-          ..color = C.blue
-          ..strokeWidth = 1.5
-          ..style = PaintingStyle.stroke
-          ..strokeJoin = StrokeJoin.round);
-  }
-
-  @override
-  bool shouldRepaint(covariant _TracePainter oldDelegate) =>
-      oldDelegate.values != values || oldDelegate.spectrum != spectrum;
 }
 
 class LibraryScreen extends StatelessWidget {
@@ -706,8 +717,8 @@ class LibraryScreen extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: store,
       builder: (_, __) => AppPage(children: [
-            const PageHeading('Your field library.',
-                subtitle: 'A clear record of what you heard.'),
+            const PageHeading('Field library',
+                subtitle: 'Saved recordings, references and field guidance'),
             _gap,
             _MenuTile(
                 icon: Icons.history_rounded,
@@ -732,22 +743,37 @@ class LibraryScreen extends StatelessWidget {
                         }))),
             _small,
             _MenuTile(
+                icon: Icons.touch_app_outlined,
+                title: 'Teach a three-tap reference',
+                subtitle: 'Solid tile references and known vessel fill anchors',
+                onTap: () async {
+                  final intent = await Navigator.of(context)
+                      .push<SensingIntent>(sensingRoute<SensingIntent>(
+                          context,
+                          ChooseObjectScreen(
+                              initial: SensingIntent.slab,
+                              haptics: store.haptics)));
+                  if (intent != null && context.mounted) {
+                    _push(context,
+                        GuidedReferenceScreen(intent: intent, store: store));
+                  }
+                }),
+            _small,
+            _MenuTile(
                 icon: Icons.settings_outlined,
                 title: 'Settings & privacy',
                 subtitle: 'Feedback, local storage and field guidance',
                 onTap: () => _push(context, SettingsScreen(store: store))),
             _gap,
-            const Panel(
-                color: C.pale,
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Label('A considered record', color: C.blue),
-                      _small,
-                      Text(
-                          'Keep the context with the signal. Project grids, field notes and traceable recordings are more useful than a single tap in isolation.',
-                          style: _body)
-                    ]))
+            const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Label('Keep the context'),
+                  _small,
+                  Text(
+                      'Keep the context with the signal. Project grids, field notes and traceable recordings are more useful than a single tap in isolation.',
+                      style: _body)
+                ])
           ]));
 }
 
@@ -764,20 +790,21 @@ class _MenuTile extends StatelessWidget {
   Widget build(BuildContext context) => Material(
       color: Colors.white,
       shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           side: const BorderSide(color: C.line)),
       clipBehavior: Clip.antiAlias,
       child: ListTile(
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-          leading: Icon(icon, color: C.blue),
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          leading: Icon(icon, color: C.muted, size: 20),
           title: Text(title,
               style: const TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w800, color: C.ink)),
+                  fontSize: 16, fontWeight: FontWeight.w500, color: C.ink)),
           subtitle: Padding(
-              padding: const EdgeInsets.only(top: 5),
+              padding: const EdgeInsets.only(top: 4),
               child: Text(subtitle, style: _body)),
-          trailing: const Icon(Icons.chevron_right_rounded, color: C.muted),
+          trailing:
+              const Icon(Icons.chevron_right_rounded, color: C.muted, size: 20),
           onTap: onTap));
 }
 
@@ -799,15 +826,16 @@ class ProjectsScreen extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: store,
       builder: (_, __) => AppPage(children: [
-            PageHeading('Every tap, in place.',
-                subtitle: 'Organize your inspection by room and grid.',
+            PageHeading('Projects',
+                subtitle: 'Organize recordings by room and grid',
                 trailing: IconButton(
                     tooltip: 'Create project',
                     onPressed: () => _create(context),
-                    icon: const Icon(Icons.add_rounded, color: C.blue))),
+                    icon: const Icon(Icons.add_rounded,
+                        color: C.muted, size: 20))),
             _gap,
             if (store.projects.isEmpty)
-              _Empty('Start with a space.',
+              _Empty('No projects yet',
                   'Create a project, define its grid, then attach real recordings to each inspection point.',
                   icon: Icons.grid_view_rounded,
                   action: ActionButton('Create project',
@@ -918,7 +946,7 @@ class _NewProjectDialogState extends State<_NewProjectDialog> {
                                       labelText: 'Rows (1–12)'),
                                   keyboardType: TextInputType.number,
                                   validator: _dimension)),
-                          const SizedBox(width: 14),
+                          const SizedBox(width: 16),
                           Expanded(
                               child: TextFormField(
                                   controller: _columns,
@@ -993,21 +1021,21 @@ class _ProjectScreenState extends State<ProjectScreen> {
           const SectionTitle('Inspection grid'),
           _small,
           const Text(
-              'Select a cell to review its latest recording or make a new capture. Blue means recorded, not sound or defective.',
+              'Select a cell to review its latest recording or make a new capture. A recorded cell is not a material assessment.',
               style: _body),
           _small,
           LayoutBuilder(builder: (_, constraints) {
             return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: SizedBox(
-                width: math.max(constraints.maxWidth, p.columns * 54.0),
+                width: math.max(constraints.maxWidth, p.columns * 56.0),
                 child: GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: p.columns,
-                      crossAxisSpacing: 7,
-                      mainAxisSpacing: 7),
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8),
                   itemCount: p.rows * p.columns,
                   itemBuilder: (_, i) => Semantics(
                     label:
@@ -1017,11 +1045,14 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       color: selected == i
                           ? C.blue
                           : latest.containsKey(i)
-                              ? C.pale
+                              ? C.bg
                               : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                              color: latest.containsKey(i) ? C.muted : C.line)),
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                         onTap: () => setState(() => selected = i),
                         child: Center(
                             child: Text(
@@ -1030,7 +1061,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                                     fontFamily: 'monospace',
                                     color: selected == i ? Colors.white : C.ink,
                                     fontSize: 12,
-                                    fontWeight: FontWeight.bold))),
+                                    fontWeight: FontWeight.w500))),
                       ),
                     ),
                   ),
@@ -1047,7 +1078,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 _small,
                 Text(
                     active == null
-                        ? 'No recording at this point.'
+                        ? 'No recording at this point'
                         : '${_number(active.peakHz, 0)} Hz · latest peak',
                     style: _title),
                 _small,
@@ -1084,6 +1115,13 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       : p.notes,
                   style: _body)),
           _gap,
+          ActionButton('Defect map & photos',
+              icon: Icons.location_on_outlined,
+              onPressed: () => _push(
+                  context,
+                  DefectMapScreen(
+                      store: widget.store, project: p, measurement: active))),
+          _small,
           ActionButton('Project report',
               icon: Icons.description_outlined,
               secondary: true,
@@ -1168,17 +1206,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
             .toList()
           ..sort((a, b) => b.created.compareTo(a.created));
         return _RoutePage(title: 'Measurement history', children: [
-          const PageHeading('Keep the evidence.',
-              subtitle: 'Your saved recordings, newest first.'),
+          const PageHeading('Saved recordings',
+              subtitle: 'Newest first, stored on this device'),
           _gap,
           TextField(
               decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search_rounded),
+                  prefixIcon:
+                      Icon(Icons.search_rounded, size: 20, color: C.muted),
                   hintText: 'Search recordings',
                   border: OutlineInputBorder()),
               onChanged: (v) => setState(() => query = v)),
           _small,
-          Wrap(spacing: 8, children: [
+          Wrap(spacing: 8, runSpacing: 8, children: [
             ChoiceChip(
                 label: const Text('All modules'),
                 selected: module == null,
@@ -1197,7 +1236,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               onChanged: (v) => setState(() => microphoneOnly = v)),
           _small,
           if (entries.isEmpty)
-            const _Empty('No recordings here.',
+            const _Empty('No matching recordings',
                 'Save a capture from the field scope, or adjust your filters.')
           else
             for (final m in entries) ...[
@@ -1207,7 +1246,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       MeasurementScreen(store: widget.store, measurement: m)),
                   trailing: IconButton(
                       tooltip: 'Delete recording',
-                      icon: const Icon(Icons.delete_outline_rounded),
+                      icon: const Icon(Icons.delete_outline_rounded,
+                          size: 20, color: C.muted),
                       onPressed: () => _delete(context, widget.store, m))),
               _small
             ]
@@ -1223,23 +1263,25 @@ class _MeasurementTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(16),
       child: ListTile(
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
               side: const BorderSide(color: C.line)),
           leading: Icon(
               _synthetic(m) ? Icons.science_outlined : Icons.graphic_eq_rounded,
-              color: C.blue),
+              color: C.muted,
+              size: 20),
           title: Text(m.label,
               style:
-                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
           subtitle: Text(
-              '${_moduleName(m.module)} · ${_number(m.peakHz, 0)} Hz\n${_date(m.created)}${_synthetic(m) ? ' · SYNTHETIC' : ''}',
+              '${m.intent ?? _moduleName(m.module)} · ${_number(m.peakHz, 0)} Hz\n${_date(m.created)}${_synthetic(m) ? ' · Synthetic' : ''}',
               style:
-                  const TextStyle(color: C.muted, height: 1.5, fontSize: 11)),
+                  const TextStyle(color: C.muted, height: 1.5, fontSize: 12)),
           isThreeLine: true,
-          trailing: trailing ?? const Icon(Icons.chevron_right_rounded),
+          trailing: trailing ??
+              const Icon(Icons.chevron_right_rounded, size: 20, color: C.muted),
           onTap: onTap));
 }
 
@@ -1281,20 +1323,16 @@ class CalibrationScreen extends StatelessWidget {
         final candidates = store.measurements.where(_validReference).toList()
           ..sort((a, b) => b.created.compareTo(a.created));
         return _RoutePage(title: 'Reference & calibration', children: [
-          const PageHeading('Make comparison useful.',
-              subtitle: 'A repeatable reference, not a safety threshold.'),
+          const PageHeading('Reference recording',
+              subtitle: 'A repeatable comparison, not a safety threshold'),
           _gap,
-          const Panel(
-              color: C.pale,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Label('Know the limits', color: C.blue),
-                    _small,
-                    Text(
-                        'This is a reference selection, not laboratory microphone calibration. Levels are relative digital dBFS, not calibrated dB SPL. Keep phone, distance, tap tool and surroundings consistent. No reference can establish structural safety or a defect classification.',
-                        style: _body)
-                  ])),
+          const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Label('Know the limits'),
+            _small,
+            Text(
+                'This is a reference selection, not laboratory microphone calibration. Levels are relative digital dBFS, not calibrated dB SPL. Keep phone, distance, tap tool and surroundings consistent. No reference can establish structural safety or a defect classification.',
+                style: _body)
+          ]),
           _gap,
           if (store.reference case final ref?) ...[
             const SectionTitle('Current reference'),
@@ -1315,7 +1353,7 @@ class CalibrationScreen extends StatelessWidget {
               style: _body),
           _gap,
           if (candidates.isEmpty)
-            const _Empty('No eligible reference yet.',
+            const _Empty('No eligible reference yet',
                 'Record and save a clean, repeatable tap. Review the signal-quality notes before selecting it as a reference.')
           else
             for (final m in candidates) ...[
@@ -1331,7 +1369,8 @@ class CalibrationScreen extends StatelessWidget {
                           store.reference?.id == m.id
                               ? Icons.check_circle_rounded
                               : Icons.radio_button_unchecked,
-                          color: C.blue),
+                          color: store.reference?.id == m.id ? C.blue : C.muted,
+                          size: 20),
                       onPressed: () => _perform(context, () async {
                             await store.setReference(m);
                             if (context.mounted) {
@@ -1367,32 +1406,22 @@ class MeasurementScreen extends StatelessWidget {
                 })
         ], children: [
           PageHeading(m.label,
-              subtitle: '${_moduleName(m.module)} · ${_date(m.created)}'),
+              subtitle:
+                  '${m.intent ?? _moduleName(m.module)} · ${_date(m.created)}'),
           _gap,
+          if (m.context.isNotEmpty) ...[
+            Text(m.context['interpretation'] ?? 'Saved inspection context',
+                style: _title),
+            _small,
+            for (final entry in m.context.entries)
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text('${entry.key}: ${entry.value}', style: _body)),
+            _gap,
+          ],
           _Evidence(m: m, reference: store.reference),
           _gap,
-          const SectionTitle('Waveform'),
-          _small,
-          _SignalPlot(
-              values: m.waveform,
-              label: 'CAPTURE TIME → · NORMALIZED PCM AMPLITUDE',
-              height: 190),
-          _small,
-          const Text(
-              'Trace shape is scaled for visibility. Use RMS dBFS for recorded digital level; the display is not calibrated sound pressure.',
-              style: _body),
-          _gap,
-          const SectionTitle('Frequency spectrum'),
-          _small,
-          _SignalPlot(
-              values: m.spectrum,
-              label: '20 HZ → 24 KHZ · LOG FREQUENCY',
-              spectrum: true,
-              height: 190),
-          _small,
-          const Text(
-              '256 logarithmic bins from 20 Hz to 24 kHz. The vertical display spans −100 to 0 dBFS. Spectrum is derived from captured PCM; a peak is not a material prediction.',
-              style: _body),
+          SignalExplorer(measurement: m),
           _gap,
           Panel(
               child: Column(
@@ -1432,7 +1461,7 @@ class MeasurementScreen extends StatelessWidget {
           ],
           _gap,
           const Text(
-              'Inspection record only. THUD does not determine defects, hollowness, fill percentage or fitness for use. Seek qualified assessment for safety-critical decisions.',
+              'Acoustic screening only. Vessel interpolation requires matched reference anchors; fruit firmness is a research proxy. Human map marks are inspection notes, not automatic defect or safety certification.',
               style: _body)
         ]);
       });
@@ -1451,8 +1480,18 @@ class _ReportScreenState extends State<ReportScreen> {
   Future<void> _export() async {
     setState(() => _exporting = true);
     try {
-      final document = pw.Document();
+      final regular =
+          pw.Font.ttf(await rootBundle.load('assets/fonts/Nunito-Regular.ttf'));
+      final semibold = pw.Font.ttf(
+          await rootBundle.load('assets/fonts/Nunito-SemiBold.ttf'));
+      final document = pw.Document(
+          theme: pw.ThemeData.withFont(base: regular, bold: semibold));
       final text = widget.store.reportText(widget.project);
+      final marks = widget.store.annotationsForProject(widget.project.id);
+      final latestMarks = <int, DefectAnnotation>{};
+      for (final mark in marks) {
+        latestMarks.putIfAbsent(mark.cell, () => mark);
+      }
       document.addPage(pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
           margin: const pw.EdgeInsets.all(40),
@@ -1473,11 +1512,70 @@ class _ReportScreenState extends State<ReportScreen> {
                     style: pw.TextStyle(
                         fontSize: 26, fontWeight: pw.FontWeight.bold)),
                 pw.SizedBox(height: 12),
+                pw.Text('Human-marked inspection map',
+                    style: pw.TextStyle(
+                        fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                pw.SizedBox(height: 10),
+                pw.Table(children: [
+                  for (var row = 0; row < widget.project.rows; row++)
+                    pw.TableRow(children: [
+                      for (var col = 0; col < widget.project.columns; col++)
+                        pw.Container(
+                            padding: const pw.EdgeInsets.all(5),
+                            decoration: pw.BoxDecoration(
+                                border: pw.Border.all(color: PdfColors.grey300),
+                                color: switch (latestMarks[
+                                        row * widget.project.columns + col]
+                                    ?.status) {
+                                  AnnotationStatus.defect => PdfColors.red100,
+                                  AnnotationStatus.accepted =>
+                                    PdfColors.green100,
+                                  AnnotationStatus.review =>
+                                    PdfColors.orange100,
+                                  null => PdfColors.grey100,
+                                }),
+                            child: pw.Text(
+                                'R${row + 1}:C${col + 1}\n${latestMarks[row * widget.project.columns + col]?.status.name ?? "unmarked"}',
+                                style: const pw.TextStyle(fontSize: 7))),
+                    ]),
+                ]),
+                pw.SizedBox(height: 14),
                 ...text.split('\n').map((line) => pw.Padding(
                     padding: const pw.EdgeInsets.only(bottom: 5),
                     child: pw.Text(line,
                         style:
                             const pw.TextStyle(fontSize: 10, lineSpacing: 3)))),
+                for (final mark in marks.where((a) => a.photoBase64 != null))
+                  pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.SizedBox(height: 16),
+                        pw.Text(
+                            'Photo / ${_cellName(mark.cell, widget.project.columns)} / human ${mark.status.name}',
+                            style: const pw.TextStyle(fontSize: 10)),
+                        pw.SizedBox(height: 8),
+                        pw.Container(
+                            width: 320,
+                            child: pw.Stack(children: [
+                              pw.Image(
+                                  pw.MemoryImage(
+                                      base64Decode(mark.photoBase64!)),
+                                  width: 320),
+                              if (mark.x != null && mark.y != null)
+                                pw.Positioned.fill(
+                                    child: pw.Align(
+                                        alignment: pw.Alignment(
+                                            mark.x! * 2 - 1, mark.y! * 2 - 1),
+                                        child: pw.Container(
+                                            width: 10,
+                                            height: 10,
+                                            decoration: const pw.BoxDecoration(
+                                                color: PdfColors.red,
+                                                shape: pw.BoxShape.circle)))),
+                            ])),
+                        pw.Text(mark.note,
+                            style: const pw.TextStyle(fontSize: 10)),
+                      ]),
                 pw.SizedBox(height: 16),
                 pw.Text(
                     'Disclosure: Recorded airborne acoustic evidence only. No material classification, confidence score, structural safety determination or calibrated dB SPL measurement is provided. Synthetic samples, when present, are demonstration data and must not be treated as inspection evidence.',
@@ -1529,13 +1627,37 @@ class _ReportScreenState extends State<ReportScreen> {
                     style: _body)
               ])),
           _gap,
+          SectionTitle('Human-marked findings',
+              trailing: TextButton(
+                  onPressed: () => _push(context,
+                      DefectMapScreen(store: widget.store, project: p)),
+                  child: const Text('Open defect map'))),
+          _small,
+          for (final mark in widget.store.annotationsForProject(p.id)) ...[
+            Text(
+                '${_cellName(mark.cell, p.columns)} · ${mark.status.name} · human annotation',
+                style: _title),
+            Text(
+                '${mark.note}\n${mark.measurementSource ?? "No linked acoustic recording"}',
+                style: _body),
+            if (mark.photoBase64 != null)
+              Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Image.memory(base64Decode(mark.photoBase64!),
+                      height: 160, fit: BoxFit.contain)),
+            if (mark.x != null)
+              Text(
+                  'Photo pin: x=${mark.x!.toStringAsFixed(3)}, y=${mark.y!.toStringAsFixed(3)} (relative image coordinates)',
+                  style: _body),
+            _gap,
+          ],
           const SectionTitle('Latest evidence by cell'),
           _small,
           for (var i = 0; i < p.rows * p.columns; i++)
             Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Panel(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(16),
                     child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -1545,8 +1667,8 @@ class _ReportScreenState extends State<ReportScreen> {
                                   style: const TextStyle(
                                       fontFamily: 'monospace',
                                       color: C.ink,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold))),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500))),
                           Expanded(
                               child: Text(
                                   latest[i] == null
@@ -1561,11 +1683,9 @@ class _ReportScreenState extends State<ReportScreen> {
                 style: _body)
           ],
           _gap,
-          const Panel(
-              color: C.pale,
-              child: Text(
-                  'Disclosure: This report documents measured airborne sound and user notes. It is not a structural inspection, material classifier or safety certificate. Synthetic recordings are explicitly identified and excluded from microphone coverage. Relative digital levels are not calibrated dB SPL.',
-                  style: _body)),
+          const Text(
+              'Disclosure: This report documents measured airborne sound and user notes. It is not a structural inspection, material classifier or safety certificate. Synthetic recordings are explicitly identified and excluded from microphone coverage. Relative digital levels are not calibrated dB SPL.',
+              style: _body),
           _gap,
           ActionButton(_exporting ? 'Preparing PDF…' : 'Export PDF',
               icon: Icons.ios_share_rounded,
@@ -1581,8 +1701,8 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: store,
       builder: (_, __) => _RoutePage(title: 'Settings & privacy', children: [
-            const PageHeading('Quietly in your control.',
-                subtitle: 'Field feedback and a little clarity.'),
+            const PageHeading('Settings',
+                subtitle: 'Capture feedback, privacy and field guidance'),
             _gap,
             Panel(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1597,8 +1717,8 @@ class SettingsScreen extends StatelessWidget {
                   const Divider(height: 1),
                   SwitchListTile.adaptive(
                       title: const Text('Interface sounds'),
-                      subtitle:
-                          const Text('A system click for capture controls'),
+                      subtitle: const Text(
+                          'A quiet system click after capture closes'),
                       value: store.sounds,
                       onChanged: (v) =>
                           _perform(context, () => store.setFeedback(sounds: v)))
@@ -1610,12 +1730,12 @@ class SettingsScreen extends StatelessWidget {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  Icon(Icons.phonelink_lock_outlined, color: C.blue, size: 28),
+                  Icon(Icons.phonelink_lock_outlined, color: C.muted, size: 20),
                   _small,
-                  Text('Your recordings stay local.', style: _title),
+                  Text('Your recordings stay local', style: _title),
                   _small,
                   Text(
-                      'Microphone access is used only when you start a recording. Saved traces, measured features, projects and preferences are stored on this device. THUD does not upload recordings or send them to an AI service. Exporting a PDF opens your device share sheet; you decide where it goes. Delete individual recordings in Measurement history. Removing app data removes local records.',
+                      'Microphone access is used only when you start a recording. Saved traces, reference anchors, measurements, projects, notes and attached photos stay on this device. Photo coordinates are relative image positions, not GPS. THUD does not upload evidence or send it to an AI service. Exporting a PDF shares the included evidence through your device. Delete individual recordings in Measurement history. Removing app data removes local records.',
                       style: _body)
                 ])),
             _gap,
@@ -1625,31 +1745,29 @@ class SettingsScreen extends StatelessWidget {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  Text('01  Keep the setup consistent', style: _title),
+                  Text('Keep the setup consistent', style: _title),
                   _small,
                   Text(
                       'Use the same phone, tap tool, distance and orientation. Do not strike fragile, energized or unsafe surfaces.',
                       style: _body),
                   _gap,
-                  Text('02  Give the sound room', style: _title),
+                  Text('Give the sound room', style: _title),
                   _small,
                   Text(
                       'Start in quiet surroundings. Record a brief baseline, tap once and allow the sound to decay. Review flags and repeat if the trace clips or contains interference.',
                       style: _body),
                   _gap,
-                  Text('03  Record the context', style: _title),
+                  Text('Record the context', style: _title),
                   _small,
                   Text(
                       'Attach recordings to a project cell and add notes. A different sound can have many causes. No acoustic feature here establishes a defect or structural safety.',
                       style: _body)
                 ])),
             _gap,
-            Panel(
-                color: C.pale,
-                child: Text(
-                    MediaQuery.of(context).disableAnimations
-                        ? 'Reduced motion is enabled by your device. These screens use static plots and no looping decorative animation.'
-                        : 'These screens use static plots with no looping decorative animation. System reduced-motion preferences are respected.',
-                    style: _body))
+            Text(
+                MediaQuery.of(context).disableAnimations
+                    ? 'Reduced motion is enabled by your device. These screens use static plots and no looping decorative animation.'
+                    : 'These screens use static plots with no looping decorative animation. System reduced-motion preferences are respected.',
+                style: _body)
           ]));
 }
