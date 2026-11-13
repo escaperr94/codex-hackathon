@@ -1,0 +1,103 @@
+{
+  "name": "jackfruit",
+  "path": "artifacts\\final\\classifiers\\jackfruit.tflite",
+  "sha256": "1664ff4b7b1d4e2166f90caa4707790653c4fe2488b5b5a2bea93c898a4bb758",
+  "bytes": 2696,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "CAST",
+    "CONCATENATION",
+    "DELEGATE",
+    "FULLY_CONNECTED",
+    "GREATER",
+    "LOGISTIC",
+    "STRIDED_SLICE",
+    "SUB"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      27
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "probabilities in classes order",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      0,
+      1
+    ]
+  },
+  "contract": {
+    "task": "maturity Immature/Mature",
+    "labels": {
+      "0": "Immature",
+      "1": "Mature"
+    },
+    "frontend": "UNAVAILABLE: supplied XLSX acoustic features; no raw audio/complete reproducible extraction",
+    "feature_order": [
+      "PeakFreq_Hz",
+      "SpectralCentroid_Hz",
+      "SpectralBandwidth_Hz",
+      "SpectralRolloff_Hz",
+      "SpectralFlatness",
+      "SpectralEntropy",
+      "Skewness",
+      "Kurtosis",
+      "HNR_dB",
+      "BE_50_200",
+      "BE_200_500",
+      "BE_500_1500",
+      "BE_1500_4000",
+      "BE_4000_8000",
+      "MFCC_1",
+      "MFCC_2",
+      "MFCC_3",
+      "MFCC_4",
+      "MFCC_5",
+      "MFCC_6",
+      "MFCC_7",
+      "MFCC_8",
+      "MFCC_9",
+      "MFCC_10",
+      "MFCC_11",
+      "MFCC_12",
+      "MFCC_13"
+    ],
+    "license": "Repository MIT license; no independent acquisition or dataset-origin permission statement in checked dataset README",
+    "generalization_gate": "BLOCKED: acquisition/specimen identities absent or undocumented; repeated samples could span train/test",
+    "input_limit": "jackfruit cannot be invoked from phone audio without missing exact frontend"
+  },
+  "training": {
+    "existing_full_data_head": "artifacts\\secondary-table-jackfruit-model.joblib",
+    "sha256": "9ec19ca3ad915acc2bf75bf82f0c5f7ea834006527f7f33130cec31342d9a8cc",
+    "selection": "historical mean nested INNER-CV scores, not outer-score winner",
+    "historical_report": "artifacts/secondary-table-benchmark.json"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 253,
+    "maximum_absolute_score_error": 1.6778850042697968e-07,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 9,
+    "maximum_absolute_score_error": 1.5680877940571492e-07,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": null,
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\jackfruit-verification.npz",
+    "sha256": "8f0a146f2a3643431ef86b68a0e9373405ea633ac86a44b8aa7eb3b24468b07c",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\jackfruit.joblib",
+    "sha256": "acf306efa307ada6de5a54d4727d919eefa54c41dd978d80916717b88fb69924"
+  }
+}

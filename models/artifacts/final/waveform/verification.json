@@ -1,0 +1,199 @@
+{
+  "script_sha256": "e85cfa818e4fc89c442255a242c6b18237030b9fcde7cc0db5b51c2835ec1449",
+  "models": [
+    {
+      "file": "artifacts\\final\\waveform\\ycb-material-waveform-f32.tflite",
+      "sha256": "6c0244420e9f8681001eb0b9d84ab9e5a976ad4c439333bfe59d8fb41cf82686",
+      "bytes": 12915988,
+      "fixture": "artifacts\\final\\waveform\\ycb-material-waveform-f32.parity.npz",
+      "fixture_sha256": "2902d051bfdbdab5ffd6e3f6a11ddf59751abbae4fcc01e468d31d4c780b9509",
+      "class_order": [
+        "Aluminium",
+        "Ceramic",
+        "Foam",
+        "Hard_Plastic",
+        "Other_Plastic",
+        "Paper",
+        "Soft_Plastic",
+        "Steel",
+        "Wood"
+      ],
+      "input_shape": [
+        16000
+      ],
+      "dtype": "float32",
+      "sample_rate": 16000,
+      "output_scores": "uncalibrated LinearSVC one-vs-rest margins [1,K]; larger wins, not probabilities",
+      "frontend_included": "YAMNet DSP+encoder+scaler+linear head",
+      "external_preprocessing": "Stereo averaged, polyphase resampled 44.1kHz->16kHz, one 1-second window centered on loudest 20ms energy block per recording; no amplitude normalization. Mean frozen YAMNet frames.",
+      "real_recordings": 131,
+      "zero_decision_changes": true,
+      "max_absolute_error": 9.798312078856952e-05,
+      "p50_ms": 3.293699999630917,
+      "p95_ms": 3.491339999163756,
+      "timing_scope": "desktop2thread waveform-to-score; excludes decode/resample/crop/capture",
+      "head_sha256": "e4b7545baade21537a195e682faab227e2bb702141e19023e21377087f1aeddc",
+      "source_report_sha256": "b9f19385dd767763237d54fdc776b20e7bf38fa4f383fc5f0af217e977c9ff6f",
+      "original_oof_metrics": {
+        "accuracy": 0.37037037037037035,
+        "balanced_accuracy": 0.37037037037037035,
+        "macro_f1": 0.34065255731922395,
+        "confusion_matrix": [
+          [
+            2,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "release_status": "research-only; dataset/checkpoint license review required; no phone accuracy or runtime measured"
+    },
+    {
+      "file": "artifacts\\final\\waveform\\realimpact-material-waveform-f32.tflite",
+      "sha256": "51d7042747ea557fb7b5d158f6a4ba10a42db482db688e634e59398117ce4c40",
+      "bytes": 12891388,
+      "fixture": "artifacts\\final\\waveform\\realimpact-material-waveform-f32.parity.npz",
+      "fixture_sha256": "74158a4e7b4fdd95f34fb99ce02619aa763a2c7282e5a196554b7c106c9a95f0",
+      "class_order": [
+        "Ceramic",
+        "Plastic",
+        "Wood"
+      ],
+      "input_shape": [
+        16000
+      ],
+      "dtype": "float32",
+      "sample_rate": 16000,
+      "output_scores": "uncalibrated LinearSVC one-vs-rest margins [1,K]; larger wins, not probabilities",
+      "frontend_included": "YAMNet DSP+encoder+scaler+linear head",
+      "external_preprocessing": "48kHz force-deconvolved float32 -> polyphase16kHz -> 1s loudest20ms-centered crop -> 0.95 peak normalization identically for both encoders. MFCC/logmel154D or frozen official YAMNet mean1024D.",
+      "real_recordings": 270,
+      "zero_decision_changes": true,
+      "max_absolute_error": 2.9802024048564135e-05,
+      "p50_ms": 3.3232000005227746,
+      "p95_ms": 3.5824800017508096,
+      "timing_scope": "desktop2thread waveform-to-score; excludes decode/resample/crop/capture",
+      "head_sha256": "e8e39a70e4db731ca5cdfca6b73242d77476df7ba9772ea30d43c1743168f47c",
+      "source_report_sha256": "cd057f3c0c92129958ac9c323fdffe311bd4d9111801cf00d8361812044e44e5",
+      "original_oof_metrics": {
+        "accuracy": 0.8888888888888888,
+        "balanced_accuracy": 0.8888888888888888,
+        "macro_f1": 0.8857142857142858,
+        "confusion_matrix": [
+          [
+            3,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            0
+          ],
+          [
+            0,
+            1,
+            2
+          ]
+        ]
+      },
+      "release_status": "research-only; dataset/checkpoint license review required; no phone accuracy or runtime measured"
+    }
+  ],
+  "physical_phone": "not measured",
+  "scope": "real-data trained waveform-to-material margin models, not validated universal material detectors"
+}

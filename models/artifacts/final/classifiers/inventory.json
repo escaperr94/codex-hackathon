@@ -1,0 +1,2559 @@
+{
+  "status": "complete_research_heads_with_explicit_frontend_and_generalization_limits",
+  "models": [
+    {
+      "name": "acm_s2_fillclass_logistic",
+      "path": "artifacts\\final\\classifiers\\acm_s2_fillclass_logistic.tflite",
+      "sha256": "b0fb6bf99eae861d9b287e544125f91b45d260b578847780cb8ce7c3ea589234",
+      "bytes": 3092,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ARG_MAX",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "SOFTMAX",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          90
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "probabilities in classes order",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "contract": {
+        "feature_order": [
+          "13 MFCC means",
+          "13 MFCC population std",
+          "32 natural-log-mel means",
+          "32 natural-log-mel population std"
+        ],
+        "frontend": "experiments/dataset_benchmark.py:feature",
+        "frontend_sha256": "5d68692cb46af3de8bd125faf653ded954a8ad0d35b05135cf52f0d3f0f73a38",
+        "capture": "mono mean, polyphase 16kHz, first4s, whole-recording mean removal, Hann400 hop160 FFT512; 32 mel80-7600Hz; ortho DCT13",
+        "frontend_included": false,
+        "task": "filling_level_classification",
+        "labels": {
+          "0": "empty",
+          "1": "50%",
+          "2": "90%"
+        },
+        "protocol": "pouring/shaking external setup, not taps",
+        "license": "Dataset CC BY4.0; preserve attribution; no model production-suitability grant inferred",
+        "source": "https://zenodo.org/records/4770439"
+      },
+      "training": {
+        "fit": "all observations",
+        "hyperparameters": "fixed C=1, balanced, gamma=scale for RBF",
+        "feature_cache": "artifacts\\final\\classifiers\\acm_s2_fillclass-features.npz",
+        "historical_report": "artifacts/dataset-benchmarks.json",
+        "new_OOF_report": "artifacts\\final\\classifiers\\acm_s2_fillclass-logistic-oof.json"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 21,
+        "maximum_absolute_score_error": 3.4265300941083154e-07,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 3.4039837282229257e-07,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\acm_s2\\acm_s2_audio\\000014.wav",
+        "sha256": "03cd45e442ccd4ca88a0465a8cfa3cf3f0c32dd3ed7bee9f72231f0856ab92ad",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 6.074169944803032e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\acm_s2_fillclass_logistic-verification.npz",
+        "sha256": "23be43a208152e6aeea3786bb38ca62f31a94c292fc555dbc4ccc6b2c037dc17",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\acm_s2_fillclass_logistic.joblib",
+        "sha256": "018801f2a6fa2addd16d3b77be0983367f6f2a5ac18d4ea34520854bb19e5d86"
+      }
+    },
+    {
+      "name": "acm_s2_fillclass_rbf",
+      "path": "artifacts\\final\\classifiers\\acm_s2_fillclass_rbf.tflite",
+      "sha256": "5b4c3d7d1cdda570b0a5c99d4a91ea0f311b74e104f0ed1bc1512d303a2eeca9",
+      "bytes": 18132,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ABS",
+        "ADD",
+        "ARG_MAX",
+        "CAST",
+        "DELEGATE",
+        "DIV",
+        "EXP",
+        "GREATER",
+        "LESS_EQUAL",
+        "MUL",
+        "PACK",
+        "RESHAPE",
+        "SQUARED_DIFFERENCE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          90
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "contract": {
+        "feature_order": [
+          "13 MFCC means",
+          "13 MFCC population std",
+          "32 natural-log-mel means",
+          "32 natural-log-mel population std"
+        ],
+        "frontend": "experiments/dataset_benchmark.py:feature",
+        "frontend_sha256": "5d68692cb46af3de8bd125faf653ded954a8ad0d35b05135cf52f0d3f0f73a38",
+        "capture": "mono mean, polyphase 16kHz, first4s, whole-recording mean removal, Hann400 hop160 FFT512; 32 mel80-7600Hz; ortho DCT13",
+        "frontend_included": false,
+        "task": "filling_level_classification",
+        "labels": {
+          "0": "empty",
+          "1": "50%",
+          "2": "90%"
+        },
+        "protocol": "pouring/shaking external setup, not taps",
+        "license": "Dataset CC BY4.0; preserve attribution; no model production-suitability grant inferred",
+        "source": "https://zenodo.org/records/4770439"
+      },
+      "training": {
+        "fit": "all observations",
+        "hyperparameters": "fixed C=1, balanced, gamma=scale for RBF",
+        "feature_cache": "artifacts\\final\\classifiers\\acm_s2_fillclass-features.npz",
+        "historical_report": "artifacts/dataset-benchmarks.json",
+        "new_OOF_report": "artifacts\\final\\classifiers\\acm_s2_fillclass-rbf-oof.json"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 21,
+        "maximum_absolute_score_error": 1.1233609731320371e-07,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 8.177142030163509e-08,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\acm_s2\\acm_s2_audio\\000014.wav",
+        "sha256": "03cd45e442ccd4ca88a0465a8cfa3cf3f0c32dd3ed7bee9f72231f0856ab92ad",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 5.000711489344667e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\acm_s2_fillclass_rbf-verification.npz",
+        "sha256": "c944b1f70215774c54ffea2e78249e8f249a045404eaeff855678bc73ce8e118",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\acm_s2_fillclass_rbf.joblib",
+        "sha256": "9e450f31d886b490f3ab0e30b9f4e304afc16dda8d026c807fead1a1761d6547"
+      }
+    },
+    {
+      "name": "pipe_leak_logistic",
+      "path": "artifacts\\final\\classifiers\\pipe_leak_logistic.tflite",
+      "sha256": "fe86e76e5531554a49fa0e4f473ffe847098913f79511ed35d155d39d1b33180",
+      "bytes": 3200,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "CAST",
+        "CONCATENATION",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "GREATER",
+        "LOGISTIC",
+        "STRIDED_SLICE",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          90
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "probabilities in classes order",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          0,
+          1
+        ]
+      },
+      "contract": {
+        "feature_order": [
+          "13 MFCC means",
+          "13 MFCC population std",
+          "32 natural-log-mel means",
+          "32 natural-log-mel population std"
+        ],
+        "frontend": "experiments/dataset_benchmark.py:feature",
+        "frontend_sha256": "5d68692cb46af3de8bd125faf653ded954a8ad0d35b05135cf52f0d3f0f73a38",
+        "capture": "mono mean, polyphase 16kHz, first4s, whole-recording mean removal, Hann400 hop160 FFT512; 32 mel80-7600Hz; ortho DCT13",
+        "frontend_included": false,
+        "task": "leak_vs_no_leak_classification",
+        "labels": {
+          "0": "no leak including environmental noise",
+          "1": "leak"
+        },
+        "protocol": "hydrophone/contact logger pipe monitoring, not verified airborne phone audio",
+        "license": "Dataset CC BY4.0; preserve attribution; no model production-suitability grant inferred",
+        "source": "https://zenodo.org/records/18631450"
+      },
+      "training": {
+        "fit": "all observations",
+        "hyperparameters": "fixed C=1, balanced, gamma=scale for RBF",
+        "feature_cache": "artifacts\\final\\classifiers\\pipe_leak-features.npz",
+        "historical_report": "artifacts/dataset-benchmarks.json",
+        "new_OOF_report": "artifacts\\final\\classifiers\\pipe_leak-logistic-oof.json"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 1000,
+        "maximum_absolute_score_error": 1.1172874061493587e-06,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 6.210470600676032e-06,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\leak\\extracted\\environmental-noise\\environmental noise\\alarm_1-NA-noise logger_0-1.wav",
+        "sha256": "180c2e191de124ac2e4eadd43195b1384910403441cba673a2e91ce7fa6d2ca9",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 1.2803086590906787e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\pipe_leak_logistic-verification.npz",
+        "sha256": "49091763311e82b0c6a3a0ab9ebc05541b4ddf18618036a8a7250d573ad078f9",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\pipe_leak_logistic.joblib",
+        "sha256": "4c284a7d56541e3c6e484ff2113e6e5c691f4c6da43580f0059fd0d3bf0e778a"
+      }
+    },
+    {
+      "name": "pipe_leak_rbf",
+      "path": "artifacts\\final\\classifiers\\pipe_leak_rbf.tflite",
+      "sha256": "00e6dd1534973aab515f8e154b1892ffb1e4e000a9384b88bb8b02dfc638c84f",
+      "bytes": 117720,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "CAST",
+        "CONCATENATION",
+        "DELEGATE",
+        "EXP",
+        "FULLY_CONNECTED",
+        "GREATER_EQUAL",
+        "MUL",
+        "NEG",
+        "RESHAPE",
+        "SQUARED_DIFFERENCE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          90
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          0,
+          1
+        ]
+      },
+      "contract": {
+        "feature_order": [
+          "13 MFCC means",
+          "13 MFCC population std",
+          "32 natural-log-mel means",
+          "32 natural-log-mel population std"
+        ],
+        "frontend": "experiments/dataset_benchmark.py:feature",
+        "frontend_sha256": "5d68692cb46af3de8bd125faf653ded954a8ad0d35b05135cf52f0d3f0f73a38",
+        "capture": "mono mean, polyphase 16kHz, first4s, whole-recording mean removal, Hann400 hop160 FFT512; 32 mel80-7600Hz; ortho DCT13",
+        "frontend_included": false,
+        "task": "leak_vs_no_leak_classification",
+        "labels": {
+          "0": "no leak including environmental noise",
+          "1": "leak"
+        },
+        "protocol": "hydrophone/contact logger pipe monitoring, not verified airborne phone audio",
+        "license": "Dataset CC BY4.0; preserve attribution; no model production-suitability grant inferred",
+        "source": "https://zenodo.org/records/18631450"
+      },
+      "training": {
+        "fit": "all observations",
+        "hyperparameters": "fixed C=1, balanced, gamma=scale for RBF",
+        "feature_cache": "artifacts\\final\\classifiers\\pipe_leak-features.npz",
+        "historical_report": "artifacts/dataset-benchmarks.json",
+        "new_OOF_report": "artifacts\\final\\classifiers\\pipe_leak-rbf-oof.json"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 1000,
+        "maximum_absolute_score_error": 4.2333736990501913e-05,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 2.6364039349302537e-05,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\leak\\extracted\\environmental-noise\\environmental noise\\alarm_1-NA-noise logger_0-1.wav",
+        "sha256": "180c2e191de124ac2e4eadd43195b1384910403441cba673a2e91ce7fa6d2ca9",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 8.800900230809816e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\pipe_leak_rbf-verification.npz",
+        "sha256": "d1849347ad24fbc8dc764bd800a9f2a63e5aabcf1d08f574b05d2a7d9a92f930",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\pipe_leak_rbf.joblib",
+        "sha256": "b7bdf80bdce1a02b44a2cbf78892101942626162647b0becf1e2ef908a8abd7e"
+      }
+    },
+    {
+      "name": "ycb_material_mfcc_logmel",
+      "path": "artifacts\\final\\classifiers\\ycb_material_mfcc_logmel.tflite",
+      "sha256": "4531a4ff9df2fa498ca817271d1192b5caf4aef35e64755eb5bc730480dc48f1",
+      "bytes": 7684,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ARG_MAX",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          154
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "Aluminium",
+          "Ceramic",
+          "Foam",
+          "Hard_Plastic",
+          "Other_Plastic",
+          "Paper",
+          "Soft_Plastic",
+          "Steel",
+          "Wood"
+        ]
+      },
+      "contract": {
+        "task": "material_classification",
+        "frontend": "experiments/material_benchmark.py:waveform + acoustic",
+        "frontend_sha256": "153a0a7090ec572717c1916de82eaf574f49606f002f555fd95e6ffd27dfe6c2",
+        "feature_order": [
+          "64 logmel means",
+          "64 logmel population std",
+          "13 MFCC means",
+          "13 MFCC population std"
+        ],
+        "waveform": "1s peak20ms-centered16kHz; YCB decode and resample; RealImpact force-deconvolved48kHz->16kHz then .95 peak normalize",
+        "encoder": null,
+        "license": "YCB source node_license null, rights review required",
+        "limits": [
+          "Small controlled robot/gripper airborne recordings, not phone material identification or tile bonding.",
+          "Each source clip contains multiple pokes; one peak-centered excerpt is scored. No claim to reproduce paper segmentation or full-dataset results.",
+          "Only three objects per class, nested tuning has one training object per class. Split uncertainty is large; objects differ in shape/content as well as material.",
+          "Soft-plastic fruit are YCB manufactured replicas, not real fruit ripeness.",
+          "Source node_license null: local research only; no redistribution or commercial license inferred.",
+          "No iPhone/Core ML conversion, latency, energy, or on-device memory measured."
+        ]
+      },
+      "training": {
+        "selection": "all-data training-only object-rank CV; no outer-score family winner",
+        "C_grid": [
+          0.01,
+          0.1,
+          1.0,
+          10.0
+        ],
+        "mean_object_macro_f1": [
+          0.3234567901234568,
+          0.3234567901234568,
+          0.2740740740740741,
+          0.2493827160493827
+        ],
+        "selected_C": 0.01,
+        "source_cache": "material-features.npz",
+        "source_cache_sha256": "05678087823bbe1f9f009ce1587feeb08ca79b1104f61dcb3035f7e27c23e1e0",
+        "historical_report": "material-benchmark.json"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 131,
+        "maximum_absolute_score_error": 7.992204222873056e-07,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 2.1070419817803554e-06,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\material\\audio\\002_masterchef_can_6\\Clip 1.ogx",
+        "sha256": "b8dac6656cc9de6028ff672232560f1e8da507414585abc155a4a4434eb7a831",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 5.392999199438364e-07,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\ycb_material_mfcc_logmel-verification.npz",
+        "sha256": "6b0ecd72112cb3ed2d6df5839e8453a4ae57780d6b44651a8c07d3a92521eeb3",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\ycb_material_mfcc_logmel.joblib",
+        "sha256": "cc5e3012357219bf949358fa0aeb352945f5e5387735858468da2badf2bbd849"
+      }
+    },
+    {
+      "name": "ycb_material_yamnet",
+      "path": "artifacts\\final\\classifiers\\ycb_material_yamnet.tflite",
+      "sha256": "25db49fa8bfe5c34f41a8e9c8d3b5c92dac7cf4083e246c6953c250e181e7d88",
+      "bytes": 42484,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ARG_MAX",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          1024
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "Aluminium",
+          "Ceramic",
+          "Foam",
+          "Hard_Plastic",
+          "Other_Plastic",
+          "Paper",
+          "Soft_Plastic",
+          "Steel",
+          "Wood"
+        ]
+      },
+      "contract": {
+        "task": "material_classification",
+        "frontend": "same waveform crop + official frozen YAMNet frame-embedding mean",
+        "frontend_sha256": "153a0a7090ec572717c1916de82eaf574f49606f002f555fd95e6ffd27dfe6c2",
+        "feature_order": "YAMNet embedding indices0..1023",
+        "waveform": "1s peak20ms-centered16kHz; YCB decode and resample; RealImpact force-deconvolved48kHz->16kHz then .95 peak normalize",
+        "encoder": {
+          "path": "artifacts\\tfhub\\9616fd04ec2360621642ef9455b84f4b668e219e",
+          "saved_model_sha256": "672af6e1e34fe15a42d45d70217fd39f97e10aef9b0effbf9b0bf7826fccd462",
+          "pooling": "arithmetic mean of 1024D frame embeddings, not 521 event scores"
+        },
+        "license": "YCB source node_license null, rights review required",
+        "limits": [
+          "Small controlled robot/gripper airborne recordings, not phone material identification or tile bonding.",
+          "Each source clip contains multiple pokes; one peak-centered excerpt is scored. No claim to reproduce paper segmentation or full-dataset results.",
+          "Only three objects per class, nested tuning has one training object per class. Split uncertainty is large; objects differ in shape/content as well as material.",
+          "Soft-plastic fruit are YCB manufactured replicas, not real fruit ripeness.",
+          "Source node_license null: local research only; no redistribution or commercial license inferred.",
+          "No iPhone/Core ML conversion, latency, energy, or on-device memory measured."
+        ]
+      },
+      "training": {
+        "selection": "all-data training-only object-rank CV; no outer-score family winner",
+        "C_grid": [
+          0.01,
+          0.1,
+          1.0,
+          10.0
+        ],
+        "mean_object_macro_f1": [
+          0.35185185185185186,
+          0.33580246913580253,
+          0.33580246913580253,
+          0.33580246913580253
+        ],
+        "selected_C": 0.01,
+        "source_cache": "material-features.npz",
+        "source_cache_sha256": "05678087823bbe1f9f009ce1587feeb08ca79b1104f61dcb3035f7e27c23e1e0",
+        "historical_report": "material-benchmark.json"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 131,
+        "maximum_absolute_score_error": 5.139764571282512e-06,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 1.5075336481373824e-05,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\material\\audio\\002_masterchef_can_6\\Clip 1.ogx",
+        "sha256": "b8dac6656cc9de6028ff672232560f1e8da507414585abc155a4a4434eb7a831",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 2.9350366066438482e-06,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\ycb_material_yamnet-verification.npz",
+        "sha256": "524e7911576e72d92104479d68ee7d9540059534568de76d1b46962803d3a2ff",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\ycb_material_yamnet.joblib",
+        "sha256": "e4b7545baade21537a195e682faab227e2bb702141e19023e21377087f1aeddc"
+      }
+    },
+    {
+      "name": "realimpact_material_mfcc_logmel",
+      "path": "artifacts\\final\\classifiers\\realimpact_material_mfcc_logmel.tflite",
+      "sha256": "e87ff9a3215e336c7cba6fb8ef780981f91cbfcfe8eb64a3759763f14d3f98de",
+      "bytes": 3964,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ARG_MAX",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          154
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "Ceramic",
+          "Plastic",
+          "Wood"
+        ]
+      },
+      "contract": {
+        "task": "material_classification",
+        "frontend": "experiments/material_benchmark.py:waveform + acoustic",
+        "frontend_sha256": "153a0a7090ec572717c1916de82eaf574f49606f002f555fd95e6ffd27dfe6c2",
+        "feature_order": [
+          "64 logmel means",
+          "64 logmel population std",
+          "13 MFCC means",
+          "13 MFCC population std"
+        ],
+        "waveform": "1s peak20ms-centered16kHz; YCB decode and resample; RealImpact force-deconvolved48kHz->16kHz then .95 peak normalize",
+        "encoder": null,
+        "license": "RealImpact code/data/checkpoint permissions require separate review",
+        "limits": [
+          "Deterministic first30 rows represent nearby microphones/positions and mostly one source vertex, not independent diverse impacts. Whole physical objects are held out.",
+          "Plastic bowls are same product family at different sizes; material and shape remain confounded.",
+          "Three objects/class and nine scored objects give high uncertainty; no universal or phone accuracy claim.",
+          "Force-deconvolved preprocessed impulse responses are not raw phone tapping audio; gain calibration unavailable, so per-clip normalization applied.",
+          "Partial DEFLATE decompression verified shape/finite complete rows and hashed prefixes; full-member/archive CRC or complete-file SHA256 NOT verified. Small annotation members have CRC verified.",
+          "No iPhone or mobile conversion measured; source dataset redistribution permission requires review."
+        ]
+      },
+      "training": {
+        "selection": "all-data training-only object-rank CV; no outer-score family winner",
+        "C_grid": [
+          0.01,
+          0.1,
+          1.0,
+          10.0
+        ],
+        "mean_object_macro_f1": [
+          0.8518518518518517,
+          0.7037037037037036,
+          0.7037037037037036,
+          0.5555555555555555
+        ],
+        "selected_C": 0.01,
+        "source_cache": "material-realimpact-features.npz",
+        "source_cache_sha256": "1ba882f3d1a84fef6c57d717349d5314d2b617533974ba061e5042ba80bba1a0",
+        "historical_report": "material-realimpact-benchmark.json"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 270,
+        "maximum_absolute_score_error": 7.656421625590326e-07,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 2.9224587265730406e-06,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\material\\realimpact-prefix\\31_WoodSlab\\audio-first30.npy",
+        "sha256": "354c0ee16478a5fb1081bf64f18dcb774a27526464b85dc62914dd09eeed02fc",
+        "source_row": 0,
+        "real_deconvolved_audio": true,
+        "not_raw_phone_PCM": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 2.0440344394856425e-07,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\realimpact_material_mfcc_logmel-verification.npz",
+        "sha256": "bea37f5dd448dcb95ea905b9345bc983efca086645d965dec4358164058bf03a",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\realimpact_material_mfcc_logmel.joblib",
+        "sha256": "5dfab2e96c6d40ce65b605a9a211ebc8c635a76d69b99444f7993a37521df846"
+      }
+    },
+    {
+      "name": "realimpact_material_yamnet",
+      "path": "artifacts\\final\\classifiers\\realimpact_material_yamnet.tflite",
+      "sha256": "97e9ee05b9b0dd0118719f91fe9e81cb9383fd5480de6cc92ae84bf79bb013d7",
+      "bytes": 17884,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ARG_MAX",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          1024
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "Ceramic",
+          "Plastic",
+          "Wood"
+        ]
+      },
+      "contract": {
+        "task": "material_classification",
+        "frontend": "same waveform crop + official frozen YAMNet frame-embedding mean",
+        "frontend_sha256": "153a0a7090ec572717c1916de82eaf574f49606f002f555fd95e6ffd27dfe6c2",
+        "feature_order": "YAMNet embedding indices0..1023",
+        "waveform": "1s peak20ms-centered16kHz; YCB decode and resample; RealImpact force-deconvolved48kHz->16kHz then .95 peak normalize",
+        "encoder": {
+          "path": "artifacts\\tfhub\\9616fd04ec2360621642ef9455b84f4b668e219e",
+          "saved_model_sha256": "672af6e1e34fe15a42d45d70217fd39f97e10aef9b0effbf9b0bf7826fccd462",
+          "pooling": "arithmetic mean of 1024D frame embeddings, not 521 event scores"
+        },
+        "license": "RealImpact code/data/checkpoint permissions require separate review",
+        "limits": [
+          "Deterministic first30 rows represent nearby microphones/positions and mostly one source vertex, not independent diverse impacts. Whole physical objects are held out.",
+          "Plastic bowls are same product family at different sizes; material and shape remain confounded.",
+          "Three objects/class and nine scored objects give high uncertainty; no universal or phone accuracy claim.",
+          "Force-deconvolved preprocessed impulse responses are not raw phone tapping audio; gain calibration unavailable, so per-clip normalization applied.",
+          "Partial DEFLATE decompression verified shape/finite complete rows and hashed prefixes; full-member/archive CRC or complete-file SHA256 NOT verified. Small annotation members have CRC verified.",
+          "No iPhone or mobile conversion measured; source dataset redistribution permission requires review."
+        ]
+      },
+      "training": {
+        "selection": "all-data training-only object-rank CV; no outer-score family winner",
+        "C_grid": [
+          0.01,
+          0.1,
+          1.0,
+          10.0
+        ],
+        "mean_object_macro_f1": [
+          0.8518518518518517,
+          0.8518518518518517,
+          0.8518518518518517,
+          0.8518518518518517
+        ],
+        "selected_C": 0.01,
+        "source_cache": "material-realimpact-features.npz",
+        "source_cache_sha256": "1ba882f3d1a84fef6c57d717349d5314d2b617533974ba061e5042ba80bba1a0",
+        "historical_report": "material-realimpact-benchmark.json"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 270,
+        "maximum_absolute_score_error": 4.1605237051101085e-06,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 2.8045429010248313e-06,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\material\\realimpact-prefix\\31_WoodSlab\\audio-first30.npy",
+        "sha256": "354c0ee16478a5fb1081bf64f18dcb774a27526464b85dc62914dd09eeed02fc",
+        "source_row": 0,
+        "real_deconvolved_audio": true,
+        "not_raw_phone_PCM": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 6.102033760502223e-07,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\realimpact_material_yamnet-verification.npz",
+        "sha256": "9b080afad132b02b18fc4aaf29ab51f2dbcc19e26d37afe82763fc16a81a2e8d",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\realimpact_material_yamnet.joblib",
+        "sha256": "e8e39a70e4db731ca5cdfca6b73242d77476df7ba9772ea30d43c1743168f47c"
+      }
+    },
+    {
+      "name": "pucks_mfcc-logmel_logistic",
+      "path": "artifacts\\final\\classifiers\\pucks_mfcc-logmel_logistic.tflite",
+      "sha256": "5238dfdc5b310e24dc9b4ea79e51d63d101118b539cb8c2995aebfc15e495d3e",
+      "bytes": 3092,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ARG_MAX",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "SOFTMAX",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          90
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "probabilities in classes order",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "ABS",
+          "PA12",
+          "PA2200"
+        ]
+      },
+      "contract": {
+        "task": "material and manufacturing-process classification",
+        "frontend": "experiments/puck_motor_benchmark.py:mono16 + features",
+        "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+        "feature_order": [
+          "13 MFCC means",
+          "13 MFCC population std",
+          "32 natural-log-mel means",
+          "32 natural-log-mel population std"
+        ],
+        "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+        "encoder": null,
+        "license": {
+          "metadata_source": "https://zenodo.org/api/records/7551338",
+          "distributed_document": "artifacts/datasets/pucks/IDMT_PUCKS.pdf",
+          "metadata_license_verbatim": "cc-by-nc-nd-4.0",
+          "distributed_pdf_license_verbatim": "The dataset is provided for evaluation purpose under the Creative Commons Attribution-ShareAlike 4.0 International License (\"by-sa\").",
+          "decision": "Local research evaluation only; do not redistribute raw/derived dataset or assume production permissions. Clarification required for license conflict.",
+          "archive_directory_observed": {
+            "wav_files": 225,
+            "puck_A": 45,
+            "puck_E": 45,
+            "puck_G": 45,
+            "puck_I": 45,
+            "no_puck": 45
+          },
+          "metadata_pdf_claimed_total_wav": 260,
+          "groups": "Each vol_000/050/100 x puck_A/E/G/I has five three-minute games with three patch-0/1/2 minute files. IDs usually 00..04, but PA2200/G at vol050 uses 00,01,02,09,10. Actual IDs are parsed, not assumed sequential; all patches and both channels grouped before splitting.",
+          "player_puck_ids": "PDF says different player sets and pucks per game; no persistent player or physical-puck identity mapping in filename or release documentation. Game is the strongest observable group, not independently verified puck-held-out evaluation.",
+          "known_material_decision": "Exclude puck_A unknown factory material and no_puck backgrounds; evaluate ABS/FDM, PA2200/SLS, PA12/MJF. Material and manufacturing process remain confounded."
+        },
+        "limits": "Game grouping not physical-puck independence; unknown puck_A excluded"
+      },
+      "training": {
+        "existing_full_data_head": "artifacts\\puck-motor-pucks-mfcc-logmel-logistic.joblib",
+        "sha256": "a61d4300605784802ddb7306ea401f796b8a9760e1087a0dfb79a06076b52128",
+        "selection": "both fixed C=1 families retained, no outer-score winner selection",
+        "source_cache_sha256": "7f2aed72e0c6ba61eb2c30cbd4592d4e51a1f11385e7c9b7b192831ff9c54a20"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 405,
+        "maximum_absolute_score_error": 1.0900105599231935e-06,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 1.9042457072293573e-07,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "archive": "artifacts\\datasets\\pucks\\IDMT_ISA_PUCKS.zip",
+        "member": "vol_000/puck_E/puckE_game-00_3min_vol000_patch-0.wav",
+        "sha256": "4573c5ba739f21c0a3c2c4aa0f1856594c63fa83063749c65539b3f580bc0283",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 2.7871285745995067e-07,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\pucks_mfcc-logmel_logistic-verification.npz",
+        "sha256": "f33cec7b0f56ebf23d3a3430939e052dbfa5c44c08aedb0970598fc98f5ca426",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\pucks_mfcc-logmel_logistic.joblib",
+        "sha256": "b51be91dcb63d864abe62187230cd30b08f33867e23b260890372d26dd6f6efd"
+      }
+    },
+    {
+      "name": "pucks_mfcc-logmel_rbf_svm",
+      "path": "artifacts\\final\\classifiers\\pucks_mfcc-logmel_rbf_svm.tflite",
+      "sha256": "260065f8c38b08f91605d858303a33f4965ab61bc2199f0cc04c50727787d625",
+      "bytes": 146932,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ABS",
+        "ADD",
+        "ARG_MAX",
+        "CAST",
+        "DELEGATE",
+        "DIV",
+        "EXP",
+        "GREATER",
+        "LESS_EQUAL",
+        "MUL",
+        "PACK",
+        "RESHAPE",
+        "SQUARED_DIFFERENCE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          90
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "ABS",
+          "PA12",
+          "PA2200"
+        ]
+      },
+      "contract": {
+        "task": "material and manufacturing-process classification",
+        "frontend": "experiments/puck_motor_benchmark.py:mono16 + features",
+        "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+        "feature_order": [
+          "13 MFCC means",
+          "13 MFCC population std",
+          "32 natural-log-mel means",
+          "32 natural-log-mel population std"
+        ],
+        "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+        "encoder": null,
+        "license": {
+          "metadata_source": "https://zenodo.org/api/records/7551338",
+          "distributed_document": "artifacts/datasets/pucks/IDMT_PUCKS.pdf",
+          "metadata_license_verbatim": "cc-by-nc-nd-4.0",
+          "distributed_pdf_license_verbatim": "The dataset is provided for evaluation purpose under the Creative Commons Attribution-ShareAlike 4.0 International License (\"by-sa\").",
+          "decision": "Local research evaluation only; do not redistribute raw/derived dataset or assume production permissions. Clarification required for license conflict.",
+          "archive_directory_observed": {
+            "wav_files": 225,
+            "puck_A": 45,
+            "puck_E": 45,
+            "puck_G": 45,
+            "puck_I": 45,
+            "no_puck": 45
+          },
+          "metadata_pdf_claimed_total_wav": 260,
+          "groups": "Each vol_000/050/100 x puck_A/E/G/I has five three-minute games with three patch-0/1/2 minute files. IDs usually 00..04, but PA2200/G at vol050 uses 00,01,02,09,10. Actual IDs are parsed, not assumed sequential; all patches and both channels grouped before splitting.",
+          "player_puck_ids": "PDF says different player sets and pucks per game; no persistent player or physical-puck identity mapping in filename or release documentation. Game is the strongest observable group, not independently verified puck-held-out evaluation.",
+          "known_material_decision": "Exclude puck_A unknown factory material and no_puck backgrounds; evaluate ABS/FDM, PA2200/SLS, PA12/MJF. Material and manufacturing process remain confounded."
+        },
+        "limits": "Game grouping not physical-puck independence; unknown puck_A excluded"
+      },
+      "training": {
+        "existing_full_data_head": "artifacts\\puck-motor-pucks-mfcc-logmel-rbf_svm.joblib",
+        "sha256": "dfd74f47fc2bdfb0ab3bbe342ca4e1db3b8874f28ef66747564e37e9a043df7b",
+        "selection": "both fixed C=1 families retained, no outer-score winner selection",
+        "source_cache_sha256": "7f2aed72e0c6ba61eb2c30cbd4592d4e51a1f11385e7c9b7b192831ff9c54a20"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 405,
+        "maximum_absolute_score_error": 2.4661789514990318e-06,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 7.99732311151935e-07,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "archive": "artifacts\\datasets\\pucks\\IDMT_ISA_PUCKS.zip",
+        "member": "vol_000/puck_E/puckE_game-00_3min_vol000_patch-0.wav",
+        "sha256": "4573c5ba739f21c0a3c2c4aa0f1856594c63fa83063749c65539b3f580bc0283",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 1.1267001331916049e-07,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\pucks_mfcc-logmel_rbf_svm-verification.npz",
+        "sha256": "00aa1e3ca844579b784b4370ad84a9629050e7f249ce192aa40ba2506f9225ea",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\pucks_mfcc-logmel_rbf_svm.joblib",
+        "sha256": "13ae86b68a532c7cf8c0f6575a74b8a646ee233a0bb82a2296f70cad5e17b950"
+      }
+    },
+    {
+      "name": "pucks_yamnet_logistic",
+      "path": "artifacts\\final\\classifiers\\pucks_yamnet_logistic.tflite",
+      "sha256": "2181f63252a629daf959f09828f853e6940780e2bee5ba0dde0d4033232ce383",
+      "bytes": 18036,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ARG_MAX",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "SOFTMAX",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          1024
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "probabilities in classes order",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "ABS",
+          "PA12",
+          "PA2200"
+        ]
+      },
+      "contract": {
+        "task": "material and manufacturing-process classification",
+        "frontend": "mono16 + four-second frozen YAMNet embedding mean",
+        "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+        "feature_order": "YAMNet indices0..1023",
+        "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+        "encoder": {
+          "path": "artifacts\\tfhub\\9616fd04ec2360621642ef9455b84f4b668e219e",
+          "saved_model_sha256": "672af6e1e34fe15a42d45d70217fd39f97e10aef9b0effbf9b0bf7826fccd462",
+          "pooling": "arithmetic mean of 1024D frame embeddings, not 521 event scores"
+        },
+        "license": {
+          "metadata_source": "https://zenodo.org/api/records/7551338",
+          "distributed_document": "artifacts/datasets/pucks/IDMT_PUCKS.pdf",
+          "metadata_license_verbatim": "cc-by-nc-nd-4.0",
+          "distributed_pdf_license_verbatim": "The dataset is provided for evaluation purpose under the Creative Commons Attribution-ShareAlike 4.0 International License (\"by-sa\").",
+          "decision": "Local research evaluation only; do not redistribute raw/derived dataset or assume production permissions. Clarification required for license conflict.",
+          "archive_directory_observed": {
+            "wav_files": 225,
+            "puck_A": 45,
+            "puck_E": 45,
+            "puck_G": 45,
+            "puck_I": 45,
+            "no_puck": 45
+          },
+          "metadata_pdf_claimed_total_wav": 260,
+          "groups": "Each vol_000/050/100 x puck_A/E/G/I has five three-minute games with three patch-0/1/2 minute files. IDs usually 00..04, but PA2200/G at vol050 uses 00,01,02,09,10. Actual IDs are parsed, not assumed sequential; all patches and both channels grouped before splitting.",
+          "player_puck_ids": "PDF says different player sets and pucks per game; no persistent player or physical-puck identity mapping in filename or release documentation. Game is the strongest observable group, not independently verified puck-held-out evaluation.",
+          "known_material_decision": "Exclude puck_A unknown factory material and no_puck backgrounds; evaluate ABS/FDM, PA2200/SLS, PA12/MJF. Material and manufacturing process remain confounded."
+        },
+        "limits": "Game grouping not physical-puck independence; unknown puck_A excluded"
+      },
+      "training": {
+        "existing_full_data_head": "artifacts\\puck-motor-pucks-yamnet-logistic.joblib",
+        "sha256": "53ee4ff04ae5949637b589885b41e496ea0eb1587b01f5ae000038adbf510580",
+        "selection": "both fixed C=1 families retained, no outer-score winner selection",
+        "source_cache_sha256": "7f2aed72e0c6ba61eb2c30cbd4592d4e51a1f11385e7c9b7b192831ff9c54a20"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 405,
+        "maximum_absolute_score_error": 8.775353361745175e-07,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 2.2424542278631776e-07,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "archive": "artifacts\\datasets\\pucks\\IDMT_ISA_PUCKS.zip",
+        "member": "vol_000/puck_E/puckE_game-00_3min_vol000_patch-0.wav",
+        "sha256": "4573c5ba739f21c0a3c2c4aa0f1856594c63fa83063749c65539b3f580bc0283",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 1.566813601083794e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\pucks_yamnet_logistic-verification.npz",
+        "sha256": "bc64ba63aef3c789579bf8a68ba2be3b73b02b92249bf5bf99e6a1f24d1c9019",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\pucks_yamnet_logistic.joblib",
+        "sha256": "d8f8e6c9089d88e4e5c790371ffa88b289453fa9a20b8e840e6913a2befc072e"
+      }
+    },
+    {
+      "name": "pucks_yamnet_rbf_svm",
+      "path": "artifacts\\final\\classifiers\\pucks_yamnet_rbf_svm.tflite",
+      "sha256": "a8b9442725747b0a0e2cf3e84af94cafeb324aa165db1063d44c2027db8a215f",
+      "bytes": 1651268,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ABS",
+        "ADD",
+        "ARG_MAX",
+        "CAST",
+        "DELEGATE",
+        "DIV",
+        "EXP",
+        "GREATER",
+        "LESS_EQUAL",
+        "MUL",
+        "PACK",
+        "RESHAPE",
+        "SQUARED_DIFFERENCE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          1024
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "ABS",
+          "PA12",
+          "PA2200"
+        ]
+      },
+      "contract": {
+        "task": "material and manufacturing-process classification",
+        "frontend": "mono16 + four-second frozen YAMNet embedding mean",
+        "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+        "feature_order": "YAMNet indices0..1023",
+        "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+        "encoder": {
+          "path": "artifacts\\tfhub\\9616fd04ec2360621642ef9455b84f4b668e219e",
+          "saved_model_sha256": "672af6e1e34fe15a42d45d70217fd39f97e10aef9b0effbf9b0bf7826fccd462",
+          "pooling": "arithmetic mean of 1024D frame embeddings, not 521 event scores"
+        },
+        "license": {
+          "metadata_source": "https://zenodo.org/api/records/7551338",
+          "distributed_document": "artifacts/datasets/pucks/IDMT_PUCKS.pdf",
+          "metadata_license_verbatim": "cc-by-nc-nd-4.0",
+          "distributed_pdf_license_verbatim": "The dataset is provided for evaluation purpose under the Creative Commons Attribution-ShareAlike 4.0 International License (\"by-sa\").",
+          "decision": "Local research evaluation only; do not redistribute raw/derived dataset or assume production permissions. Clarification required for license conflict.",
+          "archive_directory_observed": {
+            "wav_files": 225,
+            "puck_A": 45,
+            "puck_E": 45,
+            "puck_G": 45,
+            "puck_I": 45,
+            "no_puck": 45
+          },
+          "metadata_pdf_claimed_total_wav": 260,
+          "groups": "Each vol_000/050/100 x puck_A/E/G/I has five three-minute games with three patch-0/1/2 minute files. IDs usually 00..04, but PA2200/G at vol050 uses 00,01,02,09,10. Actual IDs are parsed, not assumed sequential; all patches and both channels grouped before splitting.",
+          "player_puck_ids": "PDF says different player sets and pucks per game; no persistent player or physical-puck identity mapping in filename or release documentation. Game is the strongest observable group, not independently verified puck-held-out evaluation.",
+          "known_material_decision": "Exclude puck_A unknown factory material and no_puck backgrounds; evaluate ABS/FDM, PA2200/SLS, PA12/MJF. Material and manufacturing process remain confounded."
+        },
+        "limits": "Game grouping not physical-puck independence; unknown puck_A excluded"
+      },
+      "training": {
+        "existing_full_data_head": "artifacts\\puck-motor-pucks-yamnet-rbf_svm.joblib",
+        "sha256": "82bb548cc5afdb6fbc56e233420518868c850b9d202ad49cbfeda7822e6651a7",
+        "selection": "both fixed C=1 families retained, no outer-score winner selection",
+        "source_cache_sha256": "7f2aed72e0c6ba61eb2c30cbd4592d4e51a1f11385e7c9b7b192831ff9c54a20"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 405,
+        "maximum_absolute_score_error": 5.508246158414387e-06,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 1.3537814602671006e-06,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "archive": "artifacts\\datasets\\pucks\\IDMT_ISA_PUCKS.zip",
+        "member": "vol_000/puck_E/puckE_game-00_3min_vol000_patch-0.wav",
+        "sha256": "4573c5ba739f21c0a3c2c4aa0f1856594c63fa83063749c65539b3f580bc0283",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 3.09732808290164e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\pucks_yamnet_rbf_svm-verification.npz",
+        "sha256": "b92fa41f0ff790428dc9d935903e47d1767f6d0a7c34a191d8f7d072ccf69df5",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\pucks_yamnet_rbf_svm.joblib",
+        "sha256": "0ec5fff9bfbdbda2f429d82279111357089e1f4523fef624d5d429a954054c46"
+      }
+    },
+    {
+      "name": "motor_mfcc-logmel_logistic",
+      "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_logistic.tflite",
+      "sha256": "aa0ef19b2f31cc707bfda12625d690b1480cd87f6e00b7d83dbc8b1c7570d02d",
+      "bytes": 3200,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "CAST",
+        "CONCATENATION",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "GREATER",
+        "LOGISTIC",
+        "STRIDED_SLICE",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          90
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "probabilities in classes order",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "debonded",
+          "repaired"
+        ]
+      },
+      "contract": {
+        "task": "same-motor debonded/repaired condition",
+        "frontend": "experiments/puck_motor_benchmark.py:mono16 + features",
+        "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+        "feature_order": [
+          "13 MFCC means",
+          "13 MFCC population std",
+          "32 natural-log-mel means",
+          "32 natural-log-mel population std"
+        ],
+        "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+        "encoder": null,
+        "license": {
+          "source": "https://data.mendeley.com/datasets/bxcnxfm94c/5",
+          "license": "CC BY 4.0",
+          "condition_names": [
+            "debonded",
+            "repaired"
+          ],
+          "independent_sources": 20,
+          "excluded_m4a": 20,
+          "duplicate_relationship": "The 20 WAV files are the decoded working copies of the same 20 M4A recordings with the first 2.0 seconds removed. Do not count formats as independent observations.",
+          "split": "Five leave-one-speed-out folds: 100, 200, 500, 750, 1000 rpm. Each held-out speed contains both directions and both conditions, every source file's windows remain together.",
+          "identifiability_limit": "One physical motor before/after rebonding and one source recording per operating condition. Speed transfer can be scored; unseen-motor, repeat-session and causal fault generalization cannot be established."
+        },
+        "limits": "20 WAVs from one physical motor; M4A counterparts excluded; no unseen-motor validation"
+      },
+      "training": {
+        "existing_full_data_head": "artifacts\\puck-motor-motor-mfcc-logmel-logistic.joblib",
+        "sha256": "fe845a43279e2af5b7502d44e47be1dec00ddd290500038171df53bdd05ad16b",
+        "selection": "both fixed C=1 families retained, no outer-score winner selection",
+        "source_cache_sha256": "153176f823c4944f5cbf28d893b1f8d52bfd229d00a167aeed9cedf2eab87379"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 60,
+        "maximum_absolute_score_error": 4.75214136930191e-08,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 2.3149253236542933e-08,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\phone-motor\\audio_debonded_1000rpm_forward.wav",
+        "sha256": "2d64ae98a41b446345ce70a1cdb3dacf8d8fe831105ede7e6fba04314c949184",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 1.764621082589457e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_logistic-verification.npz",
+        "sha256": "96bbf9d314167a9c5ac0a556cae3dbeb54de1b0d0a8736c7da9e2f1409c14cfe",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_logistic.joblib",
+        "sha256": "17ed1df0d6f2f778b53bcef33a9d63814209e3a11ce81bf349e9f18274db7a14"
+      }
+    },
+    {
+      "name": "motor_mfcc-logmel_rbf_svm",
+      "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_rbf_svm.tflite",
+      "sha256": "34e032a59a197a42df57a513545b0efaaa35399a2b4a7a4ae8c4c7eea72bc70f",
+      "bytes": 16892,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "CAST",
+        "CONCATENATION",
+        "DELEGATE",
+        "EXP",
+        "FULLY_CONNECTED",
+        "GREATER_EQUAL",
+        "MUL",
+        "NEG",
+        "RESHAPE",
+        "SQUARED_DIFFERENCE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          90
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "debonded",
+          "repaired"
+        ]
+      },
+      "contract": {
+        "task": "same-motor debonded/repaired condition",
+        "frontend": "experiments/puck_motor_benchmark.py:mono16 + features",
+        "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+        "feature_order": [
+          "13 MFCC means",
+          "13 MFCC population std",
+          "32 natural-log-mel means",
+          "32 natural-log-mel population std"
+        ],
+        "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+        "encoder": null,
+        "license": {
+          "source": "https://data.mendeley.com/datasets/bxcnxfm94c/5",
+          "license": "CC BY 4.0",
+          "condition_names": [
+            "debonded",
+            "repaired"
+          ],
+          "independent_sources": 20,
+          "excluded_m4a": 20,
+          "duplicate_relationship": "The 20 WAV files are the decoded working copies of the same 20 M4A recordings with the first 2.0 seconds removed. Do not count formats as independent observations.",
+          "split": "Five leave-one-speed-out folds: 100, 200, 500, 750, 1000 rpm. Each held-out speed contains both directions and both conditions, every source file's windows remain together.",
+          "identifiability_limit": "One physical motor before/after rebonding and one source recording per operating condition. Speed transfer can be scored; unseen-motor, repeat-session and causal fault generalization cannot be established."
+        },
+        "limits": "20 WAVs from one physical motor; M4A counterparts excluded; no unseen-motor validation"
+      },
+      "training": {
+        "existing_full_data_head": "artifacts\\puck-motor-motor-mfcc-logmel-rbf_svm.joblib",
+        "sha256": "bf8c697f3736c84d5671c37f4e40cdc0d3200e467c36a4406e0df79d38de5aa4",
+        "selection": "both fixed C=1 families retained, no outer-score winner selection",
+        "source_cache_sha256": "153176f823c4944f5cbf28d893b1f8d52bfd229d00a167aeed9cedf2eab87379"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 60,
+        "maximum_absolute_score_error": 5.495173481806503e-07,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 2.0892078522738444e-07,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\phone-motor\\audio_debonded_1000rpm_forward.wav",
+        "sha256": "2d64ae98a41b446345ce70a1cdb3dacf8d8fe831105ede7e6fba04314c949184",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 8.376849247593299e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_rbf_svm-verification.npz",
+        "sha256": "8541cb47b330f46991fda754060a59faefec44e22680045024a23a23285ceaaf",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_rbf_svm.joblib",
+        "sha256": "5dd26d0d3eb68f31a93a3a450c84d9e18d7ec84181cb51c90596654c860145dd"
+      }
+    },
+    {
+      "name": "motor_yamnet_logistic",
+      "path": "artifacts\\final\\classifiers\\motor_yamnet_logistic.tflite",
+      "sha256": "779518debc8c91e1a42ac683c39d0c507c5dfbd786e6224c3bdce2ebedd162bd",
+      "bytes": 10672,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "CAST",
+        "CONCATENATION",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "GREATER",
+        "LOGISTIC",
+        "STRIDED_SLICE",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          1024
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "probabilities in classes order",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "debonded",
+          "repaired"
+        ]
+      },
+      "contract": {
+        "task": "same-motor debonded/repaired condition",
+        "frontend": "mono16 + four-second frozen YAMNet embedding mean",
+        "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+        "feature_order": "YAMNet indices0..1023",
+        "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+        "encoder": {
+          "path": "artifacts\\tfhub\\9616fd04ec2360621642ef9455b84f4b668e219e",
+          "saved_model_sha256": "672af6e1e34fe15a42d45d70217fd39f97e10aef9b0effbf9b0bf7826fccd462",
+          "pooling": "arithmetic mean of 1024D frame embeddings, not 521 event scores"
+        },
+        "license": {
+          "source": "https://data.mendeley.com/datasets/bxcnxfm94c/5",
+          "license": "CC BY 4.0",
+          "condition_names": [
+            "debonded",
+            "repaired"
+          ],
+          "independent_sources": 20,
+          "excluded_m4a": 20,
+          "duplicate_relationship": "The 20 WAV files are the decoded working copies of the same 20 M4A recordings with the first 2.0 seconds removed. Do not count formats as independent observations.",
+          "split": "Five leave-one-speed-out folds: 100, 200, 500, 750, 1000 rpm. Each held-out speed contains both directions and both conditions, every source file's windows remain together.",
+          "identifiability_limit": "One physical motor before/after rebonding and one source recording per operating condition. Speed transfer can be scored; unseen-motor, repeat-session and causal fault generalization cannot be established."
+        },
+        "limits": "20 WAVs from one physical motor; M4A counterparts excluded; no unseen-motor validation"
+      },
+      "training": {
+        "existing_full_data_head": "artifacts\\puck-motor-motor-yamnet-logistic.joblib",
+        "sha256": "5b63bb667e52b7efe89727a5f53ab7e080916d16d200439474baa5ef3b11d483",
+        "selection": "both fixed C=1 families retained, no outer-score winner selection",
+        "source_cache_sha256": "153176f823c4944f5cbf28d893b1f8d52bfd229d00a167aeed9cedf2eab87379"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 60,
+        "maximum_absolute_score_error": 8.496585490735953e-08,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 6.231376115106713e-08,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\phone-motor\\audio_debonded_1000rpm_forward.wav",
+        "sha256": "2d64ae98a41b446345ce70a1cdb3dacf8d8fe831105ede7e6fba04314c949184",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 1.809451204148882e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\motor_yamnet_logistic-verification.npz",
+        "sha256": "a10f78d88298787efd61c428c7f24e6e5402ae67d45a78d7dd6ae8a2dcdcd558",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\motor_yamnet_logistic.joblib",
+        "sha256": "0d5aa91dfc774c9d977d34335b6bcb4ca50365cc4bd2992773987ecbfdb153b0"
+      }
+    },
+    {
+      "name": "motor_yamnet_rbf_svm",
+      "path": "artifacts\\final\\classifiers\\motor_yamnet_rbf_svm.tflite",
+      "sha256": "0dc6297d524a25c934370728b4af5f54a267c0667e8bf1e549539e23919a5ae8",
+      "bytes": 241588,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "CAST",
+        "CONCATENATION",
+        "DELEGATE",
+        "EXP",
+        "FULLY_CONNECTED",
+        "GREATER_EQUAL",
+        "MUL",
+        "NEG",
+        "RESHAPE",
+        "SQUARED_DIFFERENCE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          1024
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          "debonded",
+          "repaired"
+        ]
+      },
+      "contract": {
+        "task": "same-motor debonded/repaired condition",
+        "frontend": "mono16 + four-second frozen YAMNet embedding mean",
+        "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+        "feature_order": "YAMNet indices0..1023",
+        "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+        "encoder": {
+          "path": "artifacts\\tfhub\\9616fd04ec2360621642ef9455b84f4b668e219e",
+          "saved_model_sha256": "672af6e1e34fe15a42d45d70217fd39f97e10aef9b0effbf9b0bf7826fccd462",
+          "pooling": "arithmetic mean of 1024D frame embeddings, not 521 event scores"
+        },
+        "license": {
+          "source": "https://data.mendeley.com/datasets/bxcnxfm94c/5",
+          "license": "CC BY 4.0",
+          "condition_names": [
+            "debonded",
+            "repaired"
+          ],
+          "independent_sources": 20,
+          "excluded_m4a": 20,
+          "duplicate_relationship": "The 20 WAV files are the decoded working copies of the same 20 M4A recordings with the first 2.0 seconds removed. Do not count formats as independent observations.",
+          "split": "Five leave-one-speed-out folds: 100, 200, 500, 750, 1000 rpm. Each held-out speed contains both directions and both conditions, every source file's windows remain together.",
+          "identifiability_limit": "One physical motor before/after rebonding and one source recording per operating condition. Speed transfer can be scored; unseen-motor, repeat-session and causal fault generalization cannot be established."
+        },
+        "limits": "20 WAVs from one physical motor; M4A counterparts excluded; no unseen-motor validation"
+      },
+      "training": {
+        "existing_full_data_head": "artifacts\\puck-motor-motor-yamnet-rbf_svm.joblib",
+        "sha256": "e7f251bee45f777815582f6f5d91eba05e0fc0aac270dd5d5e5c30a5c5e74111",
+        "selection": "both fixed C=1 families retained, no outer-score winner selection",
+        "source_cache_sha256": "153176f823c4944f5cbf28d893b1f8d52bfd229d00a167aeed9cedf2eab87379"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 60,
+        "maximum_absolute_score_error": 1.4483403385501248e-06,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 1.2498715009356953e-06,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\phone-motor\\audio_debonded_1000rpm_forward.wav",
+        "sha256": "2d64ae98a41b446345ce70a1cdb3dacf8d8fe831105ede7e6fba04314c949184",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 1.5899316385681317e-07,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\motor_yamnet_rbf_svm-verification.npz",
+        "sha256": "aec13574067e7d64cb1012c603ae1d0b0c04f453309f02d5941a8b2f63614888",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\motor_yamnet_rbf_svm.joblib",
+        "sha256": "46671c8f73ce16915dbd1d8690fe65308ae6fd06b2ebc7384acdbbab8b6a3eee"
+      }
+    },
+    {
+      "name": "compressed_air_logistic",
+      "path": "artifacts\\final\\classifiers\\compressed_air_logistic.tflite",
+      "sha256": "af3daf2e996c982f79e45eed0ef4a49aca950353c418d2e9ddd66a78a9be53bc",
+      "bytes": 3200,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "CAST",
+        "CONCATENATION",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "GREATER",
+        "LOGISTIC",
+        "STRIDED_SLICE",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          90
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "probabilities in classes order",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          0,
+          1
+        ]
+      },
+      "contract": {
+        "feature_order": [
+          "13 MFCC means",
+          "13 MFCC population std",
+          "32 natural-log-mel means",
+          "32 natural-log-mel population std"
+        ],
+        "frontend": "experiments/dataset_benchmark.py:feature",
+        "frontend_sha256": "5d68692cb46af3de8bd125faf653ded954a8ad0d35b05135cf52f0d3f0f73a38",
+        "capture": "mono mean, polyphase 16kHz, first4s, whole-recording mean removal, Hann400 hop160 FFT512; 32 mel80-7600Hz; ortho DCT13",
+        "frontend_included": false,
+        "task": "audible_compressed_air_leak_vs_no_leak",
+        "labels": {
+          "0": "no_leak (_iO_)",
+          "1": "leak (_niO_)"
+        },
+        "license": "CC BY-NC-ND4.0; no commercial/redistribution rights inferred",
+        "limits": "48selected whole recordings; no session3 or unknown factories/phone/seal-tap validation"
+      },
+      "training": {
+        "fit": "all48cached real recordings",
+        "selection": "fixed C=1 gamma=scale, both families retained",
+        "cache_sha256": "c51d0bc9293bbf9ef38ee02cc32f833cf664350c9d61d6f498c8e0a63afbd45c"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 48,
+        "maximum_absolute_score_error": 2.840206343446283e-07,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 7.709360350105499e-08,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\compressed-air\\tubeleak\\lab\\1\\1_iO_3.5n_1m_.wav",
+        "sha256": "97e28a657a48737f2427aec7eaa9f38ea0b51eda9afbec8d5d228fe048748e82",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 2.085842332189003e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\compressed_air_logistic-verification.npz",
+        "sha256": "e9c1a235f9426a4e94eaae33e659b5b3c18c259356fba17bff1ac592b80a3698",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\compressed_air_logistic.joblib",
+        "sha256": "b161827eeab700c7cb2584a4cd725a81030478d98e5da1a3031cd22467563961"
+      }
+    },
+    {
+      "name": "compressed_air_rbf",
+      "path": "artifacts\\final\\classifiers\\compressed_air_rbf.tflite",
+      "sha256": "e709d98c2b7af427470cbc1b12f7e371fde7c2abaf8890be56c6e45fe2340bb9",
+      "bytes": 16892,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "CAST",
+        "CONCATENATION",
+        "DELEGATE",
+        "EXP",
+        "FULLY_CONNECTED",
+        "GREATER_EQUAL",
+        "MUL",
+        "NEG",
+        "RESHAPE",
+        "SQUARED_DIFFERENCE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          90
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          0,
+          1
+        ]
+      },
+      "contract": {
+        "feature_order": [
+          "13 MFCC means",
+          "13 MFCC population std",
+          "32 natural-log-mel means",
+          "32 natural-log-mel population std"
+        ],
+        "frontend": "experiments/dataset_benchmark.py:feature",
+        "frontend_sha256": "5d68692cb46af3de8bd125faf653ded954a8ad0d35b05135cf52f0d3f0f73a38",
+        "capture": "mono mean, polyphase 16kHz, first4s, whole-recording mean removal, Hann400 hop160 FFT512; 32 mel80-7600Hz; ortho DCT13",
+        "frontend_included": false,
+        "task": "audible_compressed_air_leak_vs_no_leak",
+        "labels": {
+          "0": "no_leak (_iO_)",
+          "1": "leak (_niO_)"
+        },
+        "license": "CC BY-NC-ND4.0; no commercial/redistribution rights inferred",
+        "limits": "48selected whole recordings; no session3 or unknown factories/phone/seal-tap validation"
+      },
+      "training": {
+        "fit": "all48cached real recordings",
+        "selection": "fixed C=1 gamma=scale, both families retained",
+        "cache_sha256": "c51d0bc9293bbf9ef38ee02cc32f833cf664350c9d61d6f498c8e0a63afbd45c"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 48,
+        "maximum_absolute_score_error": 8.476918467170691e-07,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 8.126719921452974e-07,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\compressed-air\\tubeleak\\lab\\1\\1_iO_3.5n_1m_.wav",
+        "sha256": "97e28a657a48737f2427aec7eaa9f38ea0b51eda9afbec8d5d228fe048748e82",
+        "decoded_real_audio": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 1.8391482803359338e-07,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\compressed_air_rbf-verification.npz",
+        "sha256": "6f46f6222526ebdee83c44211d3e4daa4e20fbf175e42593d3d620d23e948113",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\compressed_air_rbf.joblib",
+        "sha256": "f18db7467b2dca8bd11c9bbd1644b52f628813b00abf03ee0b2312ce15fa5b73"
+      }
+    },
+    {
+      "name": "jackfruit",
+      "path": "artifacts\\final\\classifiers\\jackfruit.tflite",
+      "sha256": "1664ff4b7b1d4e2166f90caa4707790653c4fe2488b5b5a2bea93c898a4bb758",
+      "bytes": 2696,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "CAST",
+        "CONCATENATION",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "GREATER",
+        "LOGISTIC",
+        "STRIDED_SLICE",
+        "SUB"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          27
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "probabilities in classes order",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          0,
+          1
+        ]
+      },
+      "contract": {
+        "task": "maturity Immature/Mature",
+        "labels": {
+          "0": "Immature",
+          "1": "Mature"
+        },
+        "frontend": "UNAVAILABLE: supplied XLSX acoustic features; no raw audio/complete reproducible extraction",
+        "feature_order": [
+          "PeakFreq_Hz",
+          "SpectralCentroid_Hz",
+          "SpectralBandwidth_Hz",
+          "SpectralRolloff_Hz",
+          "SpectralFlatness",
+          "SpectralEntropy",
+          "Skewness",
+          "Kurtosis",
+          "HNR_dB",
+          "BE_50_200",
+          "BE_200_500",
+          "BE_500_1500",
+          "BE_1500_4000",
+          "BE_4000_8000",
+          "MFCC_1",
+          "MFCC_2",
+          "MFCC_3",
+          "MFCC_4",
+          "MFCC_5",
+          "MFCC_6",
+          "MFCC_7",
+          "MFCC_8",
+          "MFCC_9",
+          "MFCC_10",
+          "MFCC_11",
+          "MFCC_12",
+          "MFCC_13"
+        ],
+        "license": "Repository MIT license; no independent acquisition or dataset-origin permission statement in checked dataset README",
+        "generalization_gate": "BLOCKED: acquisition/specimen identities absent or undocumented; repeated samples could span train/test",
+        "input_limit": "jackfruit cannot be invoked from phone audio without missing exact frontend"
+      },
+      "training": {
+        "existing_full_data_head": "artifacts\\secondary-table-jackfruit-model.joblib",
+        "sha256": "9ec19ca3ad915acc2bf75bf82f0c5f7ea834006527f7f33130cec31342d9a8cc",
+        "selection": "historical mean nested INNER-CV scores, not outer-score winner",
+        "historical_report": "artifacts/secondary-table-benchmark.json"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 253,
+        "maximum_absolute_score_error": 1.6778850042697968e-07,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 9,
+        "maximum_absolute_score_error": 1.5680877940571492e-07,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": null,
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\jackfruit-verification.npz",
+        "sha256": "8f0a146f2a3643431ef86b68a0e9373405ea633ac86a44b8aa7eb3b24468b07c",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\jackfruit.joblib",
+        "sha256": "acf306efa307ada6de5a54d4727d919eefa54c41dd978d80916717b88fb69924"
+      }
+    },
+    {
+      "name": "gpla12",
+      "path": "artifacts\\final\\classifiers\\gpla12.tflite",
+      "sha256": "2ec4b89726d68b09045c16574a3d848dd654ca8d5c66d9f78898b7a62636de99",
+      "bytes": 254332,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ABS",
+        "ADD",
+        "ARG_MAX",
+        "CAST",
+        "DELEGATE",
+        "DIV",
+        "EXP",
+        "GREATER",
+        "LESS_EQUAL",
+        "MUL",
+        "PACK",
+        "RESHAPE",
+        "SQUARED_DIFFERENCE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          44
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      "contract": {
+        "task": "12pressure/microphone/noise combinations among leakage signals; NOT leak-vs-no-leak or package seal integrity",
+        "labels": {
+          "1": {
+            "microphone": 1,
+            "pressure_MPa": 0.2,
+            "noise": "noiseless"
+          },
+          "2": {
+            "microphone": 1,
+            "pressure_MPa": 0.2,
+            "noise": "strongly_noisy"
+          },
+          "3": {
+            "microphone": 1,
+            "pressure_MPa": 0.4,
+            "noise": "noiseless"
+          },
+          "4": {
+            "microphone": 1,
+            "pressure_MPa": 0.4,
+            "noise": "strongly_noisy"
+          },
+          "5": {
+            "microphone": 1,
+            "pressure_MPa": 0.5,
+            "noise": "noiseless"
+          },
+          "6": {
+            "microphone": 1,
+            "pressure_MPa": 0.5,
+            "noise": "strongly_noisy"
+          },
+          "7": {
+            "microphone": 2,
+            "pressure_MPa": 0.2,
+            "noise": "noiseless"
+          },
+          "8": {
+            "microphone": 2,
+            "pressure_MPa": 0.2,
+            "noise": "strongly_noisy"
+          },
+          "9": {
+            "microphone": 2,
+            "pressure_MPa": 0.4,
+            "noise": "noiseless"
+          },
+          "10": {
+            "microphone": 2,
+            "pressure_MPa": 0.4,
+            "noise": "strongly_noisy"
+          },
+          "11": {
+            "microphone": 2,
+            "pressure_MPa": 0.5,
+            "noise": "noiseless"
+          },
+          "12": {
+            "microphone": 2,
+            "pressure_MPa": 0.5,
+            "noise": "strongly_noisy"
+          }
+        },
+        "frontend": "experiments/secondary_table_benchmark.py:gpla_frontend; source1460preprocessed numeric values, not PCM",
+        "feature_order": [
+          "mean",
+          "std",
+          "min",
+          "max",
+          "q10",
+          "q25",
+          "q50",
+          "q75",
+          "q90",
+          "standardized third moment",
+          "standardized fourth moment",
+          "centered sign crossing fraction",
+          "32normalized rFFT power bands in ascending cycles/sample"
+        ],
+        "license": "Repository EPL-2.0; review dataset rights separately before product use",
+        "generalization_gate": "BLOCKED: acquisition/specimen identities absent or undocumented; repeated samples could span train/test",
+        "input_limit": "GPLA12 is12leak-only pressure/mic/noise classes, not leak detection"
+      },
+      "training": {
+        "existing_full_data_head": "artifacts\\secondary-table-gpla-v1-model.joblib",
+        "sha256": "f4a3ccce58ec3d45366d63c6261b4ad72d2265ba3e72dc038af07afb2b0b4b57",
+        "selection": "historical mean nested INNER-CV scores, not outer-score winner",
+        "historical_report": "artifacts/secondary-table-benchmark.json"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 684,
+        "maximum_absolute_score_error": 1.2624145178108392e-06,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 7.336706433491713e-07,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts/datasets/secondary-tables/gpla/data.csv",
+        "sha256": "00135bf5f4a417d07219dd9cd340dd3834dd2cbb75aea7b11fdacfba2f0fcba1",
+        "real_preprocessed_time_series": true,
+        "not_audio_PCM": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 5.355178416266426e-07,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\gpla12-verification.npz",
+        "sha256": "b1e3528771fdc65f68fe40169a7ed5e0792c7ccd842d4660df52a70ce20b36ba",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\gpla12.joblib",
+        "sha256": "2ae966b06ab42820dbe21694b30f6943c9fdea488a5026560469bd6af670474c"
+      }
+    },
+    {
+      "name": "sdnet_spectral_svm",
+      "path": "artifacts\\final\\classifiers\\sdnet_spectral_svm.tflite",
+      "sha256": "7481ae74ffa184a505c65f728fe5fdf97e8c7d9648d02fc7514836a249905799",
+      "bytes": 516724,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ABS",
+        "ADD",
+        "ARG_MAX",
+        "CAST",
+        "DELEGATE",
+        "DIV",
+        "EXP",
+        "GREATER",
+        "LESS_EQUAL",
+        "MUL",
+        "PACK",
+        "RESHAPE",
+        "SQUARED_DIFFERENCE",
+        "STRIDED_SLICE",
+        "SUB",
+        "SUM"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          84
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          1,
+          2,
+          3
+        ]
+      },
+      "contract": {
+        "task": "structural impact-echo concrete class",
+        "labels": {
+          "1": "sound concrete",
+          "2": "delamination above top rebar mat",
+          "3": "delamination below top rebar mat"
+        },
+        "frontend": "experiments/impact_echo_benchmark.py:spectral_features, native102400Hz sensor amplitude, first2048samples/20ms; not ordinary phone PCM",
+        "frontend_sha256": "ba2d0f4bcbfe7e6ffcae359d65591b3685e2fd1c65fe591022d72e9d57646188",
+        "feature_order": [
+          "64 natural-log normalized band energies, ascending500..25000Hz",
+          "ortho DCT coefficients1..16",
+          "centroid_Hz",
+          "width_Hz",
+          "peak_band_center_Hz",
+          "flatness"
+        ],
+        "license": "Author-preprocessed SDNET mirror; original data and mirror permissions require review",
+        "limits": "Whole bridge decks held out historically; no phone or tile sensing claim",
+        "source": "https://commons.und.edu/data/19/ ; pinned author derivative https://github.com/ehoxha91/impact_echo_datasets commit ff970edfa89637623e13cd89132c5266862c6344",
+        "unresolved_label_provenance": "Pinned mirror counts1378/494/64 differ by one label from published1379sound/557delaminated; original raw archive unavailable; do not claim identical official labels"
+      },
+      "training": {
+        "fit": "all1936real sensor records",
+        "selection": {
+          "svc__C": 0.1,
+          "svc__kernel": "rbf"
+        },
+        "training_warnings": [],
+        "cache_sha256": "cff58e653abbd781499700b0670d93a0ffc92c4c9fcf463c475845c798d2933f"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 1936,
+        "maximum_absolute_score_error": 1.132961959582346e-06,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 4.6937717623762865e-07,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\impact_echo\\repository\\IE_data_sdnet2021_original\\forest_river_nb\\frnb_origin_2A.npy",
+        "sha256": "10472f2fd1d5c43f916aecd000f782a25e436cd7e3e7c29a35d47cfa72d9561c",
+        "source_row": 0,
+        "real_sensor_waveform": true,
+        "not_phone_PCM": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 2.5257188052130175e-07,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\sdnet_spectral_svm-verification.npz",
+        "sha256": "c02c1b5192e78f4cf0d3cfa22d61326d7c20c884dcff1d35b56162fc2beba90d",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\sdnet_spectral_svm.joblib",
+        "sha256": "15405f6b8398b630ff8bae6164bb4f2dc7f4f8fe53120810527e325277e866ff"
+      }
+    },
+    {
+      "name": "sdnet_small_spectral_mlp",
+      "path": "artifacts\\final\\classifiers\\sdnet_small_spectral_mlp.tflite",
+      "sha256": "515ac24d860a5869c057fca4825cb88c190a4395bb43c0faef8b80c8c8f291c5",
+      "bytes": 13644,
+      "format": "builtin-only float32 TFLite",
+      "operators": [
+        "ARG_MAX",
+        "DELEGATE",
+        "FULLY_CONNECTED",
+        "SOFTMAX",
+        "SUB",
+        "TANH"
+      ],
+      "input": {
+        "name": "features",
+        "shape": [
+          1,
+          84
+        ],
+        "dtype": "float32",
+        "frontend_included": false,
+        "scaler_included": true
+      },
+      "output": {
+        "scores": "probabilities in classes order",
+        "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+        "classes": [
+          1,
+          2,
+          3
+        ]
+      },
+      "contract": {
+        "task": "structural impact-echo concrete class",
+        "labels": {
+          "1": "sound concrete",
+          "2": "delamination above top rebar mat",
+          "3": "delamination below top rebar mat"
+        },
+        "frontend": "experiments/impact_echo_benchmark.py:spectral_features, native102400Hz sensor amplitude, first2048samples/20ms; not ordinary phone PCM",
+        "frontend_sha256": "ba2d0f4bcbfe7e6ffcae359d65591b3685e2fd1c65fe591022d72e9d57646188",
+        "feature_order": [
+          "64 natural-log normalized band energies, ascending500..25000Hz",
+          "ortho DCT coefficients1..16",
+          "centroid_Hz",
+          "width_Hz",
+          "peak_band_center_Hz",
+          "flatness"
+        ],
+        "license": "Author-preprocessed SDNET mirror; original data and mirror permissions require review",
+        "limits": "Whole bridge decks held out historically; no phone or tile sensing claim",
+        "source": "https://commons.und.edu/data/19/ ; pinned author derivative https://github.com/ehoxha91/impact_echo_datasets commit ff970edfa89637623e13cd89132c5266862c6344",
+        "unresolved_label_provenance": "Pinned mirror counts1378/494/64 differ by one label from published1379sound/557delaminated; original raw archive unavailable; do not claim identical official labels"
+      },
+      "training": {
+        "fit": "all1936real sensor records",
+        "selection": "fixed tanh32 alpha1 MLP historical comparator, not outer-selected",
+        "training_warnings": [
+          "lbfgs failed to converge (status=1):\nSTOP: TOTAL NO. OF ITERATIONS REACHED LIMIT.\n\nIncrease the number of iterations (max_iter) or scale the data as shown in:\n    https://scikit-learn.org/stable/modules/preprocessing.html"
+        ],
+        "cache_sha256": "cff58e653abbd781499700b0670d93a0ffc92c4c9fcf463c475845c798d2933f"
+      },
+      "full_data_fit_parity_not_generalization": {
+        "rows": 1936,
+        "maximum_absolute_score_error": 3.4400840609460914e-07,
+        "class_disagreements": 0
+      },
+      "finite_boundary_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 1.9186618960276292e-07,
+        "class_disagreements": 0
+      },
+      "real_input_smoke": {
+        "source": "artifacts\\datasets\\impact_echo\\repository\\IE_data_sdnet2021_original\\forest_river_nb\\frnb_origin_2A.npy",
+        "sha256": "10472f2fd1d5c43f916aecd000f782a25e436cd7e3e7c29a35d47cfa72d9561c",
+        "source_row": 0,
+        "real_sensor_waveform": true,
+        "not_phone_PCM": true,
+        "cache_row": 0,
+        "frontend_cache_maximum_absolute_error": 0.0,
+        "runtime": {
+          "rows": 1,
+          "maximum_absolute_score_error": 2.099009432932064e-08,
+          "class_disagreements": 0
+        }
+      },
+      "physical_iphone": "not tested",
+      "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+      "verification_fixture": {
+        "path": "artifacts\\final\\classifiers\\sdnet_small_spectral_mlp-verification.npz",
+        "sha256": "b13e97ccc228d971c9a0d5dbc9e9a7c3b39a5c7c2ed9d4299415b627d525e3e9",
+        "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+      },
+      "full_data_sklearn_head": {
+        "path": "artifacts\\final\\classifiers\\sdnet_small_spectral_mlp.joblib",
+        "sha256": "00ea172ca63e5edde329aedd6afc5bb9b2068edfd57d12abccbc5ad82a3a4031"
+      }
+    }
+  ],
+  "excluded": {
+    "ccny": "No unambiguous per-signal ground truth/index-to-geometry mapping; no supervised model exported.",
+    "durian_coconut": "Owned separately; deliberately outside this experiment."
+  },
+  "missing_prerequisites": {
+    "jackfruit": "No raw audio and exact source acoustic frontend; exported supplied-feature research head only.",
+    "gpla12": "1460preprocessed values lack original sampling/calibration; no raw-PCM/audio inference claim.",
+    "all": "Physical iPhone runtime, independent target-phone acquisition validation and production license review not done."
+  },
+  "historical_report_hashes_preserved": {
+    "artifacts\\acc-benchmark.json": "500e1e621c10f42a28703e609ccd81ccae2e2f0a18f10e367ad30b837b7b02e1",
+    "artifacts\\acc-ccm-metadata.json": "151887d73e59de6b90d9cfa2eeefa04e5bc99bb6ca75ff81f8b1c5671ee43458",
+    "artifacts\\acc-inspection.json": "c250008ad259120c0804367fe13ece6bebefe39dc89eff5c467078bd27ba84fd",
+    "artifacts\\acc-predictions.npz": "368f6a729a637a2911cbd586211a5d2f7fb57849c2e6153add63258db29fc66c",
+    "artifacts\\ccm-browser-access.json": "7d23eb96e36d42ea943095a92d39f83efdbd30d26c3d57e247cc6de6b758785f",
+    "artifacts\\cnn-pilot.json": "460784a0f0d0896a3a70d04ddf2269fe6901dca1d81d6acf3c48ec29f65ede73",
+    "artifacts\\coconut-benchmark.json": "31af66d2a7e8a30890b7cf9cd0081e60febfb0514182e445f2b9f213dd09ca0c",
+    "artifacts\\coconut-classifier.joblib": "b45a341eb577bdb50671302b5279da76deedd4a0d929cd7fd4c450911383ebe9",
+    "artifacts\\coconut-features.npz": "8fbcc1e374ad61f4b561ba94e5e1869caade1500f7e0186dfac14aab4c9ec448",
+    "artifacts\\compressed-air-access.json": "add1096b6495af8d4d6bd90ee19bdcde04505417acf56b3a4f964298fc6e6119",
+    "artifacts\\compressed-air-benchmark.json": "053f9ed1032373d1069b780906df95506fd70589ede8a4760dd3ad46bcb46b48",
+    "artifacts\\compressed-air-exploration.json": "833b982a7cac94ad6f42328fc6972716f5b56ec2caca7dc71aed709575ea015f",
+    "artifacts\\compressed-air-features.npz": "c51d0bc9293bbf9ef38ee02cc32f833cf664350c9d61d6f498c8e0a63afbd45c",
+    "artifacts\\compressed-air-manifest.json": "0bd44f4b9bf60e05810fd35df41a922f04e3edd0757bd7f13af1a6ab17bca036",
+    "artifacts\\compressed-air-protocol.json": "665952e24f763363fa0dca990265ad492d0f3d1a85925eb24f53fb633872eb1f",
+    "artifacts\\compressed-air-sources.json": "46f7064e063f747836633098cd6b27fcf48f1de8619668570783cc9ec9c05cd0",
+    "artifacts\\dataset-benchmarks.json": "82db40fc7582a93f20d914de95a9e983f8de74a1d92d6fff030528b137af0e3d",
+    "artifacts\\dcase-ablation-features.npz": "8772ac21a7f0474b6df3c1680bb3581d2f7b2a75b9f0f5ef3f77976b289b3b85",
+    "artifacts\\dcase-ablation-plan.json": "7b9b6aff50599e57bcf9943be0548d7f25477805f376c804d7975c2fc874a5ec",
+    "artifacts\\dcase-ablation-precision-check.json": "5e81cbc94bf3894a5d783f353bf0d61773912a4e193e38d8b17884bed0c57771",
+    "artifacts\\dcase-ablation.json": "279afbc13873955da4251e11d9b57c39b804aa7287c8a474258fd3069ab78605",
+    "artifacts\\dcase-benchmark.json": "d8155147a41b3053b85d8e1a6b8f54a3314011735604dfe1d39a85051aff8822",
+    "artifacts\\durian-features.npz": "c270f92d20ccc078aca48739c009eb29d4344f78316fcd7054dbaedf9c33ec8e",
+    "artifacts\\durian-integrity-audit.json": "b4fb875389792ddd51faef160f9048e3420a5322eb42e7a111ba3bdeb59854ea",
+    "artifacts\\durian-mfcc-fold-0.tflite": "bba7b58f968afa2e9b0132af7831763514704e64d6352df50a5dd7672c061ffe",
+    "artifacts\\durian-mfcc-fold-1.tflite": "8b25a513396b461cb6d55a8d819372b3552b5d90fc10064303ee873998c8b3cd",
+    "artifacts\\durian-mfcc-fold-2.tflite": "15fbbed9e242702fff5eb4e440fecec1ca03cf8c21b6b854b45237a7cb7651c2",
+    "artifacts\\durian-mfcc-fold-3.tflite": "9c7db76369906ccfe0b243774b59f3f22d9090ad9f0fca863e92bbd2101d04df",
+    "artifacts\\durian-mfcc-fold-4.tflite": "1d47723d16eafe6ca20442e3b6ad8b6983a0e1cfae9eaab3235a92bbc78845e3",
+    "artifacts\\durian-recordings.json": "264153345f9393a748196631bc387c34052c3d4d3f2505430a4c36ad61c6eafd",
+    "artifacts\\durian-results.json": "239f2e82f2860852df6e40170f2401e011a15bbe648bb07f41de4d44ca509e91",
+    "artifacts\\durian-tflite-heads.json": "532007c3d66631ae80e6bab8523e12bff457406e0c961a7b319c29f7ed110e44",
+    "artifacts\\durian-timing-heads.joblib": "3bbf21d7e6c12e7b273f244deb9e35dd7d9169d5e55a90b73e008fe430d490b4",
+    "artifacts\\impact-echo-artifact-hashes.json": "2afee363ddd1d2619644f258755e1270ec3ff9ace0b63d186562dc29ca80e365",
+    "artifacts\\impact-echo-ccny-descriptive.csv": "92dfe29d77e0a50630276fe34a3ecafbadd3eade46cd9e77932daf49371888ec",
+    "artifacts\\impact-echo-ccny-descriptive.joblib": "2092db2fc06c25a767eaef2b91dfc25fa25d5051ed739b5b832ffd3a40c28ab6",
+    "artifacts\\impact-echo-ccny-features.npz": "db1e00f0a42f549cfbc4d3d241db7fc04116f3a8cd0ed9241f2039ce94ad79d4",
+    "artifacts\\impact-echo-input-hashes.json": "ec37f9b6c8a4d8077954d95189290da631cbad40dea3edbd32ae5e046eb5f467",
+    "artifacts\\impact-echo-results.json": "6f0dc968368580a8249029867e1c381b476ddfd4d519c399d7e9939d1375700f",
+    "artifacts\\impact-echo-sdnet-features.npz": "cff58e653abbd781499700b0670d93a0ffc92c4c9fcf463c475845c798d2933f",
+    "artifacts\\impact-echo-sdnet-predictions.csv": "05dc93f3ade84563ce384b52302bafc15b9b03d165154683fc8161e13f6600db",
+    "artifacts\\impact-echo-sdnet-small_spectral_mlp-forest_river_nb.joblib": "061527754f0b5c9b31848c3d11cf928eec3c640b66722a977a26a497330526cc",
+    "artifacts\\impact-echo-sdnet-small_spectral_mlp-forest_river_sb.joblib": "c89141764cf61a4d1d9572ee95b07797e69768ad2315f735a1482b73201aae42",
+    "artifacts\\impact-echo-sdnet-small_spectral_mlp-park_river_median.joblib": "86c19a2ab5818c5de50b3f2f16f5095d9f9c347b816210145cfd0ae7a212a955",
+    "artifacts\\impact-echo-sdnet-small_spectral_mlp-park_river_nb.joblib": "c1adaa96f4d94724c1264b7a2f9ce2eee8a76a7bf3dc77b57c37fdf118c7cc20",
+    "artifacts\\impact-echo-sdnet-small_spectral_mlp-park_river_sb.joblib": "97762fc603cb9ea3f5d9d7cc680e5dfd8252041aadcc8fd59d70f113b4863ba3",
+    "artifacts\\impact-echo-sdnet-spectral_svm-forest_river_nb.joblib": "bebdc1a64275a3cab5806e8e7f68ebf95d3ceb543e3260ae65c44b7d8aad9310",
+    "artifacts\\impact-echo-sdnet-spectral_svm-forest_river_sb.joblib": "0bfd570d22eda671bb93fdec95a6682184ebfb85b463b983bb4d5347b70a1edf",
+    "artifacts\\impact-echo-sdnet-spectral_svm-park_river_median.joblib": "3fecebaebfc5a0b42339311b5bb914a1f9e5e3466172db43a471b3405f73c526",
+    "artifacts\\impact-echo-sdnet-spectral_svm-park_river_nb.joblib": "3777a771a7b1e9261713262116de5e44aef0bb9fd7748929820e37429565fad7",
+    "artifacts\\impact-echo-sdnet-spectral_svm-park_river_sb.joblib": "2f4ab7a717902a70bea5ad31eaa83850258f557a44d69f1484788f026b1675f8",
+    "artifacts\\impact-echo-sdnet-splits.csv": "0a86948ef3c2eac4a0800228f61e9743dc99ce2c0a5267dfe3d510ca94411582",
+    "artifacts\\machine-task-benchmark.json": "72e984174b91b220bdb38646da19925281cf2fab78ef80090e4a828abcb80174",
+    "artifacts\\machine-task-embeddings.npz": "02fd152063b13d618cebd797c1c2b312f47e12653e8b909366bdb038526d67ce",
+    "artifacts\\machine-task-refit.npz": "d8820f63c5dc9e62f746b47c1b83c790d1d152da02ff93bc986d21bc07764e79",
+    "artifacts\\machine-task-stgram-embeddings.npz": "65eb1d3242986dce6b9ca13c993ba07b7dec23f98c22d953ae8774ddf495e42c",
+    "artifacts\\machine-task-stgram-refit.npz": "a566e8d28bf02e855031ca60b6161ba406f74db934ae90e1b3fdd7e6776c3241",
+    "artifacts\\machine-task-stgram.json": "24a370076406188b0d169810cca99bf2c3cc0da071bd51cce6c57cae3b0e6435",
+    "artifacts\\machine-task-summary.json": "bef969a373811cad6a4dba2a4130c0bc77edf792e3cbdf0f02f7b5bbf4ba3646",
+    "artifacts\\material-access.json": "beab60d418bf6f1b5f071bf9c6c2015864627b35a7b8d8e73ff9691d33fe4265",
+    "artifacts\\material-benchmark.json": "b9f19385dd767763237d54fdc776b20e7bf38fa4f383fc5f0af217e977c9ff6f",
+    "artifacts\\material-features.npz": "05678087823bbe1f9f009ce1587feeb08ca79b1104f61dcb3035f7e27c23e1e0",
+    "artifacts\\material-heads.joblib": "bff7180d73a3d89d67c356645dd0630a9eed753c2132c17a45063a9b1e206e3a",
+    "artifacts\\material-realimpact-benchmark.json": "cd057f3c0c92129958ac9c323fdffe311bd4d9111801cf00d8361812044e44e5",
+    "artifacts\\material-realimpact-features.npz": "1ba882f3d1a84fef6c57d717349d5314d2b617533974ba061e5042ba80bba1a0",
+    "artifacts\\material-realimpact-heads.joblib": "fa9cc02571bdb43281216468daf05a2c1944193fc191d0e3c50294a354d4a30c",
+    "artifacts\\material-realimpact-protocol.json": "d2d956e248907f23b03636b526f5a8208a45ec673af461ef188e786a56487c6d",
+    "artifacts\\material-summary.json": "32b030b3b18420eb4d29083fbc4065273f408ebf3da9b500b65b6fc0edb21d53",
+    "artifacts\\miaow_16k.wav": "f2a00c3a3e7596f1541c4cbd59d6034a674b76ae9c53c8784882345c044da558",
+    "artifacts\\mn04_as_mAP_432.pt": "899a8c6217063f6941793102a2780b3dd788ab11fce468d9cf5f0577c453321c",
+    "artifacts\\multimachine-benchmark.json": "6236c9ba43a2d94c12cc1c815cf9112d1810bcd2b6c488800008a67ee8c3fb94",
+    "artifacts\\multimachine-combined-summary.json": "2d2c62861eedfc81cd91e52ad87697c1d5fc379f05f5065c422e808bfd231ffa",
+    "artifacts\\multimachine-cpu-timing.json": "aca4660d27861bfd8660896bcc754d97e661368665e5b5d6938aec1e991d2beb",
+    "artifacts\\multimachine-DCASE2020dev-section00-manifest.json": "40efca3e57864ac49649f4f8ec49cbb08a7a51e0709a67cca6ef1baf9932e324",
+    "artifacts\\multimachine-DCASE2020dev-section00-scores.json": "2d10ec2b1a31e51f56bef16f8c0971cdfa97d925367c185f94fb259cde7cff1d",
+    "artifacts\\multimachine-DCASE2020dev-section00.npz": "2902c1fb0bd47759fa8447d9118274c2c4036273aaa310d029a35a2a5ff35d40",
+    "artifacts\\multimachine-DCASE2020dev-section02-manifest.json": "12dc9abe7dafab49c3198c43b505827f500aae5a93c2f1e8d364738cc4de9465",
+    "artifacts\\multimachine-DCASE2020dev-section02-scores.json": "97f742240f56d88ceffed1e4c728989fa1827f734650a6071d128ff7a8fef96c",
+    "artifacts\\multimachine-DCASE2020dev-section02.npz": "cd5d3a704f972aa5ad56ea5acf82e217d4284306d7ad083c327fd56a98f9220c",
+    "artifacts\\multimachine-DCASE2020dev-section04-manifest.json": "02f741bf35eb8f447799d7da2f083f2ec1417f19b6d80edb1c8ec74244a3028f",
+    "artifacts\\multimachine-DCASE2020dev-section04-scores.json": "df6b8abf4a2699a147f333c87660a8f2c246fcae702afa6018beecaba46e068f",
+    "artifacts\\multimachine-DCASE2020dev-section04.npz": "f588e8817726ee535ecf6dc6fc419e234fd86d5d4020e4b8be19a879ce99dbcd",
+    "artifacts\\multimachine-DCASE2020dev-section06-manifest.json": "366eedefd188a0a6ef41a80a31c14633ab1a5fe71a82af381c2e630263207ff6",
+    "artifacts\\multimachine-DCASE2020dev-section06-scores.json": "8e7c4a8fa25bf8dc023b9967148da7e8fdc76277d68867e649113b191f0a7c37",
+    "artifacts\\multimachine-DCASE2020dev-section06.npz": "fa6c3c9e2f7cfd08de126de98a41c24f9a5a86235f63562fb753f63f8855623c",
+    "artifacts\\multimachine-DCASE2023dev-section00-manifest.json": "458f0f772b5e3b2e3288e424e44701054d460f0548214284461edae9e7da6661",
+    "artifacts\\multimachine-DCASE2023dev-section00-scores.json": "3dc58a3da7fc37ed24edcdde2d8a85afa28fa2cd27e50db952fa2406b753b2e6",
+    "artifacts\\multimachine-DCASE2023dev-section00.npz": "fca0dca0b70489f55fa7144e88ee82f0b1720dbf154ec5c441f10388516067c8",
+    "artifacts\\multimachine-DCASE2024eval-section00-manifest.json": "e62429fb3618e168861150f098741c6a5343968c1c423f5b192fc2e6c1d7c547",
+    "artifacts\\multimachine-DCASE2024eval-section00-scores.json": "87f1d8e128d31d4bb467ddbe8199c48dfb37ac6cc22a319c73d326112a1863eb",
+    "artifacts\\multimachine-DCASE2024eval-section00.npz": "90f876afd76b59db4b4f2647975530340271908e4e37473769a2f2670a38b72d",
+    "artifacts\\multimachine-DCASE2025dev-section00-manifest.json": "d9d93b7a58c8420003d704be8f8317019f0361bae02c30aa4e0cf00d1a94bcdd",
+    "artifacts\\multimachine-DCASE2025dev-section00-scores.json": "8b6c5c47718fc6c2b6ba0c1ac38447f310d366955293d815e04576d76fb004ef",
+    "artifacts\\multimachine-DCASE2025dev-section00.npz": "55cdd227e5fbbef02ad4c4d253944e2db548be7f885057ac6cb055e488303c39",
+    "artifacts\\multimachine-DCASE2026dev-section00-manifest.json": "1a334f71cf23d7fcf5e0f288290f9a325abcfe34dd94d3d02fda3f1ff2436248",
+    "artifacts\\multimachine-DCASE2026dev-section00-scores.json": "1c8e1829b9c14b86b6d25679ae1f6ed7661f691bf14f7abb37e4a279b9f0c222",
+    "artifacts\\multimachine-DCASE2026dev-section00.npz": "2cf1f411a6ab1a5231d6ec79d52173c0a41dae576837e125bf7416281f78f5b5",
+    "artifacts\\multimachine-downloads.json": "515b170e0c089770f717f622fae39bdbe7116f4d92ead316650b71c47642b50f",
+    "artifacts\\multimachine-expanded-protocol.json": "5b4addea2060117a1a62a85f9e3ad5db9c224b755ec8a2f6927ff661bb713c41",
+    "artifacts\\multimachine-extra-benchmark.json": "9f3b162a8b21e622a602386863f211beeb0ea60933af1985d625c55976569217",
+    "artifacts\\multimachine-extra-downloads.json": "aa252d4bc925885c0b8f49afe6af28d2332de34b759d82e1c0e1cb34c71bfecf",
+    "artifacts\\multimachine-extra-supplementary-excluded.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "artifacts\\multimachine-inventory.json": "706cb6d4d0b0135a9a32bb3e89945c712a4896be6d2464dbb0b72cf902ba877d",
+    "artifacts\\multimachine-licenses.json": "b470548af57cd2e3ca9315831c3f8fdc77c781e461b34818b1a6da80b70571d3",
+    "artifacts\\multimachine-MIMIIDG-section00-manifest.json": "ea41f119bad3fa70a98ada9217acaef195ccd5f87f9de14aeb2a564098a074bb",
+    "artifacts\\multimachine-MIMIIDG-section00-scores.json": "c6d2446544d6de588cf443b8e7d213c6b9509c426a28d53f480fbd838dfddbec",
+    "artifacts\\multimachine-MIMIIDG-section00.npz": "3a1b55e3202f6d0901a82f05465a130fc9c90a58e32daf60c784eec27dad6ca2",
+    "artifacts\\multimachine-MIMIIDG-section01-manifest.json": "2470ef63f16bb7ecebcf75cb30896015057fe72d1affb77a246d22099b3bc7e9",
+    "artifacts\\multimachine-MIMIIDG-section01-scores.json": "9ab4a910860211f3a45f8b8278ad4953931c884c215ada53feaa5efbcd8560a2",
+    "artifacts\\multimachine-MIMIIDG-section01.npz": "ccd5f2479f64c9e209e2bd2565c87978167481e6730caf6fcbf65d86d26a0ea0",
+    "artifacts\\multimachine-MIMIIDG-section02-manifest.json": "f4c6f7a9d43cf4978d89d4a0eececfa2531e559a026a653a671ca5d4023c90ba",
+    "artifacts\\multimachine-MIMIIDG-section02-scores.json": "087ac58a4996e13febc59ee57b1ce22111dd15adbb038c6dea1f81efba5b24e3",
+    "artifacts\\multimachine-MIMIIDG-section02.npz": "f3782edb3e64940ea8a4434687ab03d119c268e38d6d5fdaada0e599bf165d68",
+    "artifacts\\multimachine-MIMIIDUE-section00-manifest.json": "3d90657a5e3c4e36a7d76ecdbc7ee12f8697d16ac9f6642def4ea1df1c26bb63",
+    "artifacts\\multimachine-MIMIIDUE-section00-scores.json": "3082cf496c8c1a42ce9950ed5646286b5757f458a3fabf84afd146dc5abf35cd",
+    "artifacts\\multimachine-MIMIIDUE-section00.npz": "25adea7351c6d6e3fc7bea85119f126c32382c6d13b139507ef46e554fd067a9",
+    "artifacts\\multimachine-MIMIIDUE-section01-manifest.json": "6705d29219aab8cb7233a9aed977b2ef19ec91cafb698b39f074e3fc055feb52",
+    "artifacts\\multimachine-MIMIIDUE-section01-scores.json": "5d38f32c4724f8363b2ef684034a5e0f9ebfe8666904e9e81d022cdb5a2ac778",
+    "artifacts\\multimachine-MIMIIDUE-section01.npz": "f80629823a75a004777509dcb2308264fa67d794359e541de893bf776641c054",
+    "artifacts\\multimachine-MIMIIDUE-section02-manifest.json": "b8f245950b9baa39c10da4a0652dda46a682ebb634555fb77b7cfc304ccbe7a8",
+    "artifacts\\multimachine-MIMIIDUE-section02-scores.json": "bb81dd40e9fbdc0035cda710951ecc47e759651f79285a4b30e8cdaa170346d3",
+    "artifacts\\multimachine-MIMIIDUE-section02.npz": "ac10a05e4ad28f8651a0b7d0c19f56bbef72cad1534903618a494551a70275a2",
+    "artifacts\\multimachine-model-contract.json": "c40475ae21080ba819e2c5e1a2a34c8ca83b8ba424eab0ae66bdcedc03569376",
+    "artifacts\\multimachine-protocol.json": "728291e842ee3f3ceda00d44f616c7e54061e53ce897363b6409ed40f56e265f",
+    "artifacts\\multimachine-supplementary-excluded.json": "52057d8814b636c6ac1ab1fdbce5d94b5a763f7025e148083d1d2d59fcb354a3",
+    "artifacts\\multimachine-valve-cpu-timing.json": "8b3e5b1c464af3f7babcb33ab0f347bfc6967dcefb02e38e11e65b1c55c58e6e",
+    "artifacts\\objectfolder-access.json": "2b1eb06b9a1ea23376481f0447b96ae0343d04742f8d304c74a84285b0279687",
+    "artifacts\\objectfolder-benchmark.json": "6df9d6fc29ef32ca1d073b2b4889c113121501c9662e3febf29b6889f8d80ace",
+    "artifacts\\pretrained-comparison.json": "d16fb03b86e8e006887cfb16db826813a73144b8f620498e9ea2d18e5c940fb6",
+    "artifacts\\puck-motor-motor-duplicate-audit.json": "7b98e5833e4c9badf3961b416eb5e76a0ec4d1581d5f9fd6193dc16c167f2f80",
+    "artifacts\\puck-motor-motor-extraction.json": "12cc77e322ac7f16844465f078546e931aa3ef3a9bb3f045a0c6a615c8458db8",
+    "artifacts\\puck-motor-motor-features.npz": "153176f823c4944f5cbf28d893b1f8d52bfd229d00a167aeed9cedf2eab87379",
+    "artifacts\\puck-motor-motor-manifest.json": "6ba69519e2a5a61ed5d2bd49c7f72dc6f524f6c3c27a608e2beb0b78c142ad5c",
+    "artifacts\\puck-motor-motor-mfcc-logmel-logistic.joblib": "fe845a43279e2af5b7502d44e47be1dec00ddd290500038171df53bdd05ad16b",
+    "artifacts\\puck-motor-motor-mfcc-logmel-majority.joblib": "99f657bfaa1c428336a94508710ac788f4a0c3cbc0980ec062f5ce0a64da1b62",
+    "artifacts\\puck-motor-motor-mfcc-logmel-rbf_svm.joblib": "bf8c697f3736c84d5671c37f4e40cdc0d3200e467c36a4406e0df79d38de5aa4",
+    "artifacts\\puck-motor-motor-protocol.json": "f6ef6082f47c89b2482640903a0d49c9220bea320cbf61ce4a154a34dae9f23e",
+    "artifacts\\puck-motor-motor-report.json": "1947b7cb8421fd13bf19098adcc859f7d7f966082eda80c819d67cd9b5fa3b8b",
+    "artifacts\\puck-motor-motor-summary.json": "cfe0fd15e07fb6b9c756ad3da409ca934831f3c5591e55962ee36be03f470dd8",
+    "artifacts\\puck-motor-motor-yamnet-logistic.joblib": "5b63bb667e52b7efe89727a5f53ab7e080916d16d200439474baa5ef3b11d483",
+    "artifacts\\puck-motor-motor-yamnet-majority.joblib": "af08a4fcb30e04ba38f68ecbb6e86a9cd5e9641a146060ea9d2537eceaaa65c0",
+    "artifacts\\puck-motor-motor-yamnet-rbf_svm.joblib": "e7f251bee45f777815582f6f5d91eba05e0fc0aac270dd5d5e5c30a5c5e74111",
+    "artifacts\\puck-motor-pucks-extraction.json": "623b65b27ed43a4be6841cf6551ff537b5f6b13731a4cbdeb00f16c5f3c053a5",
+    "artifacts\\puck-motor-pucks-features.npz": "7f2aed72e0c6ba61eb2c30cbd4592d4e51a1f11385e7c9b7b192831ff9c54a20",
+    "artifacts\\puck-motor-pucks-manifest.json": "359dfa0ae0a2b1d0d956b9a4782b327f0cd114c05eff57d69fc113d274f40af3",
+    "artifacts\\puck-motor-pucks-mfcc-logmel-logistic.joblib": "a61d4300605784802ddb7306ea401f796b8a9760e1087a0dfb79a06076b52128",
+    "artifacts\\puck-motor-pucks-mfcc-logmel-majority.joblib": "3d4ad0634e547a3686d778222b7a03303e486a3f69af088d310834d4a35877dd",
+    "artifacts\\puck-motor-pucks-mfcc-logmel-rbf_svm.joblib": "dfd74f47fc2bdfb0ab3bbe342ca4e1db3b8874f28ef66747564e37e9a043df7b",
+    "artifacts\\puck-motor-pucks-protocol.json": "91921a6d05eac52b60d6cee14d9510a3f892943f2103e05c45035b0ca34bd5ca",
+    "artifacts\\puck-motor-pucks-report.json": "d63791c7830cb80cfd777c82ef2cbc65c12c45b4f1934c0fcdaa2940dff32346",
+    "artifacts\\puck-motor-pucks-summary.json": "0b7f9745b94aa2d4c077a0ef1425b1635e5a72048e74c50dd543edb20a3be0cb",
+    "artifacts\\puck-motor-pucks-yamnet-logistic.joblib": "53ee4ff04ae5949637b589885b41e496ea0eb1587b01f5ae000038adbf510580",
+    "artifacts\\puck-motor-pucks-yamnet-majority.joblib": "771ba51fb63a91c4e21f496b30d045a29275b67f952c3ac2199b8371cd0abcce",
+    "artifacts\\puck-motor-pucks-yamnet-rbf_svm.joblib": "82bb548cc5afdb6fbc56e233420518868c850b9d202ad49cbfeda7822e6651a7",
+    "artifacts\\puck-motor-runtime.json": "15ed90e25254829b9d3fbe1587f8987148bc4b3303fd597d3a0daa43050e6d64",
+    "artifacts\\puck-motor-source-audit.json": "4c725fe0fcc6f296a9c15a502e9df66d0021a0d411835a65a1231533ee27888e",
+    "artifacts\\secondary-table-benchmark.json": "96a35701b4a1487e21df77edd3fb4f6677cd847278bb3b2a60f2194775699308",
+    "artifacts\\secondary-table-gpla-v1-model.joblib": "f4a3ccce58ec3d45366d63c6261b4ad72d2265ba3e72dc038af07afb2b0b4b57",
+    "artifacts\\secondary-table-jackfruit-model.joblib": "9ec19ca3ad915acc2bf75bf82f0c5f7ea834006527f7f33130cec31342d9a8cc",
+    "artifacts\\sound-water-benchmark.json": "7131d73a0af55344ae3d96e870f1b650bf32b27c8da1980d4c9e9a13f004d753",
+    "artifacts\\tflite-parity.json": "d9bf02623592ac430c7ec84b390f6339080c05175d27414240edf40650941878",
+    "artifacts\\water-ablation-heads.npz": "2ac158f57a714f28cb71c812623d61a760d2deaee933edb944a29447dda674c1",
+    "artifacts\\water-ablation-protocol.json": "66cded4f248b0cfabec2b2e86824bc9e61f8f06ade1a9cfc4e5ca8c8bb3571aa",
+    "artifacts\\water-ablation-temporal.npz": "77e61670c31312d916c48701c2f7ac856e9fedc6a182494cbdc598728b49e87c",
+    "artifacts\\water-ablation.json": "ba01fb709047e7cf364f2262c6bbb8b6bc6d6b09bf9e6beeb3edd42ada51fd7e",
+    "artifacts\\yamnet-embedding-f32.tflite": "420472f3eb419c7950948be7b291a6599c91f8bfe326d080151ed0364cba271f",
+    "artifacts\\yamnet-fill-verified.tflite": "eb3c7f8ddae0a45ee6c1248d90c77ad14f633ac577c6e567f6ac926275f8a4ee",
+    "artifacts\\yamnet-pilot-official.json": "840a9a3df75d5801358c7572eaac3ed4ba927d21a0d7e1e989d741107eaa6bd2",
+    "artifacts\\yamnet-tile-verified.tflite": "8b4753fcfaac22639fc82b15945ead9acfb1857257d834d174f37fb78505e07f",
+    "artifacts\\yamnet.h5": "13c3308955bbfaef262f175ac9c40e47b134573a93984f009220dd7cc12a1744",
+    "artifacts\\yamnet_class_map.csv": "cdf24d193e196d9e95912a2667051ae203e92a2ba09449218ccb40ef787c6df2"
+  },
+  "environment": {
+    "python": "3.12.9",
+    "tensorflow": "2.19.0",
+    "threads_max": 2
+  },
+  "script_sha256": "184efbf389f5d91c5ca9ee925738b8b29b7791cdeb9c9351a7a0ea3a444f506e"
+}

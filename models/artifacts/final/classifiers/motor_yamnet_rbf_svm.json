@@ -1,0 +1,105 @@
+{
+  "name": "motor_yamnet_rbf_svm",
+  "path": "artifacts\\final\\classifiers\\motor_yamnet_rbf_svm.tflite",
+  "sha256": "0dc6297d524a25c934370728b4af5f54a267c0667e8bf1e549539e23919a5ae8",
+  "bytes": 241588,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "CAST",
+    "CONCATENATION",
+    "DELEGATE",
+    "EXP",
+    "FULLY_CONNECTED",
+    "GREATER_EQUAL",
+    "MUL",
+    "NEG",
+    "RESHAPE",
+    "SQUARED_DIFFERENCE",
+    "STRIDED_SLICE",
+    "SUB",
+    "SUM"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      1024
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      "debonded",
+      "repaired"
+    ]
+  },
+  "contract": {
+    "task": "same-motor debonded/repaired condition",
+    "frontend": "mono16 + four-second frozen YAMNet embedding mean",
+    "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+    "feature_order": "YAMNet indices0..1023",
+    "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+    "encoder": {
+      "path": "artifacts\\tfhub\\9616fd04ec2360621642ef9455b84f4b668e219e",
+      "saved_model_sha256": "672af6e1e34fe15a42d45d70217fd39f97e10aef9b0effbf9b0bf7826fccd462",
+      "pooling": "arithmetic mean of 1024D frame embeddings, not 521 event scores"
+    },
+    "license": {
+      "source": "https://data.mendeley.com/datasets/bxcnxfm94c/5",
+      "license": "CC BY 4.0",
+      "condition_names": [
+        "debonded",
+        "repaired"
+      ],
+      "independent_sources": 20,
+      "excluded_m4a": 20,
+      "duplicate_relationship": "The 20 WAV files are the decoded working copies of the same 20 M4A recordings with the first 2.0 seconds removed. Do not count formats as independent observations.",
+      "split": "Five leave-one-speed-out folds: 100, 200, 500, 750, 1000 rpm. Each held-out speed contains both directions and both conditions, every source file's windows remain together.",
+      "identifiability_limit": "One physical motor before/after rebonding and one source recording per operating condition. Speed transfer can be scored; unseen-motor, repeat-session and causal fault generalization cannot be established."
+    },
+    "limits": "20 WAVs from one physical motor; M4A counterparts excluded; no unseen-motor validation"
+  },
+  "training": {
+    "existing_full_data_head": "artifacts\\puck-motor-motor-yamnet-rbf_svm.joblib",
+    "sha256": "e7f251bee45f777815582f6f5d91eba05e0fc0aac270dd5d5e5c30a5c5e74111",
+    "selection": "both fixed C=1 families retained, no outer-score winner selection",
+    "source_cache_sha256": "153176f823c4944f5cbf28d893b1f8d52bfd229d00a167aeed9cedf2eab87379"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 60,
+    "maximum_absolute_score_error": 1.4483403385501248e-06,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 7,
+    "maximum_absolute_score_error": 1.2498715009356953e-06,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "source": "artifacts\\datasets\\phone-motor\\audio_debonded_1000rpm_forward.wav",
+    "sha256": "2d64ae98a41b446345ce70a1cdb3dacf8d8fe831105ede7e6fba04314c949184",
+    "decoded_real_audio": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 1.5899316385681317e-07,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\motor_yamnet_rbf_svm-verification.npz",
+    "sha256": "aec13574067e7d64cb1012c603ae1d0b0c04f453309f02d5941a8b2f63614888",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\motor_yamnet_rbf_svm.joblib",
+    "sha256": "46671c8f73ce16915dbd1d8690fe65308ae6fd06b2ebc7384acdbbab8b6a3eee"
+  }
+}

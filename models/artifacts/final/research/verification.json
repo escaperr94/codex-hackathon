@@ -1,0 +1,1301 @@
+{
+  "script_sha256": "99940733d2c19e2d76c77bf1db3bcaa89b4ee88136b2a392b4bfb1036e181187",
+  "models": [
+    {
+      "file": "artifacts\\final\\research\\yamnet-waveform-embedding-f32.tflite",
+      "sha256": "420472f3eb419c7950948be7b291a6599c91f8bfe326d080151ed0364cba271f",
+      "bytes": 12872896,
+      "input": "float32 [15600], mono16kHz PCM in [-1,1]; capture/resampling outside model",
+      "output": "float32 [1024] mean embedding, not event scores or physical estimate",
+      "frontend_included": true,
+      "operators": "TFLITE_BUILTINS only; CUSTOM opcodes rejected",
+      "real_audio": "artifacts\\sound-of-water\\audios\\VID_20240116_230040_2.1_16.7.wav",
+      "audio_sha256": "3c481c2de6e95320354ba062ba5e62d794dc73daa8c302f2424d9c1a1d0c0340",
+      "real_windows": 3,
+      "max_absolute_error": 7.62939453125e-06,
+      "fixture": "artifacts\\final\\research\\yamnet-waveform-embedding-f32.parity.npz",
+      "fixture_sha256": "3f64c7f2a32e00385eb84ea36f8a92ef13d88d392d5fc24b284b249623c77f20",
+      "scope": "975ms fixed YAMNet encoder; not interchangeable with whole-recording temporal pooling heads"
+    },
+    {
+      "file": "artifacts\\final\\research\\pouring-shape-yamnet-three-bins.tflite",
+      "sha256": "73edee08bb1db099d9f9fafa556f9d1c00abe4c8ccf603cea9af22ca7f3d65b2",
+      "bytes": 50548,
+      "fixture": "artifacts\\final\\research\\pouring-shape-yamnet-three-bins.parity.npz",
+      "fixture_sha256": "19b722a003b1af0501e444e932e620251a892c66f6d4bdbcc6f0b8c36e806bdb",
+      "input_shape": [
+        1,
+        3072
+      ],
+      "output_shape": [
+        1,
+        3
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 125,
+      "max_absolute_error": 1.188738151580715e-06,
+      "max_scaled_error": 1.188738151580715e-06,
+      "decision_changes": 0,
+      "desktop_cpu_head_only_p50_ms": 0.006599999323952943,
+      "desktop_cpu_head_only_p95_ms": 0.007434998224198351,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "class_order": [
+        "bottleneck",
+        "cylindrical",
+        "semiconical"
+      ],
+      "output_semantics": "container shape probabilities, not water volume/fill",
+      "frontend_included": false,
+      "frontend": "whole-recording YAMNet frame embeddings pooled into three chronological bins; experiments.water_ablation.main lines for temporal extraction",
+      "selection": "existing training-container-only validation; retained original training-only fit, no test refit",
+      "held_out_container_metrics": {
+        "n": 12,
+        "accuracy": 0.3333333333333333,
+        "balanced_accuracy": 0.2333333333333333,
+        "macro_f1": 0.2261904761904762,
+        "confusion_matrix": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            1,
+            3,
+            2
+          ],
+          [
+            0,
+            4,
+            1
+          ]
+        ],
+        "class_order": [
+          "bottleneck",
+          "cylindrical",
+          "semiconical"
+        ]
+      },
+      "source_report_sha256": "ba01fb709047e7cf364f2262c6bbb8b6bc6d6b09bf9e6beeb3edd42ada51fd7e",
+      "release_status": "research comparator only; poor heldout performance",
+      "real_audio_frontend_check": {
+        "audio": "artifacts\\sound-of-water\\audios\\VID_20240116_230040_2.1_16.7.wav",
+        "sha256": "3c481c2de6e95320354ba062ba5e62d794dc73daa8c302f2424d9c1a1d0c0340",
+        "max_feature_error": 0.0
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2023dev-section00-cosine1NN.tflite",
+      "sha256": "edceae856860c8442e4f6dfae4da2c14d34e456023d5b6ed589b35fe75f2616f",
+      "bytes": 1538696,
+      "fixture": "artifacts\\final\\research\\DCASE2023dev-section00-cosine1NN.parity.npz",
+      "fixture_sha256": "eef3088a2f0b433713202be444b4f8aed50ede1f7bf8879f195ce8269a6dbf9b",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 7.748603820800781e-07,
+      "max_scaled_error": 7.748603820800781e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.018300001102034003,
+      "desktop_cpu_head_only_p95_ms": 0.023409999812429305,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 1000,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "DCASE2023dev/section00",
+      "test_auc": 0.5988,
+      "reference_test_auc": 0.5988,
+      "cache_sha256": "fca0dca0b70489f55fa7144e88ee82f0b1720dbf154ec5c441f10388516067c8",
+      "manifest_sha256": "458f0f772b5e3b2e3288e424e44701054d460f0548214284461edae9e7da6661",
+      "real_audio_frontend_check": {
+        "member": "valve/test/section_00_source_test_anomaly_0000_pat_00.wav",
+        "wav_sha256": "f408c6d80d07d6ae85d8a3a34273529ceafeacbdab6f9de9c94980c297b99645",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2023dev-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "7eb9ff4e706933553f93e4494b359fcc3cdf81d73b06826080988d0c3c0b04fd",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\DCASE2023dev-section00-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "290f285912fe98219cf9e11ac18b595b01fcab8331c1bfa4e0a6cc4be4a10d16",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 0.00024669208278282895,
+      "max_scaled_error": 8.055944392337163e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.005099998816149309,
+      "desktop_cpu_head_only_p95_ms": 0.005300000339047983,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1000,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "DCASE2023dev/section00",
+      "test_auc": 0.5840000000000001,
+      "reference_test_auc": 0.5840000000000001,
+      "cache_sha256": "fca0dca0b70489f55fa7144e88ee82f0b1720dbf154ec5c441f10388516067c8",
+      "manifest_sha256": "458f0f772b5e3b2e3288e424e44701054d460f0548214284461edae9e7da6661",
+      "real_audio_frontend_check": {
+        "member": "valve/test/section_00_source_test_anomaly_0000_pat_00.wav",
+        "wav_sha256": "f408c6d80d07d6ae85d8a3a34273529ceafeacbdab6f9de9c94980c297b99645",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2024eval-section00-cosine1NN.tflite",
+      "sha256": "ea186f0556d98cdb5eff2cbefd930fa50c007af20640014ea0204291e7f19c9f",
+      "bytes": 1538696,
+      "fixture": "artifacts\\final\\research\\DCASE2024eval-section00-cosine1NN.parity.npz",
+      "fixture_sha256": "1d1c629a7673b23a2cf6b83a8aa3e5b52dc6736dab384f3634e8babcfb6f106e",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 7.618598665271037e-07,
+      "max_scaled_error": 7.618598665271037e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.018050001017400064,
+      "desktop_cpu_head_only_p95_ms": 0.021610000840155408,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 1000,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "DCASE2024eval/section00",
+      "test_auc": 0.5705,
+      "reference_test_auc": 0.5705,
+      "cache_sha256": "90f876afd76b59db4b4f2647975530340271908e4e37473769a2f2670a38b72d",
+      "manifest_sha256": "e62429fb3618e168861150f098741c6a5343968c1c423f5b192fc2e6c1d7c547",
+      "real_audio_frontend_check": {
+        "member": "RoboticArm/train/section_00_source_train_normal_0000_weight00_BckgA.wav",
+        "wav_sha256": "84701fc456541fdfad0b70f35619efb2bf5a589f9bcbc8b08e4fe866568c4cb0",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2024eval-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "170412b2c0b0b5b9932216ef43dba3a02430f21f32df488193c311f8ca5bc2f8",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\DCASE2024eval-section00-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "dfffc5fa506c531d7a69c920ab2a34962f53a46c92ed3d8b81c3e9f5c2c9875f",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 0.0005185718039228959,
+      "max_scaled_error": 5.612194060079642e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004499997885432094,
+      "desktop_cpu_head_only_p95_ms": 0.004800000169780105,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1000,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "DCASE2024eval/section00",
+      "test_auc": 0.5272,
+      "reference_test_auc": 0.5272,
+      "cache_sha256": "90f876afd76b59db4b4f2647975530340271908e4e37473769a2f2670a38b72d",
+      "manifest_sha256": "e62429fb3618e168861150f098741c6a5343968c1c423f5b192fc2e6c1d7c547",
+      "real_audio_frontend_check": {
+        "member": "RoboticArm/train/section_00_source_train_normal_0000_weight00_BckgA.wav",
+        "wav_sha256": "84701fc456541fdfad0b70f35619efb2bf5a589f9bcbc8b08e4fe866568c4cb0",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2025dev-section00-cosine1NN.tflite",
+      "sha256": "6bdf915166701f3b0d49b6c0899af02b9efc4442d96e494be58be1cf9a3c55ec",
+      "bytes": 1538696,
+      "fixture": "artifacts\\final\\research\\DCASE2025dev-section00-cosine1NN.parity.npz",
+      "fixture_sha256": "61d6f0e36fdb68877f53b45136ec79fda8096e665d60cda092fa0610392cecc0",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 8.344650268554688e-07,
+      "max_scaled_error": 8.344650268554688e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.018399998225504532,
+      "desktop_cpu_head_only_p95_ms": 0.018700000509852543,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 1000,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "DCASE2025dev/section00",
+      "test_auc": 0.7783000000000001,
+      "reference_test_auc": 0.7783,
+      "cache_sha256": "55cdd227e5fbbef02ad4c4d253944e2db548be7f885057ac6cb055e488303c39",
+      "manifest_sha256": "d9d93b7a58c8420003d704be8f8317019f0361bae02c30aa4e0cf00d1a94bcdd",
+      "real_audio_frontend_check": {
+        "member": "valve/test/section_00_source_test_anomaly_0000_v1pat_00_v2pat_05.wav",
+        "wav_sha256": "38789aeb96ea14039938688637675cebca2972f0442666eb00a012aa577adf63",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2025dev-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "60bc20076fb9f3b00ac242aeb56a0850d7211f7153384b62573695e1d59e3eb9",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\DCASE2025dev-section00-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "83b283310827e2cf067240445bb05c6d9f6d82f6e763c0ef8dec72ae1b8bc348",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 0.0001575717885202721,
+      "max_scaled_error": 1.172460631500771e-06,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004300000000512227,
+      "desktop_cpu_head_only_p95_ms": 0.004405000800034031,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1000,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "DCASE2025dev/section00",
+      "test_auc": 0.7559000000000001,
+      "reference_test_auc": 0.7559000000000001,
+      "cache_sha256": "55cdd227e5fbbef02ad4c4d253944e2db548be7f885057ac6cb055e488303c39",
+      "manifest_sha256": "d9d93b7a58c8420003d704be8f8317019f0361bae02c30aa4e0cf00d1a94bcdd",
+      "real_audio_frontend_check": {
+        "member": "valve/test/section_00_source_test_anomaly_0000_v1pat_00_v2pat_05.wav",
+        "wav_sha256": "38789aeb96ea14039938688637675cebca2972f0442666eb00a012aa577adf63",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDG-section00-cosine1NN.tflite",
+      "sha256": "06d448ccb1ca3d028d8497794ef0a74c571f26a851fae124881fbf33b6065908",
+      "bytes": 1538696,
+      "fixture": "artifacts\\final\\research\\MIMIIDG-section00-cosine1NN.parity.npz",
+      "fixture_sha256": "0056515cb2912ffb4813483f08ca4f8a459834cafa26ad6f0d8858ecdf2558bb",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 7.748603820800781e-07,
+      "max_scaled_error": 7.748603820800781e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.021249999917927198,
+      "desktop_cpu_head_only_p95_ms": 0.027030001911043655,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 1000,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "MIMIIDG/section00",
+      "test_auc": 0.5988,
+      "reference_test_auc": 0.5988,
+      "cache_sha256": "3a1b55e3202f6d0901a82f05465a130fc9c90a58e32daf60c784eec27dad6ca2",
+      "manifest_sha256": "ea41f119bad3fa70a98ada9217acaef195ccd5f87f9de14aeb2a564098a074bb",
+      "real_audio_frontend_check": {
+        "member": "valve/test/section_00_source_test_anomaly_0000_pat_00.wav",
+        "wav_sha256": "329c3fddf3bfc96bde227d48eaabbdcda26e7546ba3a59b5f400764a0495dc4e",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDG-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "fe6298371de0de69069871681631bef47dc578096785539e928681cf17fd8ac8",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\MIMIIDG-section00-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "be67e5b2f0fa3456055f4da7d37e4552ecc4dffe3f522bf0d4c084860b157ee4",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 0.0002466920917072457,
+      "max_scaled_error": 8.055943676188438e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004300000000512227,
+      "desktop_cpu_head_only_p95_ms": 0.004405000800034031,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1000,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "MIMIIDG/section00",
+      "test_auc": 0.5840000000000001,
+      "reference_test_auc": 0.5840000000000001,
+      "cache_sha256": "3a1b55e3202f6d0901a82f05465a130fc9c90a58e32daf60c784eec27dad6ca2",
+      "manifest_sha256": "ea41f119bad3fa70a98ada9217acaef195ccd5f87f9de14aeb2a564098a074bb",
+      "real_audio_frontend_check": {
+        "member": "valve/test/section_00_source_test_anomaly_0000_pat_00.wav",
+        "wav_sha256": "329c3fddf3bfc96bde227d48eaabbdcda26e7546ba3a59b5f400764a0495dc4e",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDG-section01-cosine1NN.tflite",
+      "sha256": "627670fad3f5fc386a1d5dd984ca400ed28c01175e951c614275d15bf7381c92",
+      "bytes": 1538696,
+      "fixture": "artifacts\\final\\research\\MIMIIDG-section01-cosine1NN.parity.npz",
+      "fixture_sha256": "2c4ad518ad52b5e068c9ef4a1f75dd1c6a6365a738de9cd12b20a40835e0eab1",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 8.940696716308594e-07,
+      "max_scaled_error": 8.940696716308594e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.01869999869086314,
+      "desktop_cpu_head_only_p95_ms": 0.020409998978720978,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 1000,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "MIMIIDG/section01",
+      "test_auc": 0.5535,
+      "reference_test_auc": 0.5535,
+      "cache_sha256": "ccd5f2479f64c9e209e2bd2565c87978167481e6730caf6fcbf65d86d26a0ea0",
+      "manifest_sha256": "2470ef63f16bb7ecebcf75cb30896015057fe72d1affb77a246d22099b3bc7e9",
+      "real_audio_frontend_check": {
+        "member": "valve/test/section_01_source_test_anomaly_0000_pat_05_panel_open.wav",
+        "wav_sha256": "193f3a05a642e30d2260f52e8842691c9c3893c597bf2f08b208db66856caa68",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDG-section01-Gaussian_LedoitWolf.tflite",
+      "sha256": "0ca82ba508e98679a8e03150dc5cb94b7b6a8e2fdb22b3011fa974afd158487e",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\MIMIIDG-section01-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "97446f7e83b9b511b42bd456ded5f6691f0bb6c6d3994e52004b1a4bfd92473e",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 0.00023749343267809309,
+      "max_scaled_error": 9.084141446763355e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004500001523410901,
+      "desktop_cpu_head_only_p95_ms": 0.005800000508315861,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1000,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "MIMIIDG/section01",
+      "test_auc": 0.5989,
+      "reference_test_auc": 0.5989,
+      "cache_sha256": "ccd5f2479f64c9e209e2bd2565c87978167481e6730caf6fcbf65d86d26a0ea0",
+      "manifest_sha256": "2470ef63f16bb7ecebcf75cb30896015057fe72d1affb77a246d22099b3bc7e9",
+      "real_audio_frontend_check": {
+        "member": "valve/test/section_01_source_test_anomaly_0000_pat_05_panel_open.wav",
+        "wav_sha256": "193f3a05a642e30d2260f52e8842691c9c3893c597bf2f08b208db66856caa68",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDG-section02-cosine1NN.tflite",
+      "sha256": "d4d3b0ec04808fea714155bf2546f70843fe4f0d556bf613f199265382c8628d",
+      "bytes": 1538696,
+      "fixture": "artifacts\\final\\research\\MIMIIDG-section02-cosine1NN.parity.npz",
+      "fixture_sha256": "4f2a2a5dfbcd9e2c299c963cdeba6ade97e2d85a5479f93b4c97ab2cba25b85d",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 7.816506781832544e-07,
+      "max_scaled_error": 7.816506781832544e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.03534999996190891,
+      "desktop_cpu_head_only_p95_ms": 0.060630001462413916,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 1000,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "MIMIIDG/section02",
+      "test_auc": 0.6874,
+      "reference_test_auc": 0.6874,
+      "cache_sha256": "f3782edb3e64940ea8a4434687ab03d119c268e38d6d5fdaada0e599bf165d68",
+      "manifest_sha256": "f4c6f7a9d43cf4978d89d4a0eececfa2531e559a026a653a671ca5d4023c90ba",
+      "real_audio_frontend_check": {
+        "member": "valve/test/section_02_source_test_anomaly_0000_v1pat_05.wav",
+        "wav_sha256": "e97bbd043e1b37aa47de97151453402194fa358105f5defe3184bd8e6fc21ad8",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDG-section02-Gaussian_LedoitWolf.tflite",
+      "sha256": "d57b76d70f48be1c91f7b15a9350da3adc36a69ae09b053cae2d8cf1a2dc9d73",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\MIMIIDG-section02-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "ef70f3e325070627bfc181fed8b0c6957c98e9b42e94078c1daab3258bc5e16e",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 0.0001845604285790614,
+      "max_scaled_error": 8.522594221600216e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004300000000512227,
+      "desktop_cpu_head_only_p95_ms": 0.004400000761961564,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1000,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "MIMIIDG/section02",
+      "test_auc": 0.5265,
+      "reference_test_auc": 0.5265,
+      "cache_sha256": "f3782edb3e64940ea8a4434687ab03d119c268e38d6d5fdaada0e599bf165d68",
+      "manifest_sha256": "f4c6f7a9d43cf4978d89d4a0eececfa2531e559a026a653a671ca5d4023c90ba",
+      "real_audio_frontend_check": {
+        "member": "valve/test/section_02_source_test_anomaly_0000_v1pat_05.wav",
+        "wav_sha256": "e97bbd043e1b37aa47de97151453402194fa358105f5defe3184bd8e6fc21ad8",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDUE-section00-cosine1NN.tflite",
+      "sha256": "0e67dd3ce72b574a0d671267108f1399aa638659442f5e78fde561bdfb029e07",
+      "bytes": 1543304,
+      "fixture": "artifacts\\final\\research\\MIMIIDUE-section00-cosine1NN.parity.npz",
+      "fixture_sha256": "511e7a6e4caa05bf106978b77d9da0fbe82c2780879d6c2bb54b763cd918e004",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1403,
+      "max_absolute_error": 8.344650268554688e-07,
+      "max_scaled_error": 8.344650268554688e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.033799999073380604,
+      "desktop_cpu_head_only_p95_ms": 0.03501000082906103,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 1003,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "MIMIIDUE/section00",
+      "test_auc": 0.59385,
+      "reference_test_auc": 0.59385,
+      "cache_sha256": "25adea7351c6d6e3fc7bea85119f126c32382c6d13b139507ef46e554fd067a9",
+      "manifest_sha256": "3d90657a5e3c4e36a7d76ecdbc7ee12f8697d16ac9f6642def4ea1df1c26bb63",
+      "real_audio_frontend_check": {
+        "member": "valve/source_test/section_00_source_test_anomaly_0000.wav",
+        "wav_sha256": "c2352f10f3c31b624dca086f92722474c9b4b6357e5f803cb03d14f1d83760e3",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDUE-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "4fd0ab4406744f5650eb8a06773c21390fc0e9502ac04d71824894ff06426e02",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\MIMIIDUE-section00-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "47e98dbbc1c84261da99590bb396a051ee890318acf2756ffefb8626d24b35e0",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1403,
+      "max_absolute_error": 0.00027145607555212337,
+      "max_scaled_error": 5.379580273240325e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004499997885432094,
+      "desktop_cpu_head_only_p95_ms": 0.005199999759497587,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1003,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "MIMIIDUE/section00",
+      "test_auc": 0.5324500000000001,
+      "reference_test_auc": 0.5324500000000001,
+      "cache_sha256": "25adea7351c6d6e3fc7bea85119f126c32382c6d13b139507ef46e554fd067a9",
+      "manifest_sha256": "3d90657a5e3c4e36a7d76ecdbc7ee12f8697d16ac9f6642def4ea1df1c26bb63",
+      "real_audio_frontend_check": {
+        "member": "valve/source_test/section_00_source_test_anomaly_0000.wav",
+        "wav_sha256": "c2352f10f3c31b624dca086f92722474c9b4b6357e5f803cb03d14f1d83760e3",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDUE-section01-cosine1NN.tflite",
+      "sha256": "30a9fa0b22e3ac13880de48b5aa5b74d529b34225e634ec2fc924752f6333ebd",
+      "bytes": 1543304,
+      "fixture": "artifacts\\final\\research\\MIMIIDUE-section01-cosine1NN.parity.npz",
+      "fixture_sha256": "f12413e90514f5d5118a533dbac836df5c4a87abff5b0e5b358cac7f8e1ee359",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1403,
+      "max_absolute_error": 8.472414050331167e-07,
+      "max_scaled_error": 8.472414050331167e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.021400001060101204,
+      "desktop_cpu_head_only_p95_ms": 0.03973999682784779,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 1003,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "MIMIIDUE/section01",
+      "test_auc": 0.5503750000000001,
+      "reference_test_auc": 0.55035,
+      "cache_sha256": "f80629823a75a004777509dcb2308264fa67d794359e541de893bf776641c054",
+      "manifest_sha256": "6705d29219aab8cb7233a9aed977b2ef19ec91cafb698b39f074e3fc055feb52",
+      "real_audio_frontend_check": {
+        "member": "valve/source_test/section_01_source_test_anomaly_0000.wav",
+        "wav_sha256": "3a9a078163a48b88e8b98f1c403849abc0acdc8fc2b5d838bee7501d7ad234d0",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDUE-section01-Gaussian_LedoitWolf.tflite",
+      "sha256": "029a333cadcfeb99303466df19bfbea011d80632c12623715237b90ea4831554",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\MIMIIDUE-section01-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "8d4c061b40a7fc18d74c30f6723488b465fe81d1d1c57abd3e85781ac4bdef4e",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1403,
+      "max_absolute_error": 0.0004110254994884599,
+      "max_scaled_error": 6.36606135901027e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004599998646881431,
+      "desktop_cpu_head_only_p95_ms": 0.005605002479569521,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1003,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "MIMIIDUE/section01",
+      "test_auc": 0.5880000000000001,
+      "reference_test_auc": 0.5880000000000001,
+      "cache_sha256": "f80629823a75a004777509dcb2308264fa67d794359e541de893bf776641c054",
+      "manifest_sha256": "6705d29219aab8cb7233a9aed977b2ef19ec91cafb698b39f074e3fc055feb52",
+      "real_audio_frontend_check": {
+        "member": "valve/source_test/section_01_source_test_anomaly_0000.wav",
+        "wav_sha256": "3a9a078163a48b88e8b98f1c403849abc0acdc8fc2b5d838bee7501d7ad234d0",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDUE-section02-cosine1NN.tflite",
+      "sha256": "cbd372ed48dd970ba71bd6d8921c7e17837037a7825975c199e27741361c7593",
+      "bytes": 1543304,
+      "fixture": "artifacts\\final\\research\\MIMIIDUE-section02-cosine1NN.parity.npz",
+      "fixture_sha256": "bf6fe44c608289bb3ed26110f73328d67c0a8523d72689c1779f32ee0960f720",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1403,
+      "max_absolute_error": 9.476500280047873e-07,
+      "max_scaled_error": 9.476500280047873e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.017499998648418114,
+      "desktop_cpu_head_only_p95_ms": 0.02072500101348851,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 1003,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "MIMIIDUE/section02",
+      "test_auc": 0.6273250000000001,
+      "reference_test_auc": 0.6273250000000001,
+      "cache_sha256": "ac10a05e4ad28f8651a0b7d0c19f56bbef72cad1534903618a494551a70275a2",
+      "manifest_sha256": "b8f245950b9baa39c10da4a0652dda46a682ebb634555fb77b7cfc304ccbe7a8",
+      "real_audio_frontend_check": {
+        "member": "valve/source_test/section_02_source_test_anomaly_0000.wav",
+        "wav_sha256": "308f05d31deb7d8ae1a3a7e49a4b4a3e7c79d124a28b702dc8b92c8732713a9f",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\MIMIIDUE-section02-Gaussian_LedoitWolf.tflite",
+      "sha256": "d27c8887a5f0a4bff6bf0df54bce7a6c3de0488fdd9315ad1d75e950b16eff10",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\MIMIIDUE-section02-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "ed94c30460e49df670bc60be519ab3a1dab26a7be1805c2c269f3752a76d7570",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1403,
+      "max_absolute_error": 0.00031874701835477026,
+      "max_scaled_error": 6.474891138242014e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.005099998816149309,
+      "desktop_cpu_head_only_p95_ms": 0.005300000339047983,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1003,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "MIMIIDUE/section02",
+      "test_auc": 0.5770000000000001,
+      "reference_test_auc": 0.5770000000000001,
+      "cache_sha256": "ac10a05e4ad28f8651a0b7d0c19f56bbef72cad1534903618a494551a70275a2",
+      "manifest_sha256": "b8f245950b9baa39c10da4a0652dda46a682ebb634555fb77b7cfc304ccbe7a8",
+      "real_audio_frontend_check": {
+        "member": "valve/source_test/section_02_source_test_anomaly_0000.wav",
+        "wav_sha256": "308f05d31deb7d8ae1a3a7e49a4b4a3e7c79d124a28b702dc8b92c8732713a9f",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2020dev-section00-cosine1NN.tflite",
+      "sha256": "80f9ebd8f162ae0f1eabca21dc46751b9abd01ae90b7be0e24f67540e6c35239",
+      "bytes": 1371272,
+      "fixture": "artifacts\\final\\research\\DCASE2020dev-section00-cosine1NN.parity.npz",
+      "fixture_sha256": "358fb9fac228c901bbdfb3574aef004bb21d2a3b49ca9483a35d7bda6e68deb4",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1110,
+      "max_absolute_error": 8.940696716308594e-07,
+      "max_scaled_error": 8.940696716308594e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.029200000426499173,
+      "desktop_cpu_head_only_p95_ms": 0.030705000972375274,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 891,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "DCASE2020dev/section00",
+      "test_auc": 0.9523529411764706,
+      "reference_test_auc": 0.9523529411764706,
+      "cache_sha256": "2902c1fb0bd47759fa8447d9118274c2c4036273aaa310d029a35a2a5ff35d40",
+      "manifest_sha256": "40efca3e57864ac49649f4f8ec49cbb08a7a51e0709a67cca6ef1baf9932e324",
+      "real_audio_frontend_check": {
+        "member": "valve/test/anomaly_id_00_00000000.wav",
+        "wav_sha256": "413ed5a0c4b0350e79062c562c293015453092e1129f7598c43384ebcd367ee5",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2020dev-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "e182aa9a9ba75576c30b693e9f65b2ac4afffb1e1b2180a8546f505df77d49e0",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\DCASE2020dev-section00-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "a69307e712a2f9c6baadb95e0455ddb96a6f369bb3f1a85a1f77ee76700b50b1",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1110,
+      "max_absolute_error": 0.00018916622798315075,
+      "max_scaled_error": 6.485628663652999e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004500001523410901,
+      "desktop_cpu_head_only_p95_ms": 0.004900000931229442,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 891,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "DCASE2020dev/section00",
+      "test_auc": 0.726218487394958,
+      "reference_test_auc": 0.726218487394958,
+      "cache_sha256": "2902c1fb0bd47759fa8447d9118274c2c4036273aaa310d029a35a2a5ff35d40",
+      "manifest_sha256": "40efca3e57864ac49649f4f8ec49cbb08a7a51e0709a67cca6ef1baf9932e324",
+      "real_audio_frontend_check": {
+        "member": "valve/test/anomaly_id_00_00000000.wav",
+        "wav_sha256": "413ed5a0c4b0350e79062c562c293015453092e1129f7598c43384ebcd367ee5",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2020dev-section02-cosine1NN.tflite",
+      "sha256": "9b83f267778e7e733fc5b8bd5baa059b1192b63767d19175718882e997dfb344",
+      "bytes": 936584,
+      "fixture": "artifacts\\final\\research\\DCASE2020dev-section02-cosine1NN.parity.npz",
+      "fixture_sha256": "d4bd54ffc81fa9d06009214e9320b547e56c1f263f832b80b922ef15b9227698",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 828,
+      "max_absolute_error": 8.344650268554688e-07,
+      "max_scaled_error": 8.344650268554688e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.017600001228856854,
+      "desktop_cpu_head_only_p95_ms": 0.018005002311838325,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 608,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "DCASE2020dev/section02",
+      "test_auc": 0.7610833333333333,
+      "reference_test_auc": 0.7610833333333333,
+      "cache_sha256": "cd5d3a704f972aa5ad56ea5acf82e217d4284306d7ad083c327fd56a98f9220c",
+      "manifest_sha256": "12dc9abe7dafab49c3198c43b505827f500aae5a93c2f1e8d364738cc4de9465",
+      "real_audio_frontend_check": {
+        "member": "valve/test/anomaly_id_02_00000000.wav",
+        "wav_sha256": "260bef24964e3bbfacafb71e6e19b82667c5c6417e9e6cc4ba975619de93ceff",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2020dev-section02-Gaussian_LedoitWolf.tflite",
+      "sha256": "b3cb593543ae0be42bd10fe242c9e52378e6202166bd9cf05ead1cf93b077ab3",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\DCASE2020dev-section02-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "ca4566ba14fde83f92b5dc46a60a9d1112628a8b2c95b656e8539b2e0d4bf5aa",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 828,
+      "max_absolute_error": 0.00011889822246757831,
+      "max_scaled_error": 5.712116066319891e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004300000000512227,
+      "desktop_cpu_head_only_p95_ms": 0.004900000931229442,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 608,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "DCASE2020dev/section02",
+      "test_auc": 0.8226666666666667,
+      "reference_test_auc": 0.8226666666666667,
+      "cache_sha256": "cd5d3a704f972aa5ad56ea5acf82e217d4284306d7ad083c327fd56a98f9220c",
+      "manifest_sha256": "12dc9abe7dafab49c3198c43b505827f500aae5a93c2f1e8d364738cc4de9465",
+      "real_audio_frontend_check": {
+        "member": "valve/test/anomaly_id_02_00000000.wav",
+        "wav_sha256": "260bef24964e3bbfacafb71e6e19b82667c5c6417e9e6cc4ba975619de93ceff",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2020dev-section04-cosine1NN.tflite",
+      "sha256": "2066b67e62fdacedcb657bbd7d41bb6374bc4f303801d02ce93cc37ff0faff95",
+      "bytes": 1385096,
+      "fixture": "artifacts\\final\\research\\DCASE2020dev-section04-cosine1NN.parity.npz",
+      "fixture_sha256": "282b6059c4d375f827ed7392bdefd46bc86ce5d2268a823e367804d01386d2de",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1120,
+      "max_absolute_error": 9.5367431640625e-07,
+      "max_scaled_error": 9.5367431640625e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.015199999324977398,
+      "desktop_cpu_head_only_p95_ms": 0.029830001039954337,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 900,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "DCASE2020dev/section04",
+      "test_auc": 0.8294999999999999,
+      "reference_test_auc": 0.8294999999999999,
+      "cache_sha256": "f588e8817726ee535ecf6dc6fc419e234fd86d5d4020e4b8be19a879ce99dbcd",
+      "manifest_sha256": "02f741bf35eb8f447799d7da2f083f2ec1417f19b6d80edb1c8ec74244a3028f",
+      "real_audio_frontend_check": {
+        "member": "valve/test/anomaly_id_04_00000000.wav",
+        "wav_sha256": "e82b7f8064bd47db5d40ef8f227160953bfa4e8df7c1a0504b5c762f47e36c97",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2020dev-section04-Gaussian_LedoitWolf.tflite",
+      "sha256": "ce3ee41ab8a5fb9442b5ce6e571a4e2e6c25c245ff394b1fea02eaece30a216d",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\DCASE2020dev-section04-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "ac5e7ba51d66a4a48946e0677c1b206f0e0d0eb24c98e00d671c25dbcc8d4841",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1120,
+      "max_absolute_error": 0.00015262927900039358,
+      "max_scaled_error": 5.954179415373332e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004400000761961564,
+      "desktop_cpu_head_only_p95_ms": 0.004600002284860238,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 900,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "DCASE2020dev/section04",
+      "test_auc": 0.7628333333333334,
+      "reference_test_auc": 0.7628333333333334,
+      "cache_sha256": "f588e8817726ee535ecf6dc6fc419e234fd86d5d4020e4b8be19a879ce99dbcd",
+      "manifest_sha256": "02f741bf35eb8f447799d7da2f083f2ec1417f19b6d80edb1c8ec74244a3028f",
+      "real_audio_frontend_check": {
+        "member": "valve/test/anomaly_id_04_00000000.wav",
+        "wav_sha256": "e82b7f8064bd47db5d40ef8f227160953bfa4e8df7c1a0504b5c762f47e36c97",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2020dev-section06-cosine1NN.tflite",
+      "sha256": "17ba9f0f2608fb3d92970b4c2af5df099fb0987d6a5f28c520b121620ba6316b",
+      "bytes": 1372808,
+      "fixture": "artifacts\\final\\research\\DCASE2020dev-section06-cosine1NN.parity.npz",
+      "fixture_sha256": "8029cb87cd925745a9b8d077c54eeeb9d816a23f10298ed2fce0107f35ad3a46",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1112,
+      "max_absolute_error": 1.0728836059570312e-06,
+      "max_scaled_error": 1.0728836059570312e-06,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.017399997886968777,
+      "desktop_cpu_head_only_p95_ms": 0.018300001102034003,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 892,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "DCASE2020dev/section06",
+      "test_auc": 0.7094166666666667,
+      "reference_test_auc": 0.7094166666666667,
+      "cache_sha256": "fa6c3c9e2f7cfd08de126de98a41c24f9a5a86235f63562fb753f63f8855623c",
+      "manifest_sha256": "366eedefd188a0a6ef41a80a31c14633ab1a5fe71a82af381c2e630263207ff6",
+      "real_audio_frontend_check": {
+        "member": "valve/test/anomaly_id_06_00000000.wav",
+        "wav_sha256": "0e01d149340dd5a96c27d8c3cf0b8bd67cd39d8136668170fe83373d016f69e9",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2020dev-section06-Gaussian_LedoitWolf.tflite",
+      "sha256": "47e6414c43252ce687991ec9fdee20abf0de2d07827d7cb7eb4adac7cf9ea488",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\DCASE2020dev-section06-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "3817bfc563fdd31682ce9855f24668327d96dcd3c822f290f353c5f0aa4ad039",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1112,
+      "max_absolute_error": 0.00024247230157925515,
+      "max_scaled_error": 5.460220295259978e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.005999998393235728,
+      "desktop_cpu_head_only_p95_ms": 0.033165000422741196,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 892,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "DCASE2020dev/section06",
+      "test_auc": 0.591,
+      "reference_test_auc": 0.591,
+      "cache_sha256": "fa6c3c9e2f7cfd08de126de98a41c24f9a5a86235f63562fb753f63f8855623c",
+      "manifest_sha256": "366eedefd188a0a6ef41a80a31c14633ab1a5fe71a82af381c2e630263207ff6",
+      "real_audio_frontend_check": {
+        "member": "valve/test/anomaly_id_06_00000000.wav",
+        "wav_sha256": "0e01d149340dd5a96c27d8c3cf0b8bd67cd39d8136668170fe83373d016f69e9",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2026dev-section00-cosine1NN.tflite",
+      "sha256": "0bb4032ce9b8fcf97e9a3e2df326a453ce71441e9cf063209287961a48ac0169",
+      "bytes": 1538696,
+      "fixture": "artifacts\\final\\research\\DCASE2026dev-section00-cosine1NN.parity.npz",
+      "fixture_sha256": "f66c43aa2b8dfba4d8d9abc13d56361f367474563be958c44e53976d5845ef70",
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 7.615857685605576e-07,
+      "max_scaled_error": 7.615857685605576e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.016500001947861165,
+      "desktop_cpu_head_only_p95_ms": 0.017105002734751906,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nearest training-normal cosine distance in [0,2]; not fault probability",
+      "fit_rows": 1000,
+      "frontend_included": false,
+      "frontend": "official EfficientAT mn04_as 32kHz frontend + frozen 384D encoder; experiments.multimachine_benchmark.extract",
+      "zero_vector": "cosine distance 1, matching sklearn cosine convention",
+      "dataset": "DCASE2026dev/section00",
+      "test_auc": 0.7571,
+      "reference_test_auc": 0.7571,
+      "cache_sha256": "2cf1f411a6ab1a5231d6ec79d52173c0a41dae576837e125bf7416281f78f5b5",
+      "manifest_sha256": "1a334f71cf23d7fcf5e0f288290f9a325abcfe34dd94d3d02fda3f1ff2436248",
+      "real_audio_frontend_check": {
+        "member": "valveEmu/test/section_00_source_test_anomaly_0000_noAttribute.wav",
+        "wav_sha256": "cbe93d32a96021ff45dcb2600478755814cd872bebb0d89b6dd9341826bcd6ab",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      }
+    },
+    {
+      "file": "artifacts\\final\\research\\DCASE2026dev-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "1f3d9c37656f36cc3d638c28269fdb0553aa51a51492e88cd3fa7dd955213f29",
+      "bytes": 264684,
+      "fixture": "artifacts\\final\\research\\DCASE2026dev-section00-Gaussian_LedoitWolf.parity.npz",
+      "fixture_sha256": "8c541fa18d23eb96bf8dd11aafe84369f087dba4c01889791095a1825f3cfc4b",
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 0.00026072251290543136,
+      "max_scaled_error": 1.8545600360045885e-06,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.004499997885432094,
+      "desktop_cpu_head_only_p95_ms": 0.004705002902483102,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1000,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "dataset": "DCASE2026dev/section00",
+      "test_auc": 0.7497,
+      "reference_test_auc": 0.7497,
+      "cache_sha256": "2cf1f411a6ab1a5231d6ec79d52173c0a41dae576837e125bf7416281f78f5b5",
+      "manifest_sha256": "1a334f71cf23d7fcf5e0f288290f9a325abcfe34dd94d3d02fda3f1ff2436248",
+      "real_audio_frontend_check": {
+        "member": "valveEmu/test/section_00_source_test_anomaly_0000_noAttribute.wav",
+        "wav_sha256": "cbe93d32a96021ff45dcb2600478755814cd872bebb0d89b6dd9341826bcd6ab",
+        "real_waveform_reextraction": "matched both cached feature representations"
+      },
+      "frontend": "official EfficientAT frontend logmel mean/std 256D; experiments.multimachine_benchmark.extract"
+    },
+    {
+      "file": "artifacts\\final\\research\\valve2024-jvachier-mahalanobis.tflite",
+      "sha256": "a2c85d0522e103492de8a15795f0e7da1096f61a325f11ddf853c55253a2b386",
+      "bytes": 67564,
+      "fixture": "artifacts\\final\\research\\valve2024-jvachier-mahalanobis.parity.npz",
+      "fixture_sha256": "f7bbfebcbb347125a225d3028f9c2d30194ebac426d2e36aaea2b56f1d05eaa4",
+      "input_shape": [
+        1,
+        128
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 7.091065783271233e-05,
+      "max_scaled_error": 3.791291913693345e-06,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.0035999983083456755,
+      "desktop_cpu_head_only_p95_ms": 0.003804999869316816,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1000,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "frontend": {
+        "implementation": "unaltered pinned iaad.features and iaad.models",
+        "sample_rate": 16000,
+        "fft": 512,
+        "hop": 256,
+        "mel_bins": 128,
+        "fmin": 50,
+        "fmax": 8000,
+        "patch_frames": 64,
+        "patches_per_clip": 9,
+        "discarded_trailing_frames": 48,
+        "normalization": "per-mel clip CMVN over retained patches, saved2020 per-bin zscore, clip+-5 per official inference",
+        "pooling": "arithmetic mean of 9 L2-normalized 128D patch embeddings, no post-mean L2 normalization"
+      },
+      "source_report_sha256": "72e984174b91b220bdb38646da19925281cf2fab78ef80090e4a828abcb80174"
+    },
+    {
+      "file": "artifacts\\final\\research\\valve2024-stgram-mahalanobis.tflite",
+      "sha256": "f75faab512b1d78b93999ba62dfab3124cb36ecf0c06f666485ce7636b597adb",
+      "bytes": 67564,
+      "fixture": "artifacts\\final\\research\\valve2024-stgram-mahalanobis.parity.npz",
+      "fixture_sha256": "a44b5e62e0af9332e63c06d45bfbce06f9e5216c09d9509daca0a7186bf12748",
+      "input_shape": [
+        1,
+        128
+      ],
+      "output_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "operators": "TFLITE_BUILTINS only; FlatBuffer CUSTOM opcodes rejected",
+      "real_feature_rows": 1200,
+      "max_absolute_error": 5.5137276490313525e-05,
+      "max_scaled_error": 3.921517634324709e-07,
+      "decision_changes": null,
+      "desktop_cpu_head_only_p50_ms": 0.0035999983083456755,
+      "desktop_cpu_head_only_p95_ms": 0.003699999251693953,
+      "warmups": 20,
+      "timed_inferences": 100,
+      "output_semantics": "nonnegative squared Mahalanobis distance; larger is more anomalous; not probability",
+      "fit_rows": 1000,
+      "fit": "LedoitWolf float64 on normal training rows only",
+      "frontend_included": false,
+      "frontend": {
+        "sample_rate": 16000,
+        "samples": 160000,
+        "fft": 1024,
+        "hop": 512,
+        "mel_bins": 128,
+        "mel_frames": 313,
+        "implementation": "unaltered original dataset.Generator torchaudio MelSpectrogram+AmplitudeToDB(power), center=True defaults; soundfile float32 PCM matches librosa load at native16k mono",
+        "normalization": "No waveform/CMVN zscore; L2-normalize128D pre-classifier feature for normal-only covariance"
+      },
+      "source_report_sha256": "24a370076406188b0d169810cca99bf2c3cc0da071bd51cce6c57cae3b0e6435"
+    }
+  ],
+  "physical_phone": "not measured",
+  "limits": [
+    "No universal tile/fill/seal/moisture detector trained or claimed.",
+    "Feature scorers require the exact external frontend/encoder; only YAMNet waveform encoder includes DSP.",
+    "Previously inspected tests; fixed methods, no test-driven selection.",
+    "Original dataset and checkpoint licenses still apply; not a production redistribution grant."
+  ]
+}

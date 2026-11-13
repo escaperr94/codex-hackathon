@@ -1,0 +1,7299 @@
+{
+  "dataset": "pipe_leak",
+  "family": "logistic",
+  "status": "exploratory",
+  "protocol": "merged hash-connected filename-component LOGO, fixed C=1 gamma=scale; not verified acquisition/session independence",
+  "n_scored": 1000,
+  "accuracy": 0.914,
+  "balanced_accuracy": 0.9139999999999999,
+  "confusion_matrix": [
+    [
+      445,
+      55
+    ],
+    [
+      31,
+      469
+    ]
+  ],
+  "truth": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "prediction": [
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    1,
+    1,
+    0,
+    0
+  ],
+  "groups": [
+    "alarm_1-NA-noise logger",
+    "alarm_1-NA-noise logger",
+    "alarm_1-NA-noise logger",
+    "dog_1-NA-noise logger",
+    "dog_1-NA-noise logger",
+    "dog_1-NA-noise logger",
+    "dog_1-NA-noise logger",
+    "dog_1-NA-noise logger",
+    "dog_2-NA-noise logger",
+    "dog_2-NA-noise logger",
+    "dog_2-NA-noise logger",
+    "dog_3-NA-noise logger",
+    "dog_3-NA-noise logger",
+    "dog_4-NA-noise logger",
+    "dog_4-NA-noise logger",
+    "dog_4-NA-noise logger",
+    "dog_5-NA-noise logger",
+    "dog_5-NA-noise logger",
+    "dog_6-NA-noise logger",
+    "dog_6-NA-noise logger",
+    "dog_6-NA-noise logger",
+    "dog_7-NA-noise logger",
+    "dog_7-NA-noise logger",
+    "dog_7-NA-noise logger",
+    "dog_7-NA-noise logger",
+    "drilling_1-NA-noise logger",
+    "drilling_1-NA-noise logger",
+    "drilling_1-NA-noise logger",
+    "drilling_1-NA-noise logger",
+    "drilling_2-NA-noise logger",
+    "drilling_2-NA-noise logger",
+    "drilling_2-NA-noise logger",
+    "drilling_3-NA-noise logger",
+    "drilling_3-NA-noise logger",
+    "drilling_3-NA-noise logger",
+    "drilling_3-NA-noise logger",
+    "drilling_3-NA-noise logger",
+    "drilling_4-NA-noise logger",
+    "drilling_4-NA-noise logger",
+    "drilling_4-NA-noise logger",
+    "drilling_5-NA-noise logger",
+    "drilling_5-NA-noise logger",
+    "drilling_6-NA-noise logger",
+    "drilling_6-NA-noise logger",
+    "drilling_6-NA-noise logger",
+    "drilling_6-NA-noise logger",
+    "drilling_8-NA-noise logger",
+    "drilling_8-NA-noise logger",
+    "drilling_8-NA-noise logger",
+    "drilling_8-NA-noise logger",
+    "drum-NA-noise logger",
+    "drum-NA-noise logger",
+    "drum-NA-noise logger",
+    "engine_1-NA-noise logger",
+    "engine_1-NA-noise logger",
+    "engine_2-NA-noise logger",
+    "engine_2-NA-noise logger",
+    "engine_2-NA-noise logger",
+    "engine_2-NA-noise logger",
+    "engine_3-NA-noise logger",
+    "engine_3-NA-noise logger",
+    "engine_3-NA-noise logger",
+    "engine_6-NA-noise logger",
+    "engine_6-NA-noise logger",
+    "engine_6-NA-noise logger",
+    "engine_6-NA-noise logger",
+    "fan motor-NA-noise logger",
+    "fan motor-NA-noise logger",
+    "fan motor-NA-noise logger",
+    "fan motor-NA-noise logger",
+    "fan_1-NA-noise logger",
+    "fan_1-NA-noise logger",
+    "fan_1-NA-noise logger",
+    "flowing water-NA-noise logger",
+    "flowing water-NA-noise logger",
+    "flowing water-NA-noise logger",
+    "gas pipe-NA-noise logger",
+    "gas pipe-NA-noise logger",
+    "gas pipe-NA-noise logger",
+    "grass noise-zone 2-noise logger",
+    "grass noise-zone 2-noise logger",
+    "grass noise-zone 2-noise logger",
+    "grass noise-zone 2-noise logger",
+    "grass noise-zone 2-noise logger",
+    "hydrant-NA-noise logger",
+    "hydrant-NA-noise logger",
+    "hydrant_89-NA-noise logger",
+    "hydrant_89-NA-noise logger",
+    "hydrant_89-NA-noise logger",
+    "hydrant_89-NA-noise logger",
+    "hydrant-NA-noise logger",
+    "hydrant-NA-noise logger",
+    "hydrant-NA-noise logger",
+    "hydrant-NA-noise logger",
+    "hydrant-NA-noise logger",
+    "music_1-NA-noise logger",
+    "music_1-NA-noise logger",
+    "rain-NA-noise logger",
+    "rain-NA-noise logger",
+    "rain-NA-noise logger",
+    "rain-NA-noise logger",
+    "rain-NA-noise logger",
+    "rain_2-NA-noise logger",
+    "rain_2-NA-noise logger",
+    "rain_2-NA-noise logger",
+    "rain_3-NA-noise logger",
+    "rain_3-NA-noise logger",
+    "rain_3-NA-noise logger",
+    "unknown_noise-NA-noise logger",
+    "unknown_noise-NA-noise logger",
+    "unknown_noise-NA-noise logger",
+    "wind-NA-noise logger",
+    "wind-NA-noise logger",
+    "wind-NA-noise logger",
+    "ductile iron-NA-0.0650 MPa-2.46 ms-noise logger",
+    "ductile iron-NA-0.0650 MPa-2.46 ms-noise logger",
+    "ductile iron-NA-0.0717 MPa-2.09 ms-noise logger",
+    "ductile iron-NA-0.0717 MPa-2.09 ms-noise logger",
+    "ductile iron-NA-0.1192 MPa-2.95 ms-noise logger",
+    "ductile iron-NA-0.1192 MPa-2.95 ms-noise logger",
+    "ductile iron-NA-0.1217 MPa-3.00 ms-hydrophone",
+    "ductile iron-NA-0.1446 MPa-3.26 ms-noise logger",
+    "ductile iron-NA-0.1446 MPa-3.26 ms-noise logger",
+    "ductile iron-NA-0.1507 MPa-3.30 ms-hydrophone",
+    "ductile iron-NA-0.1507 MPa-3.30 ms-noise logger",
+    "ductile iron-NA-0.1507 MPa-3.30 ms-noise logger",
+    "ductile iron-NA-0.1527 MPa-3.40 ms-hydrophone",
+    "ductile iron-NA-0.1545 MPa-3.36 ms-noise logger",
+    "ductile iron-NA-0.1545 MPa-3.36 ms-noise logger",
+    "ductile iron-NA-0.1545 MPa-3.36 ms-noise logger",
+    "ductile iron-NA-0.1545 MPa-3.36 ms-noise logger",
+    "ductile iron-NA-0.1545 MPa-3.40 ms-noise logger",
+    "ductile iron-NA-0.1545 MPa-3.40 ms-noise logger",
+    "ductile iron-NA-0.1630 MPa-3.45 ms-hydrophone",
+    "ductile iron-NA-0.1545 MPa-3.36 ms-noise logger",
+    "ductile iron-NA-0.1545 MPa-3.36 ms-noise logger",
+    "ductile iron-NA-0.1648 MPa-3.40 ms-hydrophone",
+    "ductile iron-NA-0.1648 MPa-3.40 ms-noise logger",
+    "ductile iron-NA-0.1648 MPa-3.40 ms-noise logger",
+    "ductile iron-NA-0.1687 MPa-3.5 ms-noise logger",
+    "ductile iron-NA-0.1687 MPa-3.5 ms-noise logger",
+    "ductile iron-NA-0.1692 MPa-3.55 ms-hydrophone",
+    "ductile iron-NA-0.1726 MPa-3.58 ms-noise logger",
+    "ductile iron-NA-0.1726 MPa-3.58 ms-noise logger",
+    "ductile iron-NA-0.1767 MPa-3.50 ms-noise logger",
+    "ductile iron-NA-0.1767 MPa-3.50 ms-noise logger",
+    "ductile iron-NA-0.1771 MPa-3.62 ms-noise logger",
+    "ductile iron-NA-0.1771 MPa-3.62 ms-noise logger",
+    "ductile iron-NA-0.1803 MPa-3.68 ms-noise logger",
+    "ductile iron-NA-0.1803 MPa-3.68 ms-noise logger",
+    "ductile iron-NA-0.1869 MPa-3.77 ms-noise logger",
+    "ductile iron-NA-0.1869 MPa-3.77 ms-noise logger",
+    "ductile iron-NA-0.1892 MPa-3.59 ms-hydrophone",
+    "ductile iron-NA-0.1892 MPa-3.59 ms-noise logger",
+    "ductile iron-NA-0.1892 MPa-3.59 ms-noise logger",
+    "ductile iron-NA-0.1949 MPa-2.02 ms-noise logger",
+    "ductile iron-NA-0.1949 MPa-2.02 ms-noise logger",
+    "ductile iron-NA-0.2095 MPa-3.70 ms-noise logger",
+    "ductile iron-NA-0.2095 MPa-3.70 ms-noise logger",
+    "ductile iron-NA-0.2233 MPa-3.77 ms-hydrophone",
+    "ductile iron-NA-0.2233 MPa-3.77 ms-noise logger",
+    "ductile iron-NA-0.2233 MPa-3.77 ms-noise logger",
+    "ductile iron-NA-0.2242 MPa-3.90 ms-hydrophone",
+    "ductile iron-NA-0.2242 MPa-3.90 ms-noise logger",
+    "ductile iron-NA-0.2242 MPa-3.90 ms-noise logger",
+    "ductile iron-NA-0.2269 MPa-3.95 ms-hydrophone",
+    "ductile iron-NA-0.2269 MPa-3.95 ms-noise logger",
+    "ductile iron-NA-0.2269 MPa-3.95 ms-noise logger",
+    "ductile iron-NA-0.2283 MPa-3.80 ms-hydrophone",
+    "ductile iron-NA-0.2283 MPa-3.80 ms-noise logger",
+    "ductile iron-NA-0.2283 MPa-3.80 ms-noise logger",
+    "ductile iron-NA-0.2320 MPa-3.78 ms-hydrophone",
+    "ductile iron-NA-0.2320 MPa-3.78 ms-noise logger",
+    "ductile iron-NA-0.2320 MPa-3.78 ms-noise logger",
+    "ductile iron-NA-0.2339 MPa-4.20 ms-hydrophone",
+    "ductile iron-NA-0.2339 MPa-4.20 ms-noise logger",
+    "ductile iron-NA-0.2339 MPa-4.20 ms-noise logger",
+    "ductile iron-NA-0.2349 MPa-4.10 ms-hydrophone",
+    "ductile iron-NA-0.2349 MPa-4.10 ms-noise logger",
+    "ductile iron-NA-0.2349 MPa-4.10 ms-noise logger",
+    "ductile iron-NA-0.2377 MPa-3.95 ms-hydrophone",
+    "ductile iron-NA-0.2377 MPa-3.95 ms-noise logger",
+    "ductile iron-NA-0.2405 MPa-4.00 ms-hydrophone",
+    "ductile iron-NA-0.2405 MPa-4.00 ms-noise logger",
+    "ductile iron-NA-0.2405 MPa-4.00 ms-noise logger",
+    "ductile iron-NA-0.2425 MPa-3.97 ms-hydrophone",
+    "ductile iron-NA-0.2425 MPa-3.97 ms-noise logger",
+    "ductile iron-NA-0.2425 MPa-3.97 ms-noise logger",
+    "ductile iron-NA-0.2425 MPa-4.01 ms-hydrophone",
+    "ductile iron-NA-0.2425 MPa-4.01 ms-noise logger",
+    "ductile iron-NA-0.2425 MPa-4.01 ms-noise logger",
+    "ductile iron-NA-0.2428 MPa-3.92 ms-hydrophone",
+    "ductile iron-NA-0.2428 MPa-3.92 ms-noise logger",
+    "ductile iron-NA-0.2428 MPa-3.92 ms-noise logger",
+    "ductile iron-NA-0.2437 MPa-3.98 ms-hydrophone",
+    "ductile iron-NA-0.2437 MPa-3.98 ms-noise logger",
+    "ductile iron-NA-0.2464 MPa-4.30 ms-hydrophone",
+    "ductile iron-NA-0.2495 MPa-4.33 ms-hydrophone",
+    "ductile iron-NA-0.2495 MPa-4.33 ms-noise logger",
+    "ductile iron-NA-0.2495 MPa-4.33 ms-noise logger",
+    "ductile iron-NA-0.2580 MPa-4.35 ms-hydrophone",
+    "ductile iron-NA-0.2630 MPa-4.11 ms-hydrophone",
+    "ductile iron-NA-0.2630 MPa-4.11 ms-noise logger",
+    "ductile iron-NA-0.2630 MPa-4.11 ms-noise logger",
+    "ductile iron-NA-0.2672 MPa-4.07 ms-hydrophone",
+    "ductile iron-NA-0.2672 MPa-4.07 ms-noise logger",
+    "ductile iron-NA-0.2672 MPa-4.07 ms-noise logger",
+    "ductile iron-NA-0.2688 MPa-4.21 ms-hydrophone",
+    "ductile iron-NA-0.2688 MPa-4.21 ms-noise logger",
+    "ductile iron-NA-0.2688 MPa-4.21 ms-noise logger",
+    "ductile iron-NA-0.2688 MPa-4.21 ms-noise logger",
+    "ductile iron-NA-0.2742 MPa-4.18 ms-hydrophone",
+    "ductile iron-NA-0.2742 MPa-4.18 ms-noise logger",
+    "ductile iron-NA-0.2742 MPa-4.18 ms-noise logger",
+    "ductile iron-NA-0.2755 MPa-4.38 ms-noise logger",
+    "ductile iron-NA-0.2755 MPa-4.38 ms-noise logger",
+    "ductile iron-NA-0.2761 MPa-4.42 ms-noise logger",
+    "ductile iron-NA-0.2761 MPa-4.42 ms-noise logger",
+    "ductile iron-NA-0.2817 MPa-4.52 ms-hydrophone",
+    "ductile iron-NA-0.2866 MPa-4.50 ms-noise logger",
+    "ductile iron-NA-0.2866 MPa-4.50 ms-noise logger",
+    "ductile iron-NA-0.3003 MPa-4.65 ms-hydrophone",
+    "ductile iron-NA-0.3024 MPa-4.58 ms-noise logger",
+    "ductile iron-NA-0.3024 MPa-4.58 ms-noise logger",
+    "ductile iron-NA-0.3091 MPa-4.64 ms-noise logger",
+    "ductile iron-NA-0.3091 MPa-4.64 ms-noise logger",
+    "ductile iron-NA-0.3105 MPa-0.44 ms-hydrophone",
+    "ductile iron-NA-0.3105 MPa-0.44 ms-noise logger",
+    "ductile iron-NA-0.3105 MPa-0.44 ms-noise logger",
+    "ductile iron-NA-0.3126 MPa-4.85 ms-hydrophone",
+    "ductile iron-NA-0.3137 MPa-0.4 ms-noise logger",
+    "ductile iron-NA-0.3137 MPa-0.4 ms-noise logger",
+    "ductile iron-NA-0.3137 MPa-0.42 ms-noise logger",
+    "ductile iron-NA-0.3179 MPa-0.51 ms-hydrophone",
+    "ductile iron-NA-0.3179 MPa-0.51 ms-hydrophone",
+    "ductile iron-NA-0.3179 MPa-0.51 ms-noise logger",
+    "ductile iron-NA-0.3179 MPa-0.51 ms-noise logger",
+    "ductile iron-NA-0.3181 MPa-0.83 ms-hydrophone",
+    "ductile iron-NA-0.3181 MPa-0.83 ms-noise logger",
+    "ductile iron-NA-0.3181 MPa-0.83 ms-noise logger",
+    "ductile iron-NA-0.3181 MPa-0.94 ms-hydrophone",
+    "ductile iron-NA-0.3181 MPa-0.94 ms-noise logger",
+    "ductile iron-NA-0.3181 MPa-0.94 ms-noise logger",
+    "ductile iron-NA-0.3189 MPa-0.35 ms-noise logger",
+    "ductile iron-NA-0.3189 MPa-0.35 ms-noise logger",
+    "ductile iron-NA-0.32 MPa-NA-hydrophone",
+    "ductile iron-NA-0.32 MPa-NA-noise logger",
+    "ductile iron-NA-0.32 MPa-NA-noise logger",
+    "ductile iron-NA-0.32 MPa-NA-noise logger",
+    "ductile iron-NA-0.3212 MPa-1.23 ms-hydrophone",
+    "ductile iron-NA-0.3212 MPa-1.23 ms-noise logger",
+    "ductile iron-NA-0.3212 MPa-1.23 ms-noise logger",
+    "ductile iron-NA-0.3218 MPa-1.15 ms-hydrophone",
+    "ductile iron-NA-0.3218 MPa-1.15 ms-noise logger",
+    "ductile iron-NA-0.3218 MPa-1.15 ms-noise logger",
+    "ductile iron-NA-0.3225 MPa-0.57 ms-noise logger",
+    "ductile iron-NA-0.3225 MPa-0.57 ms-noise logger",
+    "ductile iron-NA-0.3227 MPa-1.13 ms-hydrophone",
+    "ductile iron-NA-0.3227 MPa-1.13 ms-noise logger",
+    "ductile iron-NA-0.3227 MPa-1.13 ms-noise logger",
+    "ductile iron-NA-0.3231 MPa-0.10 ms-hydrophone",
+    "ductile iron-NA-0.3231 MPa-0.10 ms-noise logger",
+    "ductile iron-NA-0.3231 MPa-0.10 ms-noise logger",
+    "ductile iron-NA-0.3234 MPa-0.31 ms-noise logger",
+    "ductile iron-NA-0.3234 MPa-0.31 ms-noise logger",
+    "ductile iron-NA-0.3234 MPa-1.20 ms-hydrophone",
+    "ductile iron-NA-0.3234 MPa-1.20 ms-noise logger",
+    "ductile iron-NA-0.3234 MPa-1.20 ms-noise logger",
+    "ductile iron-NA-0.3236 MPa-0.66 ms-hydrophone",
+    "ductile iron-NA-0.3236 MPa-0.66 ms-noise logger",
+    "ductile iron-NA-0.3236 MPa-0.66 ms-noise logger",
+    "ductile iron-NA-0.3238 MPa-0.45 ms-hydrophone",
+    "ductile iron-NA-0.3238 MPa-0.45 ms-noise logger",
+    "ductile iron-NA-0.3238 MPa-0.45 ms-noise logger",
+    "ductile iron-NA-0.3248 MPa-1.05 ms-hydrophone",
+    "ductile iron-NA-0.3248 MPa-1.05 ms-noise logger",
+    "ductile iron-NA-0.3248 MPa-1.05 ms-noise logger",
+    "ductile iron-NA-0.3249 MPa-0.01 ms-noise logger",
+    "ductile iron-NA-0.3249 MPa-0.01 ms-noise logger",
+    "ductile iron-NA-0.3270 MPa-0.05 ms-noise logger",
+    "ductile iron-NA-0.3272 MPa-0.59 ms-hydrophone",
+    "ductile iron-NA-0.3272 MPa-0.59 ms-noise logger",
+    "ductile iron-NA-0.3272 MPa-0.59 ms-noise logger",
+    "ductile iron-NA-0.3286 MPa-1.34 ms-hydrophone",
+    "ductile iron-NA-0.3286 MPa-1.34 ms-noise logger",
+    "ductile iron-NA-0.3286 MPa-1.34 ms-noise logger",
+    "ductile iron-NA-0.3286 MPa-1.40 ms-hydrophone",
+    "ductile iron-NA-0.3286 MPa-1.40 ms-noise logger",
+    "ductile iron-NA-0.3286 MPa-1.40 ms-noise logger",
+    "ductile iron-NA-0.3295 MPa-0.95 ms-hydrophone",
+    "ductile iron-NA-0.3295 MPa-0.95 ms-noise logger",
+    "ductile iron-NA-0.3295 MPa-0.95 ms-noise logger",
+    "ductile iron-NA-0.3302 MPa-0.13 ms-noise logger",
+    "ductile iron-NA-0.3302 MPa-0.13 ms-noise logger",
+    "ductile iron-NA-0.3302 MPa-1.27 ms-hydrophone",
+    "ductile iron-NA-0.3302 MPa-1.27 ms-noise logger",
+    "ductile iron-NA-0.3302 MPa-1.27 ms-noise logger",
+    "ductile iron-NA-0.3303 MPa-0.25 ms-noise logger",
+    "ductile iron-NA-0.3303 MPa-0.25 ms-noise logger",
+    "ductile iron-NA-0.3362 MPa-0.7 ms-hydrophone",
+    "ductile iron-NA-0.3362 MPa-0.7 ms-noise logger",
+    "ductile iron-NA-0.3362 MPa-0.7 ms-noise logger",
+    "ductile iron-NA-0.3441 MPa-0.22 ms-noise logger",
+    "ductile iron-NA-0.3441 MPa-0.22 ms-noise logger",
+    "ductile iron-NA-NA-NA-NA",
+    "ductile iron-NA-NA-NA-NA",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-zone 1-0.25 MPa-NA-hydrophone",
+    "ductile iron-zone 1-0.25 MPa-NA-hydrophone",
+    "ductile iron-zone 1-0.25 MPa-NA-noise logger",
+    "ductile iron-zone 1-0.25 MPa-NA-noise logger",
+    "ductile iron-zone 1-0.25 MPa-NA-noise logger",
+    "ductile iron-zone 1-0.25 MPa-NA-noise logger",
+    "ductile iron-zone 1-0.32 MPa-NA-hydrophone",
+    "ductile iron-zone 1-0.32 MPa-NA-hydrophone",
+    "ductile iron-zone 1-0.32 MPa-NA-noise logger",
+    "ductile iron-zone 1-0.32 MPa-NA-noise logger",
+    "ductile iron-zone 1-0.32 MPa-NA-noise logger",
+    "ductile iron-zone 1-0.32 MPa-NA-noise logger",
+    "ductile iron-zone 2-0.31 MPa-1.16 ms-hydrophone",
+    "ductile iron-zone 2-0.31 MPa-1.16 ms-hydrophone",
+    "ductile iron-zone 2-0.31 MPa-1.16 ms-noise logger",
+    "ductile iron-zone 2-0.31 MPa-1.16 ms-noise logger",
+    "ductile iron-zone 2-0.31 MPa-1.16 ms-noise logger",
+    "ductile iron-zone 2-0.31 MPa-1.16 ms-noise logger",
+    "ductile iron-zone 2-0.31 MPa-1.16 ms-noise logger",
+    "ductile iron-zone 2-0.31 MPa-1.16 ms-noise logger",
+    "ductile iron-zone 2-0.3106 MPa-0.77 ms-hydrophone",
+    "ductile iron-zone 2-0.3106 MPa-0.77 ms-hydrophone",
+    "ductile iron-zone 2-0.3106 MPa-0.77 ms-noise logger",
+    "ductile iron-zone 2-0.3106 MPa-0.77 ms-noise logger",
+    "ductile iron-zone 2-0.3106 MPa-0.77 ms-noise logger",
+    "ductile iron-zone 2-0.3106 MPa-0.77 ms-noise logger",
+    "ductile iron-zone 2-0.3106 MPa-0.77 ms-noise logger",
+    "ductile iron-zone 2-0.3106 MPa-0.77 ms-noise logger",
+    "ductile iron-zone 2-0.3111 MPa-0.15 ms-hydrophone",
+    "ductile iron-zone 2-0.3111 MPa-0.15 ms-noise logger",
+    "ductile iron-zone 2-0.3111 MPa-0.15 ms-noise logger",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-hydrophone",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-hydrophone",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-noise logger",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-noise logger",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-noise logger",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-noise logger",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-noise logger",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-noise logger",
+    "ductile iron-zone 2-0.3132 MPa-0.8 ms-hydrophone",
+    "ductile iron-zone 2-0.3132 MPa-0.8 ms-noise logger",
+    "ductile iron-zone 2-0.3132 MPa-0.8 ms-noise logger",
+    "ductile iron-zone 2-0.315 MPa-1.34 ms-hydrophone",
+    "ductile iron-zone 2-0.315 MPa-1.34 ms-hydrophone",
+    "ductile iron-zone 2-0.315 MPa-1.34 ms-noise logger",
+    "ductile iron-zone 2-0.315 MPa-1.34 ms-noise logger",
+    "ductile iron-zone 2-0.315 MPa-1.34 ms-noise logger",
+    "ductile iron-zone 2-0.315 MPa-1.34 ms-noise logger",
+    "ductile iron-zone 2-0.315 MPa-1.34 ms-noise logger",
+    "ductile iron-zone 2-0.3172 MPa-0.95 ms-hydrophone",
+    "ductile iron-zone 2-0.3172 MPa-0.95 ms-noise logger",
+    "ductile iron-zone 2-0.3172 MPa-0.95 ms-noise logger",
+    "ductile iron-zone 2-0.3177 MPa-1.15 ms-hydrophone",
+    "ductile iron-zone 2-0.3177 MPa-1.15 ms-noise logger",
+    "ductile iron-zone 2-0.3177 MPa-1.15 ms-noise logger",
+    "ductile iron-zone 2-0.3202 MPa-0.15 ms-hydrophone",
+    "ductile iron-zone 2-0.3202 MPa-0.15 ms-noise logger",
+    "ductile iron-zone 2-0.3202 MPa-0.15 ms-noise logger",
+    "ductile iron-zone 2-0.3235 MPa-0.5 ms-hydrophone",
+    "ductile iron-zone 2-0.3235 MPa-0.5 ms-noise logger",
+    "ductile iron-zone 2-0.3235 MPa-0.5 ms-noise logger",
+    "ductile iron-zone 2-0.3237 MPa-1.35 ms-hydrophone",
+    "ductile iron-zone 2-0.3237 MPa-1.35 ms-noise logger",
+    "ductile iron-zone 2-0.3237 MPa-1.35 ms-noise logger",
+    "ductile iron-zone 2-0.3249 MPa-1.33 ms-hydrophone",
+    "ductile iron-zone 2-0.3249 MPa-1.33 ms-noise logger",
+    "ductile iron-zone 2-0.3249 MPa-1.33 ms-noise logger",
+    "ductile iron-zone 2-0.3251 MPa-1.26 ms-hydrophone",
+    "ductile iron-zone 2-0.3251 MPa-1.26 ms-noise logger",
+    "ductile iron-zone 2-0.3251 MPa-1.26 ms-noise logger",
+    "ductile iron-zone 2-0.326 MPa-1.08 ms-hydrophone",
+    "ductile iron-zone 2-0.326 MPa-1.08 ms-noise logger",
+    "ductile iron-zone 2-0.326 MPa-1.08 ms-noise logger",
+    "ductile iron-zone 2-0.3269 MPa-1.40 ms-hydrophone",
+    "ductile iron-zone 2-0.3269 MPa-1.40 ms-noise logger",
+    "ductile iron-zone 2-0.3269 MPa-1.40 ms-noise logger",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "NA-NA-0.1545 MPa-3.36 ms-hydrophone",
+    "NA-NA-0.3137 MPa-0.42 ms-noise logger",
+    "NA-NA-NA-NA-hydrophone",
+    "NA-NA-NA-NA-noise logger",
+    "NA-NA-NA-NA-noise logger",
+    "NA-NA-NA-NA-noise logger",
+    "pe-NA-0.0650 MPa-2.46 ms-noise logger",
+    "pe-NA-0.0650 MPa-2.46 ms-noise logger",
+    "pe-NA-0.0717 MPa-2.09 ms-noise logger",
+    "pe-NA-0.0717 MPa-2.09 ms-noise logger",
+    "pe-NA-0.1192 MPa-2.95 ms-noise logger",
+    "pe-NA-0.1192 MPa-2.95 ms-noise logger",
+    "pe-NA-0.1217 MPa-3.00 ms-hydrophone",
+    "pe-NA-0.1446 MPa-3.26 ms-noise logger",
+    "pe-NA-0.1507 MPa-3.30 ms-noise logger",
+    "pe-NA-0.1507 MPa-3.30 ms-noise logger",
+    "pe-NA-0.1527 MPa-3.40 ms-hydrophone",
+    "pe-NA-0.1545 MPa-3.36 ms-hydrophone",
+    "pe-NA-0.1545 MPa-3.36 ms-noise logger",
+    "pe-NA-0.1545 MPa-3.36 ms-noise logger",
+    "pe-NA-0.1545 MPa-3.36 ms-noise logger",
+    "pe-NA-0.1545 MPa-3.36 ms-noise logger",
+    "pe-NA-0.1545 MPa-3.40 ms-hydrophone",
+    "pe-NA-0.1545 MPa-3.40 ms-noise logger",
+    "pe-NA-0.1545 MPa-3.40 ms-noise logger",
+    "pe-NA-0.1630 MPa-3.45 ms-hydrophone",
+    "pe-NA-0.1545 MPa-3.36 ms-noise logger",
+    "pe-NA-0.1545 MPa-3.36 ms-noise logger",
+    "pe-NA-0.1648 MPa-3.40 ms-hydrophone",
+    "pe-NA-0.1648 MPa-3.40 ms-noise logger",
+    "pe-NA-0.1648 MPa-3.40 ms-noise logger",
+    "pe-NA-0.1687 MPa-3.5 ms-noise logger",
+    "pe-NA-0.1687 MPa-3.5 ms-noise logger",
+    "pe-NA-0.1692 MPa-3.55 ms-hydrophone",
+    "pe-NA-0.1726 MPa-3.58 ms-hydrophone",
+    "pe-NA-0.1726 MPa-3.58 ms-noise logger",
+    "pe-NA-0.1726 MPa-3.58 ms-noise logger",
+    "pe-NA-0.1767 MPa-3.50 ms-noise logger",
+    "pe-NA-0.1767 MPa-3.50 ms-noise logger",
+    "pe-NA-0.1771 MPa-3.62 ms-hydrophone",
+    "pe-NA-0.1771 MPa-3.62 ms-noise logger",
+    "pe-NA-0.1771 MPa-3.62 ms-noise logger",
+    "pe-NA-0.1803 MPa-3.68 ms-hydrophone",
+    "pe-NA-0.1803 MPa-3.68 ms-noise logger",
+    "pe-NA-0.1803 MPa-3.68 ms-noise logger",
+    "pe-NA-0.1869 MPa-3.77 ms-hydrophone",
+    "pe-NA-0.1869 MPa-3.77 ms-noise logger",
+    "pe-NA-0.1869 MPa-3.77 ms-noise logger",
+    "pe-NA-0.1892 MPa-3.59 ms-noise logger",
+    "pe-NA-0.1892 MPa-3.59 ms-noise logger",
+    "pe-NA-0.1949 MPa-2.02 ms-noise logger",
+    "pe-NA-0.1949 MPa-2.02 ms-noise logger",
+    "pe-NA-0.2095 MPa-3.70 ms-noise logger",
+    "pe-NA-0.2095 MPa-3.70 ms-noise logger",
+    "pe-NA-0.2233 MPa-3.77 ms-noise logger",
+    "pe-NA-0.2233 MPa-3.77 ms-noise logger",
+    "pe-NA-0.2242 MPa-3.90 ms-noise logger",
+    "pe-NA-0.2242 MPa-3.90 ms-noise logger",
+    "pe-NA-0.2269 MPa-3.95 ms-noise logger",
+    "pe-NA-0.2269 MPa-3.95 ms-noise logger",
+    "pe-NA-0.2283 MPa-3.80 ms-noise logger",
+    "pe-NA-0.2283 MPa-3.80 ms-noise logger",
+    "pe-NA-0.2320 MPa-3.78 ms-noise logger",
+    "pe-NA-0.2320 MPa-3.78 ms-noise logger",
+    "pe-NA-0.2339 MPa-4.20 ms-hydrophone",
+    "pe-NA-0.2339 MPa-4.20 ms-noise logger",
+    "pe-NA-0.2339 MPa-4.20 ms-noise logger",
+    "pe-NA-0.2349 MPa-4.10 ms-hydrophone",
+    "pe-NA-0.2349 MPa-4.10 ms-noise logger",
+    "pe-NA-0.2349 MPa-4.10 ms-noise logger",
+    "pe-NA-0.2377 MPa-3.95 ms-noise logger",
+    "pe-NA-0.2405 MPa-4.00 ms-noise logger",
+    "pe-NA-0.2405 MPa-4.00 ms-noise logger",
+    "pe-NA-0.2425 MPa-3.97 ms-noise logger",
+    "pe-NA-0.2425 MPa-3.97 ms-noise logger",
+    "pe-NA-0.2425 MPa-4.01 ms-noise logger",
+    "pe-NA-0.2425 MPa-4.01 ms-noise logger",
+    "pe-NA-0.2428 MPa-3.92 ms-noise logger",
+    "pe-NA-0.2428 MPa-3.92 ms-noise logger",
+    "pe-NA-0.2437 MPa-3.98 ms-noise logger",
+    "pe-NA-0.2464 MPa-4.30 ms-hydrophone",
+    "pe-NA-0.2495 MPa-4.33 ms-hydrophone",
+    "pe-NA-0.2495 MPa-4.33 ms-noise logger",
+    "pe-NA-0.2495 MPa-4.33 ms-noise logger",
+    "pe-NA-0.2580 MPa-4.35 ms-hydrophone",
+    "pe-NA-0.2630 MPa-4.11 ms-noise logger",
+    "pe-NA-0.2630 MPa-4.11 ms-noise logger",
+    "pe-NA-0.2672 MPa-4.07 ms-noise logger",
+    "pe-NA-0.2672 MPa-4.07 ms-noise logger",
+    "pe-NA-0.2688 MPa-4.21 ms-noise logger",
+    "pe-NA-0.2742 MPa-4.18 ms-noise logger",
+    "pe-NA-0.2742 MPa-4.18 ms-noise logger",
+    "pe-NA-0.2755 MPa-4.38 ms-noise logger",
+    "pe-NA-0.2755 MPa-4.38 ms-noise logger",
+    "pe-NA-0.2761 MPa-4.42 ms-noise logger",
+    "pe-NA-0.2761 MPa-4.42 ms-noise logger",
+    "pe-NA-0.2817 MPa-4.52 ms-hydrophone",
+    "pe-NA-0.2866 MPa-4.50 ms-noise logger",
+    "pe-NA-0.2866 MPa-4.50 ms-noise logger",
+    "pe-NA-0.3003 MPa-4.65 ms-hydrophone",
+    "pe-NA-0.3024 MPa-4.58 ms-noise logger",
+    "pe-NA-0.3047 MPa-0.73 ms-noise logger",
+    "pe-NA-0.3047 MPa-0.73 ms-noise logger",
+    "pe-NA-0.306 MPa-0.68 ms-noise logger",
+    "pe-NA-0.306 MPa-0.68 ms-noise logger",
+    "pe-NA-0.3091 MPa-4.64 ms-noise logger",
+    "pe-NA-0.3091 MPa-4.64 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3126 MPa-4.85 ms-hydrophone",
+    "pe-NA-0.3130 MPa-0.38 ms-noise logger",
+    "pe-NA-0.3130 MPa-0.38 ms-noise logger",
+    "pe-NA-0.3138 MPa-0.69 ms-noise logger",
+    "pe-NA-0.3138 MPa-0.69 ms-noise logger",
+    "pe-NA-0.3153 MPa-0.57 ms-noise logger",
+    "pe-NA-0.3162 MPa-0.5 ms-noise logger",
+    "pe-NA-0.32 MPa-NA-noise logger",
+    "pe-NA-0.3202 MPa-0.60 ms-noise logger",
+    "pe-NA-0.3202 MPa-0.75 ms-noise logger",
+    "pe-NA-0.3210 MPa-0.2 ms-noise logger",
+    "pe-NA-0.3217 MPa-0.90 ms-noise logger",
+    "pe-NA-0.322 MPa-0.11 ms-hydrophone",
+    "pe-NA-0.322 MPa-0.11 ms-noise logger",
+    "pe-NA-0.3223 MPa-1.00 ms-noise logger",
+    "pe-NA-0.3223 MPa-1.00 ms-noise logger",
+    "pe-NA-0.3223 MPa-1.15 ms-noise logger",
+    "pe-NA-0.3223 MPa-1.15 ms-noise logger",
+    "pe-NA-0.3235 MPa-0.81 ms-noise logger",
+    "pe-NA-0.3235 MPa-0.81 ms-noise logger",
+    "pe-NA-0.3244 MPa-0.22 ms-noise logger",
+    "pe-NA-0.3244 MPa-0.22 ms-noise logger",
+    "pe-NA-0.3244 MPa-0.35 ms-noise logger",
+    "pe-NA-0.3249 MPa-1.68 ms-noise logger",
+    "pe-NA-0.3249 MPa-1.68 ms-noise logger",
+    "pe-NA-0.3249 MPa-1.72 ms-noise logger",
+    "pe-NA-0.3249 MPa-1.72 ms-noise logger",
+    "pe-NA-0.3256 MPa-0.52 ms-noise logger",
+    "pe-NA-0.3256 MPa-0.52 ms-noise logger",
+    "pe-NA-0.3265 MPa-1.62 ms-noise logger",
+    "pe-NA-0.3265 MPa-1.62 ms-noise logger",
+    "pe-NA-0.3267 MPa-0.95 ms-noise logger",
+    "pe-NA-0.3267 MPa-0.95 ms-noise logger",
+    "pe-NA-0.3272 MPa-1.12 ms-noise logger",
+    "pe-NA-0.3272 MPa-1.12 ms-noise logger",
+    "pe-NA-0.3280 MPa-1.46 ms-noise logger",
+    "pe-NA-0.3280 MPa-1.46 ms-noise logger",
+    "pe-NA-0.3302 MPa-1.14 ms-noise logger",
+    "pe-NA-0.3302 MPa-1.14 ms-noise logger",
+    "pe-NA-0.3302 MPa-1.44 ms-noise logger",
+    "pe-NA-0.3302 MPa-1.44 ms-noise logger",
+    "pe-NA-0.3334 MPa-0.82 ms-noise logger",
+    "pe-NA-0.3334 MPa-0.82 ms-noise logger",
+    "pe-NA-0.3334 MPa-0.94 ms-noise logger",
+    "pe-NA-0.3334 MPa-0.94 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-zone 1-0.25 MPa-NA-noise logger",
+    "pe-zone 1-0.25 MPa-NA-noise logger",
+    "pe-zone 1-0.25 MPa-NA-noise logger",
+    "pe-zone 1-0.32 MPa-NA-noise logger",
+    "pe-zone 1-0.32 MPa-NA-noise logger",
+    "pe-zone 1-0.32 MPa-NA-noise logger",
+    "pe-zone 1-0.32 MPa-NA-noise logger",
+    "pe-zone 2-0.3034 MPa-1.55 ms-noise logger",
+    "pe-zone 2-0.3034 MPa-1.55 ms-noise logger",
+    "pe-zone 2-0.3034 MPa-1.55 ms-noise logger",
+    "pe-zone 2-0.3034 MPa-1.55 ms-noise logger",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-hydrophone",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-hydrophone",
+    "ductile iron-zone 2-0.312 MPa-0.9 ms-hydrophone",
+    "pe-zone 2-0.3053 MPa-1.6 ms-noise logger",
+    "pe-zone 2-0.3053 MPa-1.6 ms-noise logger",
+    "pe-zone 2-0.313 MPa-0.52 ms-noise logger",
+    "pe-zone 2-0.313 MPa-0.52 ms-noise logger",
+    "pe-zone 2-0.3171 MPa-0.57 ms-noise logger",
+    "pe-zone 2-0.3171 MPa-0.57 ms-noise logger",
+    "pe-zone 2-0.3172 MPa-0.95 ms-hydrophone",
+    "pe-zone 2-0.3172 MPa-0.95 ms-noise logger",
+    "pe-zone 2-0.3172 MPa-0.95 ms-noise logger",
+    "pe-zone 2-0.3194 MPa-1.64 ms-noise logger",
+    "pe-zone 2-0.3194 MPa-1.64 ms-noise logger",
+    "pe-zone 2-0.32 MPa-1.26 ms-noise logger",
+    "pe-zone 2-0.32 MPa-1.26 ms-noise logger",
+    "pe-zone 2-0.322 MPa-1.55 ms-noise logger",
+    "pe-zone 2-0.322 MPa-1.55 ms-noise logger",
+    "pe-zone 2-0.3221 MPa-0.08 ms-noise logger",
+    "pe-zone 2-0.3245 MPa-1.68 ms-noise logger",
+    "pe-zone 2-0.3245 MPa-1.68 ms-noise logger",
+    "pe-zone 2-0.326 MPa-0.18 ms-noise logger",
+    "pe-zone 2-0.326 MPa-0.18 ms-noise logger",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pvc-zone 1-0.25 MPa-NA-noise logger",
+    "pvc-zone 1-0.25 MPa-NA-noise logger",
+    "pvc-zone 1-0.25 MPa-NA-noise logger",
+    "pvc-zone 1-0.32 MPa-NA-noise logger",
+    "pvc-zone 1-0.32 MPa-NA-noise logger",
+    "pvc-zone 1-0.32 MPa-NA-noise logger",
+    "pvc-zone 1-0.32 MPa-NA-noise logger",
+    "steel-zone 1-0.25 MPa-NA-hydrophone",
+    "steel-zone 1-0.25 MPa-NA-hydrophone",
+    "steel-zone 1-0.25 MPa-NA-noise logger",
+    "steel-zone 1-0.25 MPa-NA-noise logger",
+    "steel-zone 1-0.25 MPa-NA-noise logger",
+    "steel-zone 1-0.25 MPa-NA-noise logger",
+    "steel-zone 1-0.32 MPa-NA-hydrophone",
+    "steel-zone 1-0.32 MPa-NA-hydrophone",
+    "steel-zone 1-0.32 MPa-NA-noise logger",
+    "steel-zone 1-0.32 MPa-NA-noise logger",
+    "steel-zone 1-0.32 MPa-NA-noise logger",
+    "steel-zone 1-0.32 MPa-NA-noise logger",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-hydrophone",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-NA-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-hydrophone",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 1-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-hydrophone",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "ductile iron-zone 2-NA-NA-noise logger",
+    "NA-NA-NA-NA-hydrophone",
+    "NA-NA-NA-NA-hydrophone",
+    "NA-NA-NA-NA-hydrophone",
+    "NA-NA-NA-NA-hydrophone",
+    "NA-NA-NA-NA-hydrophone",
+    "NA-NA-NA-NA-hydrophone",
+    "NA-NA-NA-NA-noise logger",
+    "NA-NA-NA-NA-noise logger",
+    "NA-NA-NA-NA-noise logger",
+    "NA-NA-NA-NA-noise logger",
+    "NA-zone 2-NA-NA-hydrophone",
+    "NA-zone 2-NA-NA-hydrophone",
+    "NA-zone 2-NA-NA-noise logger",
+    "NA-zone 2-NA-NA-noise logger",
+    "NA-zone 2-NA-NA-noise logger",
+    "NA-zone 2-NA-NA-noise logger",
+    "NA-zone 2-NA-NA-noise logger",
+    "NA-zone 2-NA-NA-noise logger",
+    "NA-zone 2-NA-NA-noise logger",
+    "NA-zone 2-NA-NA-noise logger",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-NA-NA-hydrophone",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+    "pe-zone 1-NA-NA-noise logger",
+    "pe-zone 1-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-hydrophone",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pe-zone 2-NA-NA-noise logger",
+    "pvc-zone 1-NA-NA-noise logger",
+    "pvc-zone 1-NA-NA-noise logger",
+    "pvc-zone 1-NA-NA-noise logger",
+    "steel-zone 1-NA-NA-hydrophone",
+    "steel-zone 1-NA-NA-hydrophone",
+    "steel-zone 1-NA-NA-noise logger",
+    "steel-zone 1-NA-NA-noise logger",
+    "steel-zone 1-NA-NA-noise logger",
+    "steel-zone 1-NA-NA-noise logger",
+    "steel-zone 1-NA-NA-noise logger",
+    "steel-zone 1-NA-NA-noise logger",
+    "steel-zone 1-NA-NA-noise logger",
+    "steel-zone 1-NA-NA-noise logger"
+  ],
+  "folds": [
+    {
+      "held_out": "NA-NA-0.1545 MPa-3.36 ms-hydrophone",
+      "test_indices": [
+        395
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.8334313895150842e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "NA-NA-0.3137 MPa-0.42 ms-noise logger",
+      "test_indices": [
+        396
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 9.799923095243912e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "NA-NA-NA-NA-hydrophone",
+      "test_indices": [
+        397,
+        792,
+        793,
+        794,
+        795,
+        796,
+        797
+      ],
+      "tensor_score_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 1.5886875914805643e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "NA-NA-NA-NA-noise logger",
+      "test_indices": [
+        398,
+        399,
+        400,
+        798,
+        799,
+        800,
+        801
+      ],
+      "tensor_score_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 3.1551618656644465e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "NA-zone 2-NA-NA-hydrophone",
+      "test_indices": [
+        802,
+        803
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.237938327518066e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "NA-zone 2-NA-NA-noise logger",
+      "test_indices": [
+        804,
+        805,
+        806,
+        807,
+        808,
+        809,
+        810,
+        811
+      ],
+      "tensor_score_parity": {
+        "rows": 8,
+        "maximum_absolute_score_error": 3.335549769722945e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "alarm_1-NA-noise logger",
+      "test_indices": [
+        0,
+        1,
+        2
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 1.9689668920297443e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "dog_1-NA-noise logger",
+      "test_indices": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "tensor_score_parity": {
+        "rows": 5,
+        "maximum_absolute_score_error": 1.1876611005767757e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "dog_2-NA-noise logger",
+      "test_indices": [
+        8,
+        9,
+        10
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 2.0279276369272736e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "dog_3-NA-noise logger",
+      "test_indices": [
+        11,
+        12
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.893982631313463e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "dog_4-NA-noise logger",
+      "test_indices": [
+        13,
+        14,
+        15
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 1.5687570353861702e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "dog_5-NA-noise logger",
+      "test_indices": [
+        16,
+        17
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 6.767817306574386e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "dog_6-NA-noise logger",
+      "test_indices": [
+        18,
+        19,
+        20
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 1.4670773151870264e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "dog_7-NA-noise logger",
+      "test_indices": [
+        21,
+        22,
+        23,
+        24
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 3.183585961519242e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "drilling_1-NA-noise logger",
+      "test_indices": [
+        25,
+        26,
+        27,
+        28
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 3.366064704746208e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "drilling_2-NA-noise logger",
+      "test_indices": [
+        29,
+        30,
+        31
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 2.213189259497872e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "drilling_3-NA-noise logger",
+      "test_indices": [
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "tensor_score_parity": {
+        "rows": 5,
+        "maximum_absolute_score_error": 2.1261358673640984e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "drilling_4-NA-noise logger",
+      "test_indices": [
+        37,
+        38,
+        39
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 7.215990049935783e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "drilling_5-NA-noise logger",
+      "test_indices": [
+        40,
+        41
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.5419112697756532e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "drilling_6-NA-noise logger",
+      "test_indices": [
+        42,
+        43,
+        44,
+        45
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 4.424778738375268e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "drilling_8-NA-noise logger",
+      "test_indices": [
+        46,
+        47,
+        48,
+        49
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 2.2536130184214187e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "drum-NA-noise logger",
+      "test_indices": [
+        50,
+        51,
+        52
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 2.2728105286695666e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.0650 MPa-2.46 ms-noise logger",
+      "test_indices": [
+        114,
+        115
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.41668397913142e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.0717 MPa-2.09 ms-noise logger",
+      "test_indices": [
+        116,
+        117
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.1904180097221939e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1192 MPa-2.95 ms-noise logger",
+      "test_indices": [
+        118,
+        119
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 9.119057731155067e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1217 MPa-3.00 ms-hydrophone",
+      "test_indices": [
+        120
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.6393157165062178e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1446 MPa-3.26 ms-noise logger",
+      "test_indices": [
+        121,
+        122
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.8771954346519237e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1507 MPa-3.30 ms-hydrophone",
+      "test_indices": [
+        123
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.9713440374834477e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1507 MPa-3.30 ms-noise logger",
+      "test_indices": [
+        124,
+        125
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.058095327495124e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1527 MPa-3.40 ms-hydrophone",
+      "test_indices": [
+        126
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.082543198473786e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1545 MPa-3.36 ms-noise logger",
+      "test_indices": [
+        127,
+        128,
+        129,
+        130,
+        134,
+        135
+      ],
+      "tensor_score_parity": {
+        "rows": 6,
+        "maximum_absolute_score_error": 2.190391314993434e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1545 MPa-3.40 ms-noise logger",
+      "test_indices": [
+        131,
+        132
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.988282848421676e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1630 MPa-3.45 ms-hydrophone",
+      "test_indices": [
+        133
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.209147043075177e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1648 MPa-3.40 ms-hydrophone",
+      "test_indices": [
+        136
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.1202279992517106e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1648 MPa-3.40 ms-noise logger",
+      "test_indices": [
+        137,
+        138
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.6984654399875296e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1687 MPa-3.5 ms-noise logger",
+      "test_indices": [
+        139,
+        140
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.050239343911244e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1692 MPa-3.55 ms-hydrophone",
+      "test_indices": [
+        141
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.7790705070529498e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1726 MPa-3.58 ms-noise logger",
+      "test_indices": [
+        142,
+        143
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 6.467870738990911e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1767 MPa-3.50 ms-noise logger",
+      "test_indices": [
+        144,
+        145
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.379663144314037e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1771 MPa-3.62 ms-noise logger",
+      "test_indices": [
+        146,
+        147
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.459135628463116e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1803 MPa-3.68 ms-noise logger",
+      "test_indices": [
+        148,
+        149
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.7625363168960462e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1869 MPa-3.77 ms-noise logger",
+      "test_indices": [
+        150,
+        151
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.259092657386219e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1892 MPa-3.59 ms-hydrophone",
+      "test_indices": [
+        152
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 9.023884595116272e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1892 MPa-3.59 ms-noise logger",
+      "test_indices": [
+        153,
+        154
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 7.505920640582531e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.1949 MPa-2.02 ms-noise logger",
+      "test_indices": [
+        155,
+        156
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.0246226833654504e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2095 MPa-3.70 ms-noise logger",
+      "test_indices": [
+        157,
+        158
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.6369648969671857e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2233 MPa-3.77 ms-hydrophone",
+      "test_indices": [
+        159
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.1862760884717716e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2233 MPa-3.77 ms-noise logger",
+      "test_indices": [
+        160,
+        161
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.8947403363233093e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2242 MPa-3.90 ms-hydrophone",
+      "test_indices": [
+        162
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 7.582047323317909e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2242 MPa-3.90 ms-noise logger",
+      "test_indices": [
+        163,
+        164
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.2277515094623084e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2269 MPa-3.95 ms-hydrophone",
+      "test_indices": [
+        165
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 4.123432051361675e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2269 MPa-3.95 ms-noise logger",
+      "test_indices": [
+        166,
+        167
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.334175941420824e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2283 MPa-3.80 ms-hydrophone",
+      "test_indices": [
+        168
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.107471508416836e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2283 MPa-3.80 ms-noise logger",
+      "test_indices": [
+        169,
+        170
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.736473753677359e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2320 MPa-3.78 ms-hydrophone",
+      "test_indices": [
+        171
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.3491876111059184e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2320 MPa-3.78 ms-noise logger",
+      "test_indices": [
+        172,
+        173
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.131455645315583e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2339 MPa-4.20 ms-hydrophone",
+      "test_indices": [
+        174
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 5.1870623352101575e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2339 MPa-4.20 ms-noise logger",
+      "test_indices": [
+        175,
+        176
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.0998428107432687e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2349 MPa-4.10 ms-hydrophone",
+      "test_indices": [
+        177
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.9379656834850323e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2349 MPa-4.10 ms-noise logger",
+      "test_indices": [
+        178,
+        179
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.959933026984828e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2377 MPa-3.95 ms-hydrophone",
+      "test_indices": [
+        180
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.2206223698463248e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2377 MPa-3.95 ms-noise logger",
+      "test_indices": [
+        181
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.6633670218979546e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2405 MPa-4.00 ms-hydrophone",
+      "test_indices": [
+        182
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 6.491726822765997e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2405 MPa-4.00 ms-noise logger",
+      "test_indices": [
+        183,
+        184
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.6736354574730115e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2425 MPa-3.97 ms-hydrophone",
+      "test_indices": [
+        185
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 8.789082128757286e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2425 MPa-3.97 ms-noise logger",
+      "test_indices": [
+        186,
+        187
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.0197172439774249e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2425 MPa-4.01 ms-hydrophone",
+      "test_indices": [
+        188
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.4281860855346338e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2425 MPa-4.01 ms-noise logger",
+      "test_indices": [
+        189,
+        190
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.5632827860277985e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2428 MPa-3.92 ms-hydrophone",
+      "test_indices": [
+        191
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.538878967646042e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2428 MPa-3.92 ms-noise logger",
+      "test_indices": [
+        192,
+        193
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.8662085987664057e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2437 MPa-3.98 ms-hydrophone",
+      "test_indices": [
+        194
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 6.117318651632786e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2437 MPa-3.98 ms-noise logger",
+      "test_indices": [
+        195
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 4.5129046721825716e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2464 MPa-4.30 ms-hydrophone",
+      "test_indices": [
+        196
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.5238782114532796e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2495 MPa-4.33 ms-hydrophone",
+      "test_indices": [
+        197
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.865253401733824e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2495 MPa-4.33 ms-noise logger",
+      "test_indices": [
+        198,
+        199
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.5536631587108616e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2580 MPa-4.35 ms-hydrophone",
+      "test_indices": [
+        200
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 5.2509280479284826e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2630 MPa-4.11 ms-hydrophone",
+      "test_indices": [
+        201
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.770007107548821e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2630 MPa-4.11 ms-noise logger",
+      "test_indices": [
+        202,
+        203
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.4216403094488044e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2672 MPa-4.07 ms-hydrophone",
+      "test_indices": [
+        204
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.05067596237285e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2672 MPa-4.07 ms-noise logger",
+      "test_indices": [
+        205,
+        206
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.5631928064237e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2688 MPa-4.21 ms-hydrophone",
+      "test_indices": [
+        207
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.0424579333090378e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2688 MPa-4.21 ms-noise logger",
+      "test_indices": [
+        208,
+        209,
+        210
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 6.687499642943351e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2742 MPa-4.18 ms-hydrophone",
+      "test_indices": [
+        211
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 4.3077746680886264e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2742 MPa-4.18 ms-noise logger",
+      "test_indices": [
+        212,
+        213
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.6579998224640633e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2755 MPa-4.38 ms-noise logger",
+      "test_indices": [
+        214,
+        215
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 7.723970352202514e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2761 MPa-4.42 ms-noise logger",
+      "test_indices": [
+        216,
+        217
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 8.128280470920402e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2817 MPa-4.52 ms-hydrophone",
+      "test_indices": [
+        218
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.4997824588091078e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.2866 MPa-4.50 ms-noise logger",
+      "test_indices": [
+        219,
+        220
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 9.51081691180633e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3003 MPa-4.65 ms-hydrophone",
+      "test_indices": [
+        221
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.278466082472619e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3024 MPa-4.58 ms-noise logger",
+      "test_indices": [
+        222,
+        223
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.10902423081194e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3091 MPa-4.64 ms-noise logger",
+      "test_indices": [
+        224,
+        225
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.9711409282585635e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3105 MPa-0.44 ms-hydrophone",
+      "test_indices": [
+        226
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.405020116391654e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3105 MPa-0.44 ms-noise logger",
+      "test_indices": [
+        227,
+        228
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.47587686305917e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3126 MPa-4.85 ms-hydrophone",
+      "test_indices": [
+        229
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.693512707845457e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3137 MPa-0.4 ms-noise logger",
+      "test_indices": [
+        230,
+        231
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.849943919220777e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3137 MPa-0.42 ms-noise logger",
+      "test_indices": [
+        232
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.089921940535589e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3179 MPa-0.51 ms-hydrophone",
+      "test_indices": [
+        233,
+        234
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.7127714075092513e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3179 MPa-0.51 ms-noise logger",
+      "test_indices": [
+        235,
+        236
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.275761733563144e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3181 MPa-0.83 ms-hydrophone",
+      "test_indices": [
+        237
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 6.260921225909044e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3181 MPa-0.83 ms-noise logger",
+      "test_indices": [
+        238,
+        239
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.077983940473871e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3181 MPa-0.94 ms-hydrophone",
+      "test_indices": [
+        240
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.2243790648014397e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3181 MPa-0.94 ms-noise logger",
+      "test_indices": [
+        241,
+        242
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.695586592300515e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3189 MPa-0.35 ms-noise logger",
+      "test_indices": [
+        243,
+        244
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.767910662309191e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.32 MPa-NA-hydrophone",
+      "test_indices": [
+        245
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.5996878804935832e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.32 MPa-NA-noise logger",
+      "test_indices": [
+        246,
+        247,
+        248
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 2.6318550883086544e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3212 MPa-1.23 ms-hydrophone",
+      "test_indices": [
+        249
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.6099679801004925e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3212 MPa-1.23 ms-noise logger",
+      "test_indices": [
+        250,
+        251
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.2513851600544115e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3218 MPa-1.15 ms-hydrophone",
+      "test_indices": [
+        252
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.5000724296054813e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3218 MPa-1.15 ms-noise logger",
+      "test_indices": [
+        253,
+        254
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.5255834978921143e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3225 MPa-0.57 ms-noise logger",
+      "test_indices": [
+        255,
+        256
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.273897864972895e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3227 MPa-1.13 ms-hydrophone",
+      "test_indices": [
+        257
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 5.239661038380916e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3227 MPa-1.13 ms-noise logger",
+      "test_indices": [
+        258,
+        259
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.109953883306815e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3231 MPa-0.10 ms-hydrophone",
+      "test_indices": [
+        260
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.1534506067233394e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3231 MPa-0.10 ms-noise logger",
+      "test_indices": [
+        261,
+        262
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.455920850546022e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3234 MPa-0.31 ms-noise logger",
+      "test_indices": [
+        263,
+        264
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.6990476581213443e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3234 MPa-1.20 ms-hydrophone",
+      "test_indices": [
+        265
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.2998257964701452e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3234 MPa-1.20 ms-noise logger",
+      "test_indices": [
+        266,
+        267
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.4683667271551144e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3236 MPa-0.66 ms-hydrophone",
+      "test_indices": [
+        268
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.8431227261371816e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3236 MPa-0.66 ms-noise logger",
+      "test_indices": [
+        269,
+        270
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 7.336048102324355e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3238 MPa-0.45 ms-hydrophone",
+      "test_indices": [
+        271
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 9.734457573351563e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3238 MPa-0.45 ms-noise logger",
+      "test_indices": [
+        272,
+        273
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 6.837776522772288e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3248 MPa-1.05 ms-hydrophone",
+      "test_indices": [
+        274
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.3137357341163067e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3248 MPa-1.05 ms-noise logger",
+      "test_indices": [
+        275,
+        276
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 9.38341097045381e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3249 MPa-0.01 ms-noise logger",
+      "test_indices": [
+        277,
+        278
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.1454783705188163e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3270 MPa-0.05 ms-noise logger",
+      "test_indices": [
+        279
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.9717691035481266e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3272 MPa-0.59 ms-hydrophone",
+      "test_indices": [
+        280
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.7166428934476414e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3272 MPa-0.59 ms-noise logger",
+      "test_indices": [
+        281,
+        282
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.902332529863827e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3286 MPa-1.34 ms-hydrophone",
+      "test_indices": [
+        283
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.8663632129232184e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3286 MPa-1.34 ms-noise logger",
+      "test_indices": [
+        284,
+        285
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 6.273054997674166e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3286 MPa-1.40 ms-hydrophone",
+      "test_indices": [
+        286
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.482789689979171e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3286 MPa-1.40 ms-noise logger",
+      "test_indices": [
+        287,
+        288
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.2376738633967932e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3295 MPa-0.95 ms-hydrophone",
+      "test_indices": [
+        289
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.7327469953597472e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3295 MPa-0.95 ms-noise logger",
+      "test_indices": [
+        290,
+        291
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.5022490796343675e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3302 MPa-0.13 ms-noise logger",
+      "test_indices": [
+        292,
+        293
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.8320765893828934e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3302 MPa-1.27 ms-hydrophone",
+      "test_indices": [
+        294
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.7221865933336744e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3302 MPa-1.27 ms-noise logger",
+      "test_indices": [
+        295,
+        296
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.0504827936160837e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3303 MPa-0.25 ms-noise logger",
+      "test_indices": [
+        297,
+        298
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.2789812148538147e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3362 MPa-0.7 ms-hydrophone",
+      "test_indices": [
+        299
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 4.1916631277061356e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3362 MPa-0.7 ms-noise logger",
+      "test_indices": [
+        300,
+        301
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 7.760121645272733e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-0.3441 MPa-0.22 ms-noise logger",
+      "test_indices": [
+        302,
+        303
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.3755429956473506e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-NA-NA-NA",
+      "test_indices": [
+        304,
+        305
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.3540090504360336e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-NA-NA-hydrophone",
+      "test_indices": [
+        614,
+        615,
+        616,
+        617,
+        618,
+        619,
+        620,
+        621,
+        622,
+        623,
+        624,
+        625,
+        626,
+        627,
+        628,
+        629,
+        630,
+        631,
+        632,
+        633,
+        634,
+        635,
+        636,
+        637,
+        638,
+        639,
+        640,
+        641,
+        642,
+        643
+      ],
+      "tensor_score_parity": {
+        "rows": 30,
+        "maximum_absolute_score_error": 4.838706749721311e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-NA-NA-NA-noise logger",
+      "test_indices": [
+        306,
+        644,
+        645,
+        646,
+        647,
+        648,
+        649,
+        650,
+        651,
+        652,
+        653,
+        654,
+        655,
+        656,
+        657,
+        658,
+        659,
+        660,
+        661,
+        662,
+        663,
+        664,
+        665,
+        666,
+        667,
+        668,
+        669,
+        670,
+        671,
+        672,
+        673,
+        674,
+        675,
+        676,
+        677,
+        678,
+        679,
+        680,
+        681,
+        682,
+        683,
+        684,
+        685,
+        686,
+        687,
+        688,
+        689,
+        690,
+        691,
+        692,
+        693,
+        694,
+        695,
+        696,
+        697,
+        698,
+        699,
+        700,
+        701,
+        702,
+        703,
+        704,
+        705,
+        706,
+        707,
+        708,
+        709,
+        710,
+        711,
+        712,
+        713,
+        714,
+        715,
+        716,
+        717
+      ],
+      "tensor_score_parity": {
+        "rows": 75,
+        "maximum_absolute_score_error": 4.684465571558327e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 1-0.25 MPa-NA-hydrophone",
+      "test_indices": [
+        307,
+        308
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 8.869140311063006e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 1-0.25 MPa-NA-noise logger",
+      "test_indices": [
+        309,
+        310,
+        311,
+        312
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 7.909743537926062e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 1-0.32 MPa-NA-hydrophone",
+      "test_indices": [
+        313,
+        314
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.6370110111907366e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 1-0.32 MPa-NA-noise logger",
+      "test_indices": [
+        315,
+        316,
+        317,
+        318
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 3.5708037537940385e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 1-NA-NA-hydrophone",
+      "test_indices": [
+        718
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 7.897136278245398e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 1-NA-NA-noise logger",
+      "test_indices": [
+        719,
+        720,
+        721,
+        722,
+        723,
+        724,
+        725,
+        726,
+        727,
+        728,
+        729,
+        730
+      ],
+      "tensor_score_parity": {
+        "rows": 12,
+        "maximum_absolute_score_error": 1.2917830327641155e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.31 MPa-1.16 ms-hydrophone",
+      "test_indices": [
+        319,
+        320
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.3805383503040503e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.31 MPa-1.16 ms-noise logger",
+      "test_indices": [
+        321,
+        322,
+        323,
+        324,
+        325,
+        326
+      ],
+      "tensor_score_parity": {
+        "rows": 6,
+        "maximum_absolute_score_error": 7.330254825355098e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3106 MPa-0.77 ms-hydrophone",
+      "test_indices": [
+        327,
+        328
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.2895335466112101e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3106 MPa-0.77 ms-noise logger",
+      "test_indices": [
+        329,
+        330,
+        331,
+        332,
+        333,
+        334
+      ],
+      "tensor_score_parity": {
+        "rows": 6,
+        "maximum_absolute_score_error": 1.291509392764567e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3111 MPa-0.15 ms-hydrophone",
+      "test_indices": [
+        335
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.844333730183223e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3111 MPa-0.15 ms-noise logger",
+      "test_indices": [
+        336,
+        337
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.51572148060697e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.312 MPa-0.9 ms-hydrophone",
+      "test_indices": [
+        338,
+        339,
+        561,
+        562,
+        563
+      ],
+      "tensor_score_parity": {
+        "rows": 5,
+        "maximum_absolute_score_error": 2.2832143176110264e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.312 MPa-0.9 ms-noise logger",
+      "test_indices": [
+        340,
+        341,
+        342,
+        343,
+        344,
+        345
+      ],
+      "tensor_score_parity": {
+        "rows": 6,
+        "maximum_absolute_score_error": 2.79621630294713e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3132 MPa-0.8 ms-hydrophone",
+      "test_indices": [
+        346
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 5.168396044474832e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3132 MPa-0.8 ms-noise logger",
+      "test_indices": [
+        347,
+        348
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.6187122520736636e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.315 MPa-1.34 ms-hydrophone",
+      "test_indices": [
+        349,
+        350
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.245108210452429e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.315 MPa-1.34 ms-noise logger",
+      "test_indices": [
+        351,
+        352,
+        353,
+        354,
+        355
+      ],
+      "tensor_score_parity": {
+        "rows": 5,
+        "maximum_absolute_score_error": 2.853928326995714e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3172 MPa-0.95 ms-hydrophone",
+      "test_indices": [
+        356
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.607294886074584e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3172 MPa-0.95 ms-noise logger",
+      "test_indices": [
+        357,
+        358
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 6.132088870014485e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3177 MPa-1.15 ms-hydrophone",
+      "test_indices": [
+        359
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.80774136163231e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3177 MPa-1.15 ms-noise logger",
+      "test_indices": [
+        360,
+        361
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.943100251811103e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3202 MPa-0.15 ms-hydrophone",
+      "test_indices": [
+        362
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.5291751143120536e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3202 MPa-0.15 ms-noise logger",
+      "test_indices": [
+        363,
+        364
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.4554113526041874e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3235 MPa-0.5 ms-hydrophone",
+      "test_indices": [
+        365
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.945413252713024e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3235 MPa-0.5 ms-noise logger",
+      "test_indices": [
+        366,
+        367
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.83786634081018e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3237 MPa-1.35 ms-hydrophone",
+      "test_indices": [
+        368
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.9613740126777088e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3237 MPa-1.35 ms-noise logger",
+      "test_indices": [
+        369,
+        370
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.9201242646159642e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3249 MPa-1.33 ms-hydrophone",
+      "test_indices": [
+        371
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.20599351510964e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3249 MPa-1.33 ms-noise logger",
+      "test_indices": [
+        372,
+        373
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.411282508634315e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3251 MPa-1.26 ms-hydrophone",
+      "test_indices": [
+        374
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 6.542085650984575e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3251 MPa-1.26 ms-noise logger",
+      "test_indices": [
+        375,
+        376
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 7.054101802683732e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.326 MPa-1.08 ms-hydrophone",
+      "test_indices": [
+        377
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.7050005851615424e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.326 MPa-1.08 ms-noise logger",
+      "test_indices": [
+        378,
+        379
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 6.318395484594674e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3269 MPa-1.40 ms-hydrophone",
+      "test_indices": [
+        380
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 4.110540796631312e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-0.3269 MPa-1.40 ms-noise logger",
+      "test_indices": [
+        381,
+        382
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.2541337823801513e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-NA-NA-hydrophone",
+      "test_indices": [
+        383,
+        384,
+        385,
+        731,
+        732,
+        733,
+        734,
+        735,
+        736,
+        737,
+        738,
+        739,
+        740,
+        741,
+        742,
+        743,
+        744,
+        745,
+        746,
+        747,
+        748
+      ],
+      "tensor_score_parity": {
+        "rows": 21,
+        "maximum_absolute_score_error": 2.2016990408602055e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "ductile iron-zone 2-NA-NA-noise logger",
+      "test_indices": [
+        386,
+        387,
+        388,
+        389,
+        390,
+        391,
+        392,
+        393,
+        394,
+        749,
+        750,
+        751,
+        752,
+        753,
+        754,
+        755,
+        756,
+        757,
+        758,
+        759,
+        760,
+        761,
+        762,
+        763,
+        764,
+        765,
+        766,
+        767,
+        768,
+        769,
+        770,
+        771,
+        772,
+        773,
+        774,
+        775,
+        776,
+        777,
+        778,
+        779,
+        780,
+        781,
+        782,
+        783,
+        784,
+        785,
+        786,
+        787,
+        788,
+        789,
+        790,
+        791
+      ],
+      "tensor_score_parity": {
+        "rows": 52,
+        "maximum_absolute_score_error": 1.555474251624389e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "engine_1-NA-noise logger",
+      "test_indices": [
+        53,
+        54
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.7486090514727834e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "engine_2-NA-noise logger",
+      "test_indices": [
+        55,
+        56,
+        57,
+        58
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 6.909668071042319e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "engine_3-NA-noise logger",
+      "test_indices": [
+        59,
+        60,
+        61
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 2.1702261765454978e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "engine_6-NA-noise logger",
+      "test_indices": [
+        62,
+        63,
+        64,
+        65
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 2.8715442934590385e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "fan motor-NA-noise logger",
+      "test_indices": [
+        66,
+        67,
+        68,
+        69
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 1.504988027534182e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "fan_1-NA-noise logger",
+      "test_indices": [
+        70,
+        71,
+        72
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 4.2737883476640093e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "flowing water-NA-noise logger",
+      "test_indices": [
+        73,
+        74,
+        75
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 1.63621415527615e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "gas pipe-NA-noise logger",
+      "test_indices": [
+        76,
+        77,
+        78
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 1.434673013722687e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "grass noise-zone 2-noise logger",
+      "test_indices": [
+        79,
+        80,
+        81,
+        82,
+        83
+      ],
+      "tensor_score_parity": {
+        "rows": 5,
+        "maximum_absolute_score_error": 3.018265848364621e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "hydrant-NA-noise logger",
+      "test_indices": [
+        84,
+        85,
+        90,
+        91,
+        92,
+        93,
+        94
+      ],
+      "tensor_score_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 3.4958784944638666e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "hydrant_89-NA-noise logger",
+      "test_indices": [
+        86,
+        87,
+        88,
+        89
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 1.1464856131127021e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "music_1-NA-noise logger",
+      "test_indices": [
+        95,
+        96
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.5518601984010338e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.0650 MPa-2.46 ms-noise logger",
+      "test_indices": [
+        401,
+        402
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.2386308423948407e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.0717 MPa-2.09 ms-noise logger",
+      "test_indices": [
+        403,
+        404
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.1315438841474901e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1192 MPa-2.95 ms-noise logger",
+      "test_indices": [
+        405,
+        406
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.08928095993366e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1217 MPa-3.00 ms-hydrophone",
+      "test_indices": [
+        407
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 4.041371193252985e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1446 MPa-3.26 ms-noise logger",
+      "test_indices": [
+        408
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 5.659245627676057e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1507 MPa-3.30 ms-noise logger",
+      "test_indices": [
+        409,
+        410
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 6.304420641090047e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1527 MPa-3.40 ms-hydrophone",
+      "test_indices": [
+        411
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 4.431487243827803e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1545 MPa-3.36 ms-hydrophone",
+      "test_indices": [
+        412
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.5033594857882804e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1545 MPa-3.36 ms-noise logger",
+      "test_indices": [
+        413,
+        414,
+        415,
+        416,
+        421,
+        422
+      ],
+      "tensor_score_parity": {
+        "rows": 6,
+        "maximum_absolute_score_error": 2.0032151548665666e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1545 MPa-3.40 ms-hydrophone",
+      "test_indices": [
+        417
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.842439308896715e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1545 MPa-3.40 ms-noise logger",
+      "test_indices": [
+        418,
+        419
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.419730320088689e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1630 MPa-3.45 ms-hydrophone",
+      "test_indices": [
+        420
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.4625638694875107e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1648 MPa-3.40 ms-hydrophone",
+      "test_indices": [
+        423
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.636236426731663e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1648 MPa-3.40 ms-noise logger",
+      "test_indices": [
+        424,
+        425
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.8453777084204148e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1687 MPa-3.5 ms-noise logger",
+      "test_indices": [
+        426,
+        427
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.5410941522908672e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1692 MPa-3.55 ms-hydrophone",
+      "test_indices": [
+        428
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 4.314354573597967e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1726 MPa-3.58 ms-hydrophone",
+      "test_indices": [
+        429
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 9.44090240428963e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1726 MPa-3.58 ms-noise logger",
+      "test_indices": [
+        430,
+        431
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.7687034081781405e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1767 MPa-3.50 ms-noise logger",
+      "test_indices": [
+        432,
+        433
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 7.627794951226008e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1771 MPa-3.62 ms-hydrophone",
+      "test_indices": [
+        434
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.2292542095337922e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1771 MPa-3.62 ms-noise logger",
+      "test_indices": [
+        435,
+        436
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.5084434512591116e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1803 MPa-3.68 ms-hydrophone",
+      "test_indices": [
+        437
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 9.371215814457656e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1803 MPa-3.68 ms-noise logger",
+      "test_indices": [
+        438,
+        439
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.6804074354226373e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1869 MPa-3.77 ms-hydrophone",
+      "test_indices": [
+        440
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.4939996584881783e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1869 MPa-3.77 ms-noise logger",
+      "test_indices": [
+        441,
+        442
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.2005265720714817e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1892 MPa-3.59 ms-noise logger",
+      "test_indices": [
+        443,
+        444
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 8.867914513821518e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.1949 MPa-2.02 ms-noise logger",
+      "test_indices": [
+        445,
+        446
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.579309035799504e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2095 MPa-3.70 ms-noise logger",
+      "test_indices": [
+        447,
+        448
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.1834693225409865e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2233 MPa-3.77 ms-noise logger",
+      "test_indices": [
+        449,
+        450
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.0057027533558767e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2242 MPa-3.90 ms-noise logger",
+      "test_indices": [
+        451,
+        452
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.350295020241532e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2269 MPa-3.95 ms-noise logger",
+      "test_indices": [
+        453,
+        454
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.459967617442828e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2283 MPa-3.80 ms-noise logger",
+      "test_indices": [
+        455,
+        456
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.495313795008002e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2320 MPa-3.78 ms-noise logger",
+      "test_indices": [
+        457,
+        458
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.5710150614320924e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2339 MPa-4.20 ms-hydrophone",
+      "test_indices": [
+        459
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.6919059064868236e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2339 MPa-4.20 ms-noise logger",
+      "test_indices": [
+        460,
+        461
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.441103336663474e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2349 MPa-4.10 ms-hydrophone",
+      "test_indices": [
+        462
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 5.324888995295041e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2349 MPa-4.10 ms-noise logger",
+      "test_indices": [
+        463,
+        464
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.3322941689052357e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2377 MPa-3.95 ms-noise logger",
+      "test_indices": [
+        465
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.036011768653424e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2405 MPa-4.00 ms-noise logger",
+      "test_indices": [
+        466,
+        467
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.359575601573738e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2425 MPa-3.97 ms-noise logger",
+      "test_indices": [
+        468,
+        469
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.7896056747623845e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2425 MPa-4.01 ms-noise logger",
+      "test_indices": [
+        470,
+        471
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.772857114560992e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2428 MPa-3.92 ms-noise logger",
+      "test_indices": [
+        472,
+        473
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 8.106893600867693e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2437 MPa-3.98 ms-noise logger",
+      "test_indices": [
+        474
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.985485387212549e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2464 MPa-4.30 ms-hydrophone",
+      "test_indices": [
+        475
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.076682665246409e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2495 MPa-4.33 ms-hydrophone",
+      "test_indices": [
+        476
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 4.063918012109369e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2495 MPa-4.33 ms-noise logger",
+      "test_indices": [
+        477,
+        478
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 7.738677898494473e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2580 MPa-4.35 ms-hydrophone",
+      "test_indices": [
+        479
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.1852636250253568e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2630 MPa-4.11 ms-noise logger",
+      "test_indices": [
+        480,
+        481
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.1292456142685268e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2672 MPa-4.07 ms-noise logger",
+      "test_indices": [
+        482,
+        483
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.6201112401924576e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2688 MPa-4.21 ms-noise logger",
+      "test_indices": [
+        484
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 3.4685851324489647e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2742 MPa-4.18 ms-noise logger",
+      "test_indices": [
+        485,
+        486
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.683020314224848e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2755 MPa-4.38 ms-noise logger",
+      "test_indices": [
+        487,
+        488
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.378759482255191e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2761 MPa-4.42 ms-noise logger",
+      "test_indices": [
+        489,
+        490
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.7804350838953624e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2817 MPa-4.52 ms-hydrophone",
+      "test_indices": [
+        491
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 8.182561928027354e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.2866 MPa-4.50 ms-noise logger",
+      "test_indices": [
+        492,
+        493
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.499923572127585e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3003 MPa-4.65 ms-hydrophone",
+      "test_indices": [
+        494
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.002085971453127e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3024 MPa-4.58 ms-noise logger",
+      "test_indices": [
+        495
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.1465649147067722e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3047 MPa-0.73 ms-noise logger",
+      "test_indices": [
+        496,
+        497
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.4460035502317226e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.306 MPa-0.68 ms-noise logger",
+      "test_indices": [
+        498,
+        499
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.3006809485016646e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3091 MPa-4.64 ms-noise logger",
+      "test_indices": [
+        500,
+        501
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.4411175153217215e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+      "test_indices": [
+        502,
+        503,
+        549,
+        831,
+        832,
+        833,
+        834,
+        835,
+        836,
+        837,
+        838,
+        839,
+        840,
+        841,
+        842,
+        843,
+        844,
+        845,
+        846,
+        847,
+        848,
+        849,
+        850,
+        851,
+        852,
+        853,
+        854,
+        855,
+        856,
+        857,
+        858,
+        859,
+        860,
+        861,
+        862,
+        863,
+        864,
+        865,
+        866,
+        867,
+        868,
+        869,
+        870,
+        871,
+        872,
+        873,
+        874,
+        875,
+        876,
+        877,
+        878,
+        879,
+        880,
+        881,
+        882,
+        883,
+        884,
+        885,
+        886,
+        887,
+        888,
+        889,
+        890,
+        891,
+        892,
+        893,
+        894,
+        895,
+        896,
+        897,
+        898,
+        899,
+        900,
+        901,
+        902,
+        903,
+        904
+      ],
+      "tensor_score_parity": {
+        "rows": 77,
+        "maximum_absolute_score_error": 2.8721531686315416e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3126 MPa-4.85 ms-hydrophone",
+      "test_indices": [
+        504
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.3438246182495561e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3130 MPa-0.38 ms-noise logger",
+      "test_indices": [
+        505,
+        506
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.116283626119042e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3138 MPa-0.69 ms-noise logger",
+      "test_indices": [
+        507,
+        508
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 6.247957606841936e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3153 MPa-0.57 ms-noise logger",
+      "test_indices": [
+        509
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.985639624419889e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3162 MPa-0.5 ms-noise logger",
+      "test_indices": [
+        510
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 6.243975558817283e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.32 MPa-NA-noise logger",
+      "test_indices": [
+        511
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 4.7716939510777934e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3202 MPa-0.60 ms-noise logger",
+      "test_indices": [
+        512
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.222756201319953e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3202 MPa-0.75 ms-noise logger",
+      "test_indices": [
+        513
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 8.647871307942978e-10,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3210 MPa-0.2 ms-noise logger",
+      "test_indices": [
+        514
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 7.829212278487319e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3217 MPa-0.90 ms-noise logger",
+      "test_indices": [
+        515
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 2.9604792284310122e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.322 MPa-0.11 ms-hydrophone",
+      "test_indices": [
+        516
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 6.936462182416392e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.322 MPa-0.11 ms-noise logger",
+      "test_indices": [
+        517
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 8.306006993308301e-10,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3223 MPa-1.00 ms-noise logger",
+      "test_indices": [
+        518,
+        519
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.0809999490853954e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3223 MPa-1.15 ms-noise logger",
+      "test_indices": [
+        520,
+        521
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.2526161824742985e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3235 MPa-0.81 ms-noise logger",
+      "test_indices": [
+        522,
+        523
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 6.429179366662652e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3244 MPa-0.22 ms-noise logger",
+      "test_indices": [
+        524,
+        525
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.0774477354758005e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3244 MPa-0.35 ms-noise logger",
+      "test_indices": [
+        526
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.7506859295579602e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3249 MPa-1.68 ms-noise logger",
+      "test_indices": [
+        527,
+        528
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.321278812557949e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3249 MPa-1.72 ms-noise logger",
+      "test_indices": [
+        529,
+        530
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 8.364590065035316e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3256 MPa-0.52 ms-noise logger",
+      "test_indices": [
+        531,
+        532
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.9559447395067764e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3265 MPa-1.62 ms-noise logger",
+      "test_indices": [
+        533,
+        534
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.8268124707399025e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3267 MPa-0.95 ms-noise logger",
+      "test_indices": [
+        535,
+        536
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.3374956975287233e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3272 MPa-1.12 ms-noise logger",
+      "test_indices": [
+        537,
+        538
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.501104692329228e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3280 MPa-1.46 ms-noise logger",
+      "test_indices": [
+        539,
+        540
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.162561868525927e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3302 MPa-1.14 ms-noise logger",
+      "test_indices": [
+        541,
+        542
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.477992731066749e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3302 MPa-1.44 ms-noise logger",
+      "test_indices": [
+        543,
+        544
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.1123381555596694e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3334 MPa-0.82 ms-noise logger",
+      "test_indices": [
+        545,
+        546
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.825227868845758e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-0.3334 MPa-0.94 ms-noise logger",
+      "test_indices": [
+        547,
+        548
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.140200111051428e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-NA-NA-NA-hydrophone",
+      "test_indices": [
+        812,
+        813,
+        814,
+        815,
+        816,
+        817,
+        818,
+        819,
+        820,
+        821,
+        822,
+        823,
+        824,
+        825,
+        826,
+        827,
+        828,
+        829,
+        830
+      ],
+      "tensor_score_parity": {
+        "rows": 19,
+        "maximum_absolute_score_error": 2.8564203835568236e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 1-0.25 MPa-NA-noise logger",
+      "test_indices": [
+        550,
+        551,
+        552
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 1.9547004503905896e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 1-0.32 MPa-NA-noise logger",
+      "test_indices": [
+        553,
+        554,
+        555,
+        556
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 3.5246081830919707e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 1-NA-NA-noise logger",
+      "test_indices": [
+        905,
+        906
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 7.969780502214974e-09,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.3034 MPa-1.55 ms-noise logger",
+      "test_indices": [
+        557,
+        558,
+        559,
+        560
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 2.8400907037262613e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.3053 MPa-1.6 ms-noise logger",
+      "test_indices": [
+        564,
+        565
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.9142125728954795e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.313 MPa-0.52 ms-noise logger",
+      "test_indices": [
+        566,
+        567
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 5.8876510777849944e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.3171 MPa-0.57 ms-noise logger",
+      "test_indices": [
+        568,
+        569
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.3493029366328244e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.3172 MPa-0.95 ms-hydrophone",
+      "test_indices": [
+        570
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.38996649745593e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.3172 MPa-0.95 ms-noise logger",
+      "test_indices": [
+        571,
+        572
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.9141934088094956e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.3194 MPa-1.64 ms-noise logger",
+      "test_indices": [
+        573,
+        574
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 3.878660111145127e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.32 MPa-1.26 ms-noise logger",
+      "test_indices": [
+        575,
+        576
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.0536809064441996e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.322 MPa-1.55 ms-noise logger",
+      "test_indices": [
+        577,
+        578
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.887597748748362e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.3221 MPa-0.08 ms-noise logger",
+      "test_indices": [
+        579
+      ],
+      "tensor_score_parity": {
+        "rows": 1,
+        "maximum_absolute_score_error": 1.9296676256885803e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.3245 MPa-1.68 ms-noise logger",
+      "test_indices": [
+        580,
+        581
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.4363224104817505e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-0.326 MPa-0.18 ms-noise logger",
+      "test_indices": [
+        582,
+        583
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.255635506680619e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-NA-NA-hydrophone",
+      "test_indices": [
+        584,
+        585,
+        586,
+        587,
+        907,
+        908,
+        909,
+        910,
+        911,
+        912,
+        913,
+        914,
+        915,
+        916,
+        917,
+        918,
+        919,
+        920,
+        921,
+        922,
+        923,
+        924,
+        925,
+        926,
+        927,
+        928,
+        929,
+        930,
+        931,
+        932,
+        933,
+        934,
+        935
+      ],
+      "tensor_score_parity": {
+        "rows": 33,
+        "maximum_absolute_score_error": 2.899105353559861e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pe-zone 2-NA-NA-noise logger",
+      "test_indices": [
+        588,
+        589,
+        590,
+        591,
+        592,
+        593,
+        594,
+        936,
+        937,
+        938,
+        939,
+        940,
+        941,
+        942,
+        943,
+        944,
+        945,
+        946,
+        947,
+        948,
+        949,
+        950,
+        951,
+        952,
+        953,
+        954,
+        955,
+        956,
+        957,
+        958,
+        959,
+        960,
+        961,
+        962,
+        963,
+        964,
+        965,
+        966,
+        967,
+        968,
+        969,
+        970,
+        971,
+        972,
+        973,
+        974,
+        975,
+        976,
+        977,
+        978,
+        979,
+        980,
+        981,
+        982,
+        983,
+        984,
+        985,
+        986
+      ],
+      "tensor_score_parity": {
+        "rows": 58,
+        "maximum_absolute_score_error": 2.851403000381225e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pvc-zone 1-0.25 MPa-NA-noise logger",
+      "test_indices": [
+        595,
+        596,
+        597
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 3.0991744093267215e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pvc-zone 1-0.32 MPa-NA-noise logger",
+      "test_indices": [
+        598,
+        599,
+        600,
+        601
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 1.8944937474341117e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "pvc-zone 1-NA-NA-noise logger",
+      "test_indices": [
+        987,
+        988,
+        989
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 2.8943582419671543e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "rain-NA-noise logger",
+      "test_indices": [
+        97,
+        98,
+        99,
+        100,
+        101
+      ],
+      "tensor_score_parity": {
+        "rows": 5,
+        "maximum_absolute_score_error": 2.994006743639588e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "rain_2-NA-noise logger",
+      "test_indices": [
+        102,
+        103,
+        104
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 1.2326845305610235e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "rain_3-NA-noise logger",
+      "test_indices": [
+        105,
+        106,
+        107
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 3.125470915410489e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "steel-zone 1-0.25 MPa-NA-hydrophone",
+      "test_indices": [
+        602,
+        603
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 4.8174891853491886e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "steel-zone 1-0.25 MPa-NA-noise logger",
+      "test_indices": [
+        604,
+        605,
+        606,
+        607
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 1.7498331084109253e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "steel-zone 1-0.32 MPa-NA-hydrophone",
+      "test_indices": [
+        608,
+        609
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.5182689772075264e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "steel-zone 1-0.32 MPa-NA-noise logger",
+      "test_indices": [
+        610,
+        611,
+        612,
+        613
+      ],
+      "tensor_score_parity": {
+        "rows": 4,
+        "maximum_absolute_score_error": 5.251396084648974e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "steel-zone 1-NA-NA-hydrophone",
+      "test_indices": [
+        990,
+        991
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 1.1317766285268149e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "steel-zone 1-NA-NA-noise logger",
+      "test_indices": [
+        992,
+        993,
+        994,
+        995,
+        996,
+        997,
+        998,
+        999
+      ],
+      "tensor_score_parity": {
+        "rows": 8,
+        "maximum_absolute_score_error": 5.598615071544799e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "unknown_noise-NA-noise logger",
+      "test_indices": [
+        108,
+        109,
+        110
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 3.895241107443326e-08,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "wind-NA-noise logger",
+      "test_indices": [
+        111,
+        112,
+        113
+      ],
+      "tensor_score_parity": {
+        "rows": 3,
+        "maximum_absolute_score_error": 1.5112968498876e-07,
+        "class_disagreements": 0
+      }
+    }
+  ],
+  "hash_group_audit": {
+    "linked_clips": 12,
+    "hash_links": [
+      {
+        "sha256": "0c744008a07bd2220be0196c019220bf75f23565e236292e2bf025d711c9859c",
+        "indices": [
+          502,
+          549
+        ],
+        "filename_groups": [
+          "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+          "pe-NA-NA-NA-noise logger"
+        ]
+      },
+      {
+        "sha256": "98e94bd8482beca4cbdb75076d75b5e11e05a89bfb89ae73aa03ea76e051a938",
+        "indices": [
+          84,
+          91
+        ],
+        "filename_groups": [
+          "hydrant-NA-noise logger",
+          "hydrant_normal-NA-noise logger"
+        ]
+      },
+      {
+        "sha256": "b41f338d6c0bf0a1b162a77290f85e90203189b56e8f876b2573165dd00aeca0",
+        "indices": [
+          128,
+          134
+        ],
+        "filename_groups": [
+          "ductile iron-NA-0.1545 MPa-3.36 ms-noise logger",
+          "ductile iron-NA-0.1630 MPa-3.45 ms-noise logger"
+        ]
+      },
+      {
+        "sha256": "c0dda6d2318f878eb83b05d0b09aaa2d9eb617785b3a66ead86e59f1d46afe81",
+        "indices": [
+          85,
+          92
+        ],
+        "filename_groups": [
+          "hydrant-NA-noise logger",
+          "hydrant_normal-NA-noise logger"
+        ]
+      },
+      {
+        "sha256": "cbcea6ac2799d8f70990416ab4ecdce3ea04eeaf109d90f1e322860fd22da69c",
+        "indices": [
+          339,
+          561
+        ],
+        "filename_groups": [
+          "ductile iron-zone 2-0.312 MPa-0.9 ms-hydrophone",
+          "pe-zone 2-0.305 MPa-1.6 ms-noise logger"
+        ]
+      },
+      {
+        "sha256": "fd96da930b4d4b7ec27d60f04f45b5010f03f2698f6ab52fc0a04af4c7422322",
+        "indices": [
+          416,
+          421
+        ],
+        "filename_groups": [
+          "pe-NA-0.1545 MPa-3.36 ms-noise logger",
+          "pe-NA-0.1630 MPa-3.45 ms-noise logger"
+        ]
+      }
+    ],
+    "original_groups": 319,
+    "merged_connected_components": 314,
+    "method": "union filename groups connected by an identical complete-file SHA256; transitive closure before LOGO",
+    "feature_cross_group_clips": 12,
+    "feature_cross_group_sets": [
+      [
+        339,
+        561
+      ],
+      [
+        84,
+        91
+      ],
+      [
+        128,
+        134
+      ],
+      [
+        85,
+        92
+      ],
+      [
+        502,
+        549
+      ],
+      [
+        416,
+        421
+      ]
+    ],
+    "all_duplicate_clips": 72,
+    "all_duplicate_hash_sets": 36,
+    "decoded_pcm_cross_group_clips": 12,
+    "decoded_pcm_cross_group_sets": [
+      [
+        416,
+        421
+      ],
+      [
+        339,
+        561
+      ],
+      [
+        84,
+        91
+      ],
+      [
+        85,
+        92
+      ],
+      [
+        502,
+        549
+      ],
+      [
+        128,
+        134
+      ]
+    ],
+    "previous_reviewer_26_clip_count": "Not reproduced by complete-file SHA256, decoded float32 PCM SHA256 or exact feature-row hashing; observed12cross-group clips/6hash sets. All observed hash-connected groups are merged."
+  },
+  "OOF_parity_scope": "TensorFlow scorer vs sklearn on each held-out fold; full deployment TFLite verified separately on all rows"
+}

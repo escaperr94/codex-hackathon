@@ -1,0 +1,105 @@
+{
+  "name": "acm_s2_fillclass_rbf",
+  "path": "artifacts\\final\\classifiers\\acm_s2_fillclass_rbf.tflite",
+  "sha256": "5b4c3d7d1cdda570b0a5c99d4a91ea0f311b74e104f0ed1bc1512d303a2eeca9",
+  "bytes": 18132,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "ABS",
+    "ADD",
+    "ARG_MAX",
+    "CAST",
+    "DELEGATE",
+    "DIV",
+    "EXP",
+    "GREATER",
+    "LESS_EQUAL",
+    "MUL",
+    "PACK",
+    "RESHAPE",
+    "SQUARED_DIFFERENCE",
+    "STRIDED_SLICE",
+    "SUB",
+    "SUM"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      90
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      0,
+      1,
+      2
+    ]
+  },
+  "contract": {
+    "feature_order": [
+      "13 MFCC means",
+      "13 MFCC population std",
+      "32 natural-log-mel means",
+      "32 natural-log-mel population std"
+    ],
+    "frontend": "experiments/dataset_benchmark.py:feature",
+    "frontend_sha256": "5d68692cb46af3de8bd125faf653ded954a8ad0d35b05135cf52f0d3f0f73a38",
+    "capture": "mono mean, polyphase 16kHz, first4s, whole-recording mean removal, Hann400 hop160 FFT512; 32 mel80-7600Hz; ortho DCT13",
+    "frontend_included": false,
+    "task": "filling_level_classification",
+    "labels": {
+      "0": "empty",
+      "1": "50%",
+      "2": "90%"
+    },
+    "protocol": "pouring/shaking external setup, not taps",
+    "license": "Dataset CC BY4.0; preserve attribution; no model production-suitability grant inferred",
+    "source": "https://zenodo.org/records/4770439"
+  },
+  "training": {
+    "fit": "all observations",
+    "hyperparameters": "fixed C=1, balanced, gamma=scale for RBF",
+    "feature_cache": "artifacts\\final\\classifiers\\acm_s2_fillclass-features.npz",
+    "historical_report": "artifacts/dataset-benchmarks.json",
+    "new_OOF_report": "artifacts\\final\\classifiers\\acm_s2_fillclass-rbf-oof.json"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 21,
+    "maximum_absolute_score_error": 1.1233609731320371e-07,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 7,
+    "maximum_absolute_score_error": 8.177142030163509e-08,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "source": "artifacts\\datasets\\acm_s2\\acm_s2_audio\\000014.wav",
+    "sha256": "03cd45e442ccd4ca88a0465a8cfa3cf3f0c32dd3ed7bee9f72231f0856ab92ad",
+    "decoded_real_audio": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 5.000711489344667e-08,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\acm_s2_fillclass_rbf-verification.npz",
+    "sha256": "c944b1f70215774c54ffea2e78249e8f249a045404eaeff855678bc73ce8e118",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\acm_s2_fillclass_rbf.joblib",
+    "sha256": "9e450f31d886b490f3ab0e30b9f4e304afc16dda8d026c807fead1a1761d6547"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "name": "pipe_leak_logistic",
+  "path": "artifacts\\final\\classifiers\\pipe_leak_logistic.tflite",
+  "sha256": "fe86e76e5531554a49fa0e4f473ffe847098913f79511ed35d155d39d1b33180",
+  "bytes": 3200,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "CAST",
+    "CONCATENATION",
+    "DELEGATE",
+    "FULLY_CONNECTED",
+    "GREATER",
+    "LOGISTIC",
+    "STRIDED_SLICE",
+    "SUB"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      90
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "probabilities in classes order",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      0,
+      1
+    ]
+  },
+  "contract": {
+    "feature_order": [
+      "13 MFCC means",
+      "13 MFCC population std",
+      "32 natural-log-mel means",
+      "32 natural-log-mel population std"
+    ],
+    "frontend": "experiments/dataset_benchmark.py:feature",
+    "frontend_sha256": "5d68692cb46af3de8bd125faf653ded954a8ad0d35b05135cf52f0d3f0f73a38",
+    "capture": "mono mean, polyphase 16kHz, first4s, whole-recording mean removal, Hann400 hop160 FFT512; 32 mel80-7600Hz; ortho DCT13",
+    "frontend_included": false,
+    "task": "leak_vs_no_leak_classification",
+    "labels": {
+      "0": "no leak including environmental noise",
+      "1": "leak"
+    },
+    "protocol": "hydrophone/contact logger pipe monitoring, not verified airborne phone audio",
+    "license": "Dataset CC BY4.0; preserve attribution; no model production-suitability grant inferred",
+    "source": "https://zenodo.org/records/18631450"
+  },
+  "training": {
+    "fit": "all observations",
+    "hyperparameters": "fixed C=1, balanced, gamma=scale for RBF",
+    "feature_cache": "artifacts\\final\\classifiers\\pipe_leak-features.npz",
+    "historical_report": "artifacts/dataset-benchmarks.json",
+    "new_OOF_report": "artifacts\\final\\classifiers\\pipe_leak-logistic-oof.json"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 1000,
+    "maximum_absolute_score_error": 1.1172874061493587e-06,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 9,
+    "maximum_absolute_score_error": 6.210470600676032e-06,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "source": "artifacts\\datasets\\leak\\extracted\\environmental-noise\\environmental noise\\alarm_1-NA-noise logger_0-1.wav",
+    "sha256": "180c2e191de124ac2e4eadd43195b1384910403441cba673a2e91ce7fa6d2ca9",
+    "decoded_real_audio": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 1.2803086590906787e-08,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\pipe_leak_logistic-verification.npz",
+    "sha256": "49091763311e82b0c6a3a0ab9ebc05541b4ddf18618036a8a7250d573ad078f9",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\pipe_leak_logistic.joblib",
+    "sha256": "4c284a7d56541e3c6e484ff2113e6e5c691f4c6da43580f0059fd0d3bf0e778a"
+  }
+}

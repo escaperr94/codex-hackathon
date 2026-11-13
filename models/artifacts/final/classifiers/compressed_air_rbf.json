@@ -1,0 +1,97 @@
+{
+  "name": "compressed_air_rbf",
+  "path": "artifacts\\final\\classifiers\\compressed_air_rbf.tflite",
+  "sha256": "e709d98c2b7af427470cbc1b12f7e371fde7c2abaf8890be56c6e45fe2340bb9",
+  "bytes": 16892,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "CAST",
+    "CONCATENATION",
+    "DELEGATE",
+    "EXP",
+    "FULLY_CONNECTED",
+    "GREATER_EQUAL",
+    "MUL",
+    "NEG",
+    "RESHAPE",
+    "SQUARED_DIFFERENCE",
+    "STRIDED_SLICE",
+    "SUB",
+    "SUM"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      90
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      0,
+      1
+    ]
+  },
+  "contract": {
+    "feature_order": [
+      "13 MFCC means",
+      "13 MFCC population std",
+      "32 natural-log-mel means",
+      "32 natural-log-mel population std"
+    ],
+    "frontend": "experiments/dataset_benchmark.py:feature",
+    "frontend_sha256": "5d68692cb46af3de8bd125faf653ded954a8ad0d35b05135cf52f0d3f0f73a38",
+    "capture": "mono mean, polyphase 16kHz, first4s, whole-recording mean removal, Hann400 hop160 FFT512; 32 mel80-7600Hz; ortho DCT13",
+    "frontend_included": false,
+    "task": "audible_compressed_air_leak_vs_no_leak",
+    "labels": {
+      "0": "no_leak (_iO_)",
+      "1": "leak (_niO_)"
+    },
+    "license": "CC BY-NC-ND4.0; no commercial/redistribution rights inferred",
+    "limits": "48selected whole recordings; no session3 or unknown factories/phone/seal-tap validation"
+  },
+  "training": {
+    "fit": "all48cached real recordings",
+    "selection": "fixed C=1 gamma=scale, both families retained",
+    "cache_sha256": "c51d0bc9293bbf9ef38ee02cc32f833cf664350c9d61d6f498c8e0a63afbd45c"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 48,
+    "maximum_absolute_score_error": 8.476918467170691e-07,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 7,
+    "maximum_absolute_score_error": 8.126719921452974e-07,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "source": "artifacts\\datasets\\compressed-air\\tubeleak\\lab\\1\\1_iO_3.5n_1m_.wav",
+    "sha256": "97e28a657a48737f2427aec7eaa9f38ea0b51eda9afbec8d5d228fe048748e82",
+    "decoded_real_audio": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 1.8391482803359338e-07,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\compressed_air_rbf-verification.npz",
+    "sha256": "6f46f6222526ebdee83c44211d3e4daa4e20fbf175e42593d3d620d23e948113",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\compressed_air_rbf.joblib",
+    "sha256": "f18db7467b2dca8bd11c9bbd1644b52f628813b00abf03ee0b2312ce15fa5b73"
+  }
+}

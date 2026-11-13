@@ -1,0 +1,108 @@
+{
+  "name": "realimpact_material_mfcc_logmel",
+  "path": "artifacts\\final\\classifiers\\realimpact_material_mfcc_logmel.tflite",
+  "sha256": "e87ff9a3215e336c7cba6fb8ef780981f91cbfcfe8eb64a3759763f14d3f98de",
+  "bytes": 3964,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "ARG_MAX",
+    "DELEGATE",
+    "FULLY_CONNECTED",
+    "SUB"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      154
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      "Ceramic",
+      "Plastic",
+      "Wood"
+    ]
+  },
+  "contract": {
+    "task": "material_classification",
+    "frontend": "experiments/material_benchmark.py:waveform + acoustic",
+    "frontend_sha256": "153a0a7090ec572717c1916de82eaf574f49606f002f555fd95e6ffd27dfe6c2",
+    "feature_order": [
+      "64 logmel means",
+      "64 logmel population std",
+      "13 MFCC means",
+      "13 MFCC population std"
+    ],
+    "waveform": "1s peak20ms-centered16kHz; YCB decode and resample; RealImpact force-deconvolved48kHz->16kHz then .95 peak normalize",
+    "encoder": null,
+    "license": "RealImpact code/data/checkpoint permissions require separate review",
+    "limits": [
+      "Deterministic first30 rows represent nearby microphones/positions and mostly one source vertex, not independent diverse impacts. Whole physical objects are held out.",
+      "Plastic bowls are same product family at different sizes; material and shape remain confounded.",
+      "Three objects/class and nine scored objects give high uncertainty; no universal or phone accuracy claim.",
+      "Force-deconvolved preprocessed impulse responses are not raw phone tapping audio; gain calibration unavailable, so per-clip normalization applied.",
+      "Partial DEFLATE decompression verified shape/finite complete rows and hashed prefixes; full-member/archive CRC or complete-file SHA256 NOT verified. Small annotation members have CRC verified.",
+      "No iPhone or mobile conversion measured; source dataset redistribution permission requires review."
+    ]
+  },
+  "training": {
+    "selection": "all-data training-only object-rank CV; no outer-score family winner",
+    "C_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0
+    ],
+    "mean_object_macro_f1": [
+      0.8518518518518517,
+      0.7037037037037036,
+      0.7037037037037036,
+      0.5555555555555555
+    ],
+    "selected_C": 0.01,
+    "source_cache": "material-realimpact-features.npz",
+    "source_cache_sha256": "1ba882f3d1a84fef6c57d717349d5314d2b617533974ba061e5042ba80bba1a0",
+    "historical_report": "material-realimpact-benchmark.json"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 270,
+    "maximum_absolute_score_error": 7.656421625590326e-07,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 9,
+    "maximum_absolute_score_error": 2.9224587265730406e-06,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "source": "artifacts\\datasets\\material\\realimpact-prefix\\31_WoodSlab\\audio-first30.npy",
+    "sha256": "354c0ee16478a5fb1081bf64f18dcb774a27526464b85dc62914dd09eeed02fc",
+    "source_row": 0,
+    "real_deconvolved_audio": true,
+    "not_raw_phone_PCM": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 2.0440344394856425e-07,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\realimpact_material_mfcc_logmel-verification.npz",
+    "sha256": "bea37f5dd448dcb95ea905b9345bc983efca086645d965dec4358164058bf03a",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\realimpact_material_mfcc_logmel.joblib",
+    "sha256": "5dfab2e96c6d40ce65b605a9a211ebc8c635a76d69b99444f7993a37521df846"
+  }
+}

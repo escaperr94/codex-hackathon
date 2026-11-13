@@ -1,0 +1,110 @@
+{
+  "name": "sdnet_spectral_svm",
+  "path": "artifacts\\final\\classifiers\\sdnet_spectral_svm.tflite",
+  "sha256": "7481ae74ffa184a505c65f728fe5fdf97e8c7d9648d02fc7514836a249905799",
+  "bytes": 516724,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "ABS",
+    "ADD",
+    "ARG_MAX",
+    "CAST",
+    "DELEGATE",
+    "DIV",
+    "EXP",
+    "GREATER",
+    "LESS_EQUAL",
+    "MUL",
+    "PACK",
+    "RESHAPE",
+    "SQUARED_DIFFERENCE",
+    "STRIDED_SLICE",
+    "SUB",
+    "SUM"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      84
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      1,
+      2,
+      3
+    ]
+  },
+  "contract": {
+    "task": "structural impact-echo concrete class",
+    "labels": {
+      "1": "sound concrete",
+      "2": "delamination above top rebar mat",
+      "3": "delamination below top rebar mat"
+    },
+    "frontend": "experiments/impact_echo_benchmark.py:spectral_features, native102400Hz sensor amplitude, first2048samples/20ms; not ordinary phone PCM",
+    "frontend_sha256": "ba2d0f4bcbfe7e6ffcae359d65591b3685e2fd1c65fe591022d72e9d57646188",
+    "feature_order": [
+      "64 natural-log normalized band energies, ascending500..25000Hz",
+      "ortho DCT coefficients1..16",
+      "centroid_Hz",
+      "width_Hz",
+      "peak_band_center_Hz",
+      "flatness"
+    ],
+    "license": "Author-preprocessed SDNET mirror; original data and mirror permissions require review",
+    "limits": "Whole bridge decks held out historically; no phone or tile sensing claim",
+    "source": "https://commons.und.edu/data/19/ ; pinned author derivative https://github.com/ehoxha91/impact_echo_datasets commit ff970edfa89637623e13cd89132c5266862c6344",
+    "unresolved_label_provenance": "Pinned mirror counts1378/494/64 differ by one label from published1379sound/557delaminated; original raw archive unavailable; do not claim identical official labels"
+  },
+  "training": {
+    "fit": "all1936real sensor records",
+    "selection": {
+      "svc__C": 0.1,
+      "svc__kernel": "rbf"
+    },
+    "training_warnings": [],
+    "cache_sha256": "cff58e653abbd781499700b0670d93a0ffc92c4c9fcf463c475845c798d2933f"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 1936,
+    "maximum_absolute_score_error": 1.132961959582346e-06,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 7,
+    "maximum_absolute_score_error": 4.6937717623762865e-07,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "source": "artifacts\\datasets\\impact_echo\\repository\\IE_data_sdnet2021_original\\forest_river_nb\\frnb_origin_2A.npy",
+    "sha256": "10472f2fd1d5c43f916aecd000f782a25e436cd7e3e7c29a35d47cfa72d9561c",
+    "source_row": 0,
+    "real_sensor_waveform": true,
+    "not_phone_PCM": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 2.5257188052130175e-07,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\sdnet_spectral_svm-verification.npz",
+    "sha256": "c02c1b5192e78f4cf0d3cfa22d61326d7c20c884dcff1d35b56162fc2beba90d",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\sdnet_spectral_svm.joblib",
+    "sha256": "15405f6b8398b630ff8bae6164bb4f2dc7f4f8fe53120810527e325277e866ff"
+  }
+}

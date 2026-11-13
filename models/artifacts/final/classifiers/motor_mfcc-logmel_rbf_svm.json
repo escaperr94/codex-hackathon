@@ -1,0 +1,106 @@
+{
+  "name": "motor_mfcc-logmel_rbf_svm",
+  "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_rbf_svm.tflite",
+  "sha256": "34e032a59a197a42df57a513545b0efaaa35399a2b4a7a4ae8c4c7eea72bc70f",
+  "bytes": 16892,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "CAST",
+    "CONCATENATION",
+    "DELEGATE",
+    "EXP",
+    "FULLY_CONNECTED",
+    "GREATER_EQUAL",
+    "MUL",
+    "NEG",
+    "RESHAPE",
+    "SQUARED_DIFFERENCE",
+    "STRIDED_SLICE",
+    "SUB",
+    "SUM"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      90
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      "debonded",
+      "repaired"
+    ]
+  },
+  "contract": {
+    "task": "same-motor debonded/repaired condition",
+    "frontend": "experiments/puck_motor_benchmark.py:mono16 + features",
+    "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+    "feature_order": [
+      "13 MFCC means",
+      "13 MFCC population std",
+      "32 natural-log-mel means",
+      "32 natural-log-mel population std"
+    ],
+    "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+    "encoder": null,
+    "license": {
+      "source": "https://data.mendeley.com/datasets/bxcnxfm94c/5",
+      "license": "CC BY 4.0",
+      "condition_names": [
+        "debonded",
+        "repaired"
+      ],
+      "independent_sources": 20,
+      "excluded_m4a": 20,
+      "duplicate_relationship": "The 20 WAV files are the decoded working copies of the same 20 M4A recordings with the first 2.0 seconds removed. Do not count formats as independent observations.",
+      "split": "Five leave-one-speed-out folds: 100, 200, 500, 750, 1000 rpm. Each held-out speed contains both directions and both conditions, every source file's windows remain together.",
+      "identifiability_limit": "One physical motor before/after rebonding and one source recording per operating condition. Speed transfer can be scored; unseen-motor, repeat-session and causal fault generalization cannot be established."
+    },
+    "limits": "20 WAVs from one physical motor; M4A counterparts excluded; no unseen-motor validation"
+  },
+  "training": {
+    "existing_full_data_head": "artifacts\\puck-motor-motor-mfcc-logmel-rbf_svm.joblib",
+    "sha256": "bf8c697f3736c84d5671c37f4e40cdc0d3200e467c36a4406e0df79d38de5aa4",
+    "selection": "both fixed C=1 families retained, no outer-score winner selection",
+    "source_cache_sha256": "153176f823c4944f5cbf28d893b1f8d52bfd229d00a167aeed9cedf2eab87379"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 60,
+    "maximum_absolute_score_error": 5.495173481806503e-07,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 7,
+    "maximum_absolute_score_error": 2.0892078522738444e-07,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "source": "artifacts\\datasets\\phone-motor\\audio_debonded_1000rpm_forward.wav",
+    "sha256": "2d64ae98a41b446345ce70a1cdb3dacf8d8fe831105ede7e6fba04314c949184",
+    "decoded_real_audio": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 8.376849247593299e-08,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_rbf_svm-verification.npz",
+    "sha256": "8541cb47b330f46991fda754060a59faefec44e22680045024a23a23285ceaaf",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_rbf_svm.joblib",
+    "sha256": "5dd26d0d3eb68f31a93a3a450c84d9e18d7ec84181cb51c90596654c860145dd"
+  }
+}

@@ -1,0 +1,2047 @@
+{
+  "scope": "Per-fold TensorFlow implementation versus sklearn on held-out real features. These are NOT TFLite OOF measurements; each full-data deployment TFLite independently evaluated on all cached real rows and boundaries.",
+  "models": [
+    {
+      "name": "acm_s2_fillclass_logistic",
+      "folds": 4,
+      "parity": "per-fold TensorFlow score math; deployment TFLite separate"
+    },
+    {
+      "name": "acm_s2_fillclass_rbf",
+      "folds": 4,
+      "parity": "per-fold TensorFlow score math; deployment TFLite separate"
+    },
+    {
+      "name": "pipe_leak_logistic",
+      "folds": 314,
+      "parity": "per-fold TensorFlow score math; deployment TFLite separate"
+    },
+    {
+      "name": "pipe_leak_rbf",
+      "folds": 314,
+      "parity": "per-fold TensorFlow score math; deployment TFLite separate"
+    },
+    {
+      "name": "ycb_material_mfcc_logmel",
+      "folds": [
+        {
+          "fold": 0,
+          "tensor_score_parity": {
+            "rows": 45,
+            "maximum_absolute_score_error": 4.4367618867724445e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 1,
+          "tensor_score_parity": {
+            "rows": 43,
+            "maximum_absolute_score_error": 9.806518539434705e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 2,
+          "tensor_score_parity": {
+            "rows": 43,
+            "maximum_absolute_score_error": 6.992725597454452e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "source_heads": "material-heads.joblib",
+      "parity": "saved historical OOF heads, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "ycb_material_yamnet",
+      "folds": [
+        {
+          "fold": 0,
+          "tensor_score_parity": {
+            "rows": 45,
+            "maximum_absolute_score_error": 1.3937670703123572e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 1,
+          "tensor_score_parity": {
+            "rows": 43,
+            "maximum_absolute_score_error": 1.7108480143690485e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 2,
+          "tensor_score_parity": {
+            "rows": 43,
+            "maximum_absolute_score_error": 2.964880088829336e-06,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "source_heads": "material-heads.joblib",
+      "parity": "saved historical OOF heads, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "realimpact_material_mfcc_logmel",
+      "folds": [
+        {
+          "fold": 0,
+          "tensor_score_parity": {
+            "rows": 90,
+            "maximum_absolute_score_error": 5.109790117696633e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 1,
+          "tensor_score_parity": {
+            "rows": 90,
+            "maximum_absolute_score_error": 5.552112030127176e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 2,
+          "tensor_score_parity": {
+            "rows": 90,
+            "maximum_absolute_score_error": 7.882369916778487e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "source_heads": "material-realimpact-heads.joblib",
+      "parity": "saved historical OOF heads, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "realimpact_material_yamnet",
+      "folds": [
+        {
+          "fold": 0,
+          "tensor_score_parity": {
+            "rows": 90,
+            "maximum_absolute_score_error": 1.7690351107546576e-05,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 1,
+          "tensor_score_parity": {
+            "rows": 90,
+            "maximum_absolute_score_error": 5.721380993417569e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 2,
+          "tensor_score_parity": {
+            "rows": 90,
+            "maximum_absolute_score_error": 7.568076657721301e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "source_heads": "material-realimpact-heads.joblib",
+      "parity": "saved historical OOF heads, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "pucks_mfcc-logmel_logistic",
+      "folds": [
+        {
+          "held_out": "puck-E-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.3248655128528242e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 9.772724574030889e-08,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.3850054586826985e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.798762265392e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.6267472853492837e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.818801277948424e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.7076905184664213e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.061994925448232e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.017147450299021e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.51032118326178e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 8.745512791730192e-08,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.3457684467386173e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.802292544679119e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.059477796720557e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.9888206937455095e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.926382711183507e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.866328365826789e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.254828964769032e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.959944947506955e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.0675293838913191e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.932436446005497e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.251391605367914e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.500953624837379e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-09",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.5081817006666896e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-10",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.0832985764849283e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.880295521563326e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.5758622352055625e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.5342800658023634e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.5870663938599705e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.479904485681473e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.6140525055673436e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.795622938700504e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.35386743266497e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.860906577310644e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.5308951545334182e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.73168253609202e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.8600186041671805e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.276134426550726e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 8.339367755239024e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.697565793079008e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.131794775179664e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.4133135007330395e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.2401907118794213e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.9592576666903625e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.4792208325473695e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "replayed fixed historical training folds, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "pucks_mfcc-logmel_rbf_svm",
+      "folds": [
+        {
+          "held_out": "puck-E-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.094709137063667e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 7.444998283423487e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.986172861290214e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.967522481193811e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.717227820363103e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.4348814727505044e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.065469588363733e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.4679243992853372e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.4293931692721529e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.994686375628163e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.353287323428546e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.1300095901223273e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.000809889850629e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 7.472764232963058e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.080555341565926e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.2865050199060164e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.1086280791161585e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.132652635378207e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.1188201081147042e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 7.65205740327346e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.3198791357638129e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.0899119922136435e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.5854013440952386e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-09",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.974736803440514e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-10",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.8365337213221977e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.0776295753522902e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.30698082756453e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 9.434253145368388e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.3285900344120471e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.1443414567047228e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.654042084409113e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 8.882770159424069e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 8.970015996645486e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.3438217719995436e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.956524941977179e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.412620728642345e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.1881881004649486e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.3729401636686234e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.4497390771195384e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.6644385417707852e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.6939157307938046e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.335270198854488e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.1596776123487529e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.1618416579928237e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 9.457717744520977e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "replayed fixed historical training folds, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "pucks_yamnet_logistic",
+      "folds": [
+        {
+          "held_out": "puck-E-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 7.411349897123998e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.203181178721096e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.387728681996215e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.881323358794319e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 7.345779404754893e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.130875082524298e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.320140697457788e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 7.117864857519862e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.0943962724940803e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.046877299408337e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.6464239748225094e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.1857763670963806e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.265943457954947e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.0943955669473482e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.3835819017149475e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.248425729020845e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.097860450413826e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.610514018927759e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.1791975249318973e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 7.47306088899613e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.589404683565725e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.8884614500235273e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.7369689042645575e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-09",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 7.554887907490482e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-10",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 8.447000328093424e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.882761179298868e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.796784544569554e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.220624780753134e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.022190448540243e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.0470889584279774e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.415513238400834e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.2988434483496292e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.379444273367895e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.657485867503141e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.483048973742299e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.844525914813545e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.708358382123691e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.909107903488085e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.810411032783122e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.1622273661001685e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.365833985134124e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.4300323254198304e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.10179098470276e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.943941094293081e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.976340669011648e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "replayed fixed historical training folds, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "pucks_yamnet_rbf_svm",
+      "folds": [
+        {
+          "held_out": "puck-E-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.822494750365223e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.466549012345112e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 8.315700483541022e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.4631405278752183e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.7450783056947046e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.317027080813496e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.9784684492106805e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.543461534140981e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.2795501217753866e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-050-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 7.266237452174806e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.831882834091303e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.8249170448413352e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.7537442323376524e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.3112519580713595e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-E-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.31434522263352e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.12131976257335e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.8157450758504723e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.533920890503751e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.1164912663861344e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.8438835392580186e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.6299426332938571e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.280891157337763e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 1.5961074960602062e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-09",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.8714342298341577e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-050-game-10",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 6.664692062563482e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.181413496282758e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.190285629952385e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.522181329997486e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.105805971819308e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-G-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.548460238118501e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.707070696026051e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.230794843713582e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.7890300205178917e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.6505095322159065e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-000-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.9090011974571865e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.2064464206005283e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 4.4348391321780145e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.7393405899189815e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.416810043537332e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-050-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 5.076481435217772e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-00",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.6240327308222076e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-01",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.0597312819781166e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-02",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 2.8784788512759008e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-03",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.749012030929144e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "puck-I-vol-100-game-04",
+          "tensor_score_parity": {
+            "rows": 9,
+            "maximum_absolute_score_error": 3.182375444277241e-06,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "replayed fixed historical training folds, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "motor_mfcc-logmel_logistic",
+      "folds": [
+        {
+          "held_out": "100",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 5.760093964302104e-08,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "1000",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 3.6917762180621594e-08,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "200",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 1.0711214826208959e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "500",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 2.8559242526426942e-08,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "750",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 3.835815376440621e-08,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "replayed fixed historical training folds, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "motor_mfcc-logmel_rbf_svm",
+      "folds": [
+        {
+          "held_out": "100",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 5.813282366595729e-08,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "1000",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 1.666366948871456e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "200",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 2.663535505487147e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "500",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 2.9846906146602237e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "750",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 2.159350223074341e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "replayed fixed historical training folds, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "motor_yamnet_logistic",
+      "folds": [
+        {
+          "held_out": "100",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 4.0749386975846846e-08,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "1000",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 1.0416957285652728e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "200",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 2.2202150007366583e-08,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "500",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 8.184229627339334e-08,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "750",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 6.271375463384743e-08,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "replayed fixed historical training folds, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "motor_yamnet_rbf_svm",
+      "folds": [
+        {
+          "held_out": "100",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 5.4876447552754115e-09,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "1000",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 2.3286388284304849e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "200",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 1.8755206643294997e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "500",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 2.3077465449716783e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out": "750",
+          "tensor_score_parity": {
+            "rows": 12,
+            "maximum_absolute_score_error": 2.3457114251002054e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "replayed fixed historical training folds, TensorFlow scorer; deployment TFLite separate"
+    },
+    {
+      "name": "compressed_air_logistic",
+      "folds": [
+        {
+          "axis": "session",
+          "held_out": "1",
+          "tensor_score_parity": {
+            "rows": 24,
+            "maximum_absolute_score_error": 1.8057365713808338e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "axis": "session",
+          "held_out": "2",
+          "tensor_score_parity": {
+            "rows": 24,
+            "maximum_absolute_score_error": 1.266651230569238e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "axis": "microphone",
+          "held_out": "1m",
+          "tensor_score_parity": {
+            "rows": 24,
+            "maximum_absolute_score_error": 1.913670176767468e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "axis": "microphone",
+          "held_out": "2m",
+          "tensor_score_parity": {
+            "rows": 24,
+            "maximum_absolute_score_error": 1.210163177445267e-07,
+            "class_disagreements": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "compressed_air_rbf",
+      "folds": [
+        {
+          "axis": "session",
+          "held_out": "1",
+          "tensor_score_parity": {
+            "rows": 24,
+            "maximum_absolute_score_error": 1.518550427626053e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "axis": "session",
+          "held_out": "2",
+          "tensor_score_parity": {
+            "rows": 24,
+            "maximum_absolute_score_error": 2.411563412296758e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "axis": "microphone",
+          "held_out": "1m",
+          "tensor_score_parity": {
+            "rows": 24,
+            "maximum_absolute_score_error": 2.668821236229135e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "axis": "microphone",
+          "held_out": "2m",
+          "tensor_score_parity": {
+            "rows": 24,
+            "maximum_absolute_score_error": 3.173592841854145e-07,
+            "class_disagreements": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "jackfruit",
+      "folds": [
+        {
+          "fold": 0,
+          "tensor_score_parity": {
+            "rows": 61,
+            "maximum_absolute_score_error": 1.1670670130303762e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 1,
+          "tensor_score_parity": {
+            "rows": 65,
+            "maximum_absolute_score_error": 1.5067574753446777e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 2,
+          "tensor_score_parity": {
+            "rows": 61,
+            "maximum_absolute_score_error": 1.3385182850988997e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 3,
+          "tensor_score_parity": {
+            "rows": 66,
+            "maximum_absolute_score_error": 1.567480898412299e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "replayed nested historical folds; TensorFlow score math"
+    },
+    {
+      "name": "gpla12",
+      "folds": [
+        {
+          "fold": 0,
+          "tensor_score_parity": {
+            "rows": 171,
+            "maximum_absolute_score_error": 1.079317481611497e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 1,
+          "tensor_score_parity": {
+            "rows": 171,
+            "maximum_absolute_score_error": 1.919993825955091e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 2,
+          "tensor_score_parity": {
+            "rows": 171,
+            "maximum_absolute_score_error": 2.4906441574712446e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "fold": 3,
+          "tensor_score_parity": {
+            "rows": 171,
+            "maximum_absolute_score_error": 9.207651761045099e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "replayed nested historical folds; TensorFlow score math"
+    },
+    {
+      "name": "sdnet_spectral_svm",
+      "folds": [
+        {
+          "held_out_deck": "forest_river_nb",
+          "tensor_score_parity": {
+            "rows": 363,
+            "maximum_absolute_score_error": 1.2519627691220947e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out_deck": "forest_river_sb",
+          "tensor_score_parity": {
+            "rows": 363,
+            "maximum_absolute_score_error": 4.1420690095606005e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out_deck": "park_river_median",
+          "tensor_score_parity": {
+            "rows": 363,
+            "maximum_absolute_score_error": 5.282268550788061e-05,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out_deck": "park_river_nb",
+          "tensor_score_parity": {
+            "rows": 363,
+            "maximum_absolute_score_error": 6.951660770360135e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out_deck": "park_river_sb",
+          "tensor_score_parity": {
+            "rows": 484,
+            "maximum_absolute_score_error": 6.880525351249389e-05,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "saved historical deck-OOF heads; TensorFlow score math"
+    },
+    {
+      "name": "sdnet_small_spectral_mlp",
+      "folds": [
+        {
+          "held_out_deck": "forest_river_nb",
+          "tensor_score_parity": {
+            "rows": 363,
+            "maximum_absolute_score_error": 7.106591368710724e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out_deck": "forest_river_sb",
+          "tensor_score_parity": {
+            "rows": 363,
+            "maximum_absolute_score_error": 1.2910358777595832e-06,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out_deck": "park_river_median",
+          "tensor_score_parity": {
+            "rows": 363,
+            "maximum_absolute_score_error": 7.017999795744245e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out_deck": "park_river_nb",
+          "tensor_score_parity": {
+            "rows": 363,
+            "maximum_absolute_score_error": 7.670088792988139e-07,
+            "class_disagreements": 0
+          }
+        },
+        {
+          "held_out_deck": "park_river_sb",
+          "tensor_score_parity": {
+            "rows": 484,
+            "maximum_absolute_score_error": 7.384561152568025e-07,
+            "class_disagreements": 0
+          }
+        }
+      ],
+      "parity": "saved historical deck-OOF heads; TensorFlow score math"
+    }
+  ]
+}

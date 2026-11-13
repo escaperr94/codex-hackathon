@@ -1,0 +1,105 @@
+{
+  "name": "pucks_yamnet_logistic",
+  "path": "artifacts\\final\\classifiers\\pucks_yamnet_logistic.tflite",
+  "sha256": "2181f63252a629daf959f09828f853e6940780e2bee5ba0dde0d4033232ce383",
+  "bytes": 18036,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "ARG_MAX",
+    "DELEGATE",
+    "FULLY_CONNECTED",
+    "SOFTMAX",
+    "SUB"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      1024
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "probabilities in classes order",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      "ABS",
+      "PA12",
+      "PA2200"
+    ]
+  },
+  "contract": {
+    "task": "material and manufacturing-process classification",
+    "frontend": "mono16 + four-second frozen YAMNet embedding mean",
+    "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+    "feature_order": "YAMNet indices0..1023",
+    "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+    "encoder": {
+      "path": "artifacts\\tfhub\\9616fd04ec2360621642ef9455b84f4b668e219e",
+      "saved_model_sha256": "672af6e1e34fe15a42d45d70217fd39f97e10aef9b0effbf9b0bf7826fccd462",
+      "pooling": "arithmetic mean of 1024D frame embeddings, not 521 event scores"
+    },
+    "license": {
+      "metadata_source": "https://zenodo.org/api/records/7551338",
+      "distributed_document": "artifacts/datasets/pucks/IDMT_PUCKS.pdf",
+      "metadata_license_verbatim": "cc-by-nc-nd-4.0",
+      "distributed_pdf_license_verbatim": "The dataset is provided for evaluation purpose under the Creative Commons Attribution-ShareAlike 4.0 International License (\"by-sa\").",
+      "decision": "Local research evaluation only; do not redistribute raw/derived dataset or assume production permissions. Clarification required for license conflict.",
+      "archive_directory_observed": {
+        "wav_files": 225,
+        "puck_A": 45,
+        "puck_E": 45,
+        "puck_G": 45,
+        "puck_I": 45,
+        "no_puck": 45
+      },
+      "metadata_pdf_claimed_total_wav": 260,
+      "groups": "Each vol_000/050/100 x puck_A/E/G/I has five three-minute games with three patch-0/1/2 minute files. IDs usually 00..04, but PA2200/G at vol050 uses 00,01,02,09,10. Actual IDs are parsed, not assumed sequential; all patches and both channels grouped before splitting.",
+      "player_puck_ids": "PDF says different player sets and pucks per game; no persistent player or physical-puck identity mapping in filename or release documentation. Game is the strongest observable group, not independently verified puck-held-out evaluation.",
+      "known_material_decision": "Exclude puck_A unknown factory material and no_puck backgrounds; evaluate ABS/FDM, PA2200/SLS, PA12/MJF. Material and manufacturing process remain confounded."
+    },
+    "limits": "Game grouping not physical-puck independence; unknown puck_A excluded"
+  },
+  "training": {
+    "existing_full_data_head": "artifacts\\puck-motor-pucks-yamnet-logistic.joblib",
+    "sha256": "53ee4ff04ae5949637b589885b41e496ea0eb1587b01f5ae000038adbf510580",
+    "selection": "both fixed C=1 families retained, no outer-score winner selection",
+    "source_cache_sha256": "7f2aed72e0c6ba61eb2c30cbd4592d4e51a1f11385e7c9b7b192831ff9c54a20"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 405,
+    "maximum_absolute_score_error": 8.775353361745175e-07,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 9,
+    "maximum_absolute_score_error": 2.2424542278631776e-07,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "archive": "artifacts\\datasets\\pucks\\IDMT_ISA_PUCKS.zip",
+    "member": "vol_000/puck_E/puckE_game-00_3min_vol000_patch-0.wav",
+    "sha256": "4573c5ba739f21c0a3c2c4aa0f1856594c63fa83063749c65539b3f580bc0283",
+    "decoded_real_audio": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 1.566813601083794e-08,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\pucks_yamnet_logistic-verification.npz",
+    "sha256": "bc64ba63aef3c789579bf8a68ba2be3b73b02b92249bf5bf99e6a1f24d1c9019",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\pucks_yamnet_logistic.joblib",
+    "sha256": "d8f8e6c9089d88e4e5c790371ffa88b289453fa9a20b8e840e6913a2befc072e"
+  }
+}

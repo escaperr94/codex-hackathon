@@ -1,0 +1,117 @@
+{
+  "name": "pucks_mfcc-logmel_rbf_svm",
+  "path": "artifacts\\final\\classifiers\\pucks_mfcc-logmel_rbf_svm.tflite",
+  "sha256": "260065f8c38b08f91605d858303a33f4965ab61bc2199f0cc04c50727787d625",
+  "bytes": 146932,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "ABS",
+    "ADD",
+    "ARG_MAX",
+    "CAST",
+    "DELEGATE",
+    "DIV",
+    "EXP",
+    "GREATER",
+    "LESS_EQUAL",
+    "MUL",
+    "PACK",
+    "RESHAPE",
+    "SQUARED_DIFFERENCE",
+    "STRIDED_SLICE",
+    "SUB",
+    "SUM"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      90
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      "ABS",
+      "PA12",
+      "PA2200"
+    ]
+  },
+  "contract": {
+    "task": "material and manufacturing-process classification",
+    "frontend": "experiments/puck_motor_benchmark.py:mono16 + features",
+    "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+    "feature_order": [
+      "13 MFCC means",
+      "13 MFCC population std",
+      "32 natural-log-mel means",
+      "32 natural-log-mel population std"
+    ],
+    "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+    "encoder": null,
+    "license": {
+      "metadata_source": "https://zenodo.org/api/records/7551338",
+      "distributed_document": "artifacts/datasets/pucks/IDMT_PUCKS.pdf",
+      "metadata_license_verbatim": "cc-by-nc-nd-4.0",
+      "distributed_pdf_license_verbatim": "The dataset is provided for evaluation purpose under the Creative Commons Attribution-ShareAlike 4.0 International License (\"by-sa\").",
+      "decision": "Local research evaluation only; do not redistribute raw/derived dataset or assume production permissions. Clarification required for license conflict.",
+      "archive_directory_observed": {
+        "wav_files": 225,
+        "puck_A": 45,
+        "puck_E": 45,
+        "puck_G": 45,
+        "puck_I": 45,
+        "no_puck": 45
+      },
+      "metadata_pdf_claimed_total_wav": 260,
+      "groups": "Each vol_000/050/100 x puck_A/E/G/I has five three-minute games with three patch-0/1/2 minute files. IDs usually 00..04, but PA2200/G at vol050 uses 00,01,02,09,10. Actual IDs are parsed, not assumed sequential; all patches and both channels grouped before splitting.",
+      "player_puck_ids": "PDF says different player sets and pucks per game; no persistent player or physical-puck identity mapping in filename or release documentation. Game is the strongest observable group, not independently verified puck-held-out evaluation.",
+      "known_material_decision": "Exclude puck_A unknown factory material and no_puck backgrounds; evaluate ABS/FDM, PA2200/SLS, PA12/MJF. Material and manufacturing process remain confounded."
+    },
+    "limits": "Game grouping not physical-puck independence; unknown puck_A excluded"
+  },
+  "training": {
+    "existing_full_data_head": "artifacts\\puck-motor-pucks-mfcc-logmel-rbf_svm.joblib",
+    "sha256": "dfd74f47fc2bdfb0ab3bbe342ca4e1db3b8874f28ef66747564e37e9a043df7b",
+    "selection": "both fixed C=1 families retained, no outer-score winner selection",
+    "source_cache_sha256": "7f2aed72e0c6ba61eb2c30cbd4592d4e51a1f11385e7c9b7b192831ff9c54a20"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 405,
+    "maximum_absolute_score_error": 2.4661789514990318e-06,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 7,
+    "maximum_absolute_score_error": 7.99732311151935e-07,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "archive": "artifacts\\datasets\\pucks\\IDMT_ISA_PUCKS.zip",
+    "member": "vol_000/puck_E/puckE_game-00_3min_vol000_patch-0.wav",
+    "sha256": "4573c5ba739f21c0a3c2c4aa0f1856594c63fa83063749c65539b3f580bc0283",
+    "decoded_real_audio": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 1.1267001331916049e-07,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\pucks_mfcc-logmel_rbf_svm-verification.npz",
+    "sha256": "00aa1e3ca844579b784b4370ad84a9629050e7f249ce192aa40ba2506f9225ea",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\pucks_mfcc-logmel_rbf_svm.joblib",
+    "sha256": "13ae86b68a532c7cf8c0f6575a74b8a646ee233a0bb82a2296f70cad5e17b950"
+  }
+}

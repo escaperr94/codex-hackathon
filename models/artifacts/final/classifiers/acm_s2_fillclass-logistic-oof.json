@@ -1,0 +1,160 @@
+{
+  "dataset": "acm_s2_fillclass",
+  "family": "logistic",
+  "status": "exploratory",
+  "protocol": "fixed C=1, gamma=scale; whole container LOGO",
+  "n_scored": 21,
+  "accuracy": 0.8095238095238095,
+  "balanced_accuracy": 0.8555555555555555,
+  "confusion_matrix": [
+    [
+      2,
+      0,
+      0
+    ],
+    [
+      0,
+      9,
+      1
+    ],
+    [
+      1,
+      2,
+      6
+    ]
+  ],
+  "truth": [
+    2,
+    1,
+    2,
+    2,
+    1,
+    0,
+    2,
+    1,
+    2,
+    2,
+    1,
+    0,
+    1,
+    1,
+    1,
+    2,
+    1,
+    2,
+    1,
+    2,
+    1
+  ],
+  "prediction": [
+    2,
+    1,
+    2,
+    1,
+    1,
+    0,
+    2,
+    1,
+    2,
+    1,
+    1,
+    0,
+    1,
+    1,
+    1,
+    2,
+    1,
+    2,
+    1,
+    0,
+    2
+  ],
+  "groups": [
+    "17",
+    "16",
+    "17",
+    "18",
+    "19",
+    "16",
+    "17",
+    "18",
+    "16",
+    "16",
+    "17",
+    "19",
+    "17",
+    "18",
+    "17",
+    "18",
+    "16",
+    "18",
+    "16",
+    "16",
+    "18"
+  ],
+  "folds": [
+    {
+      "held_out": "16",
+      "test_indices": [
+        1,
+        5,
+        8,
+        9,
+        16,
+        18,
+        19
+      ],
+      "tensor_score_parity": {
+        "rows": 7,
+        "maximum_absolute_score_error": 2.1986405468465975e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "17",
+      "test_indices": [
+        0,
+        2,
+        6,
+        10,
+        12,
+        14
+      ],
+      "tensor_score_parity": {
+        "rows": 6,
+        "maximum_absolute_score_error": 1.3945047228069996e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "18",
+      "test_indices": [
+        3,
+        7,
+        13,
+        15,
+        17,
+        20
+      ],
+      "tensor_score_parity": {
+        "rows": 6,
+        "maximum_absolute_score_error": 2.836553146812193e-07,
+        "class_disagreements": 0
+      }
+    },
+    {
+      "held_out": "19",
+      "test_indices": [
+        4,
+        11
+      ],
+      "tensor_score_parity": {
+        "rows": 2,
+        "maximum_absolute_score_error": 2.993544310214702e-07,
+        "class_disagreements": 0
+      }
+    }
+  ],
+  "hash_group_audit": null,
+  "OOF_parity_scope": "TensorFlow scorer vs sklearn on each held-out fold; full deployment TFLite verified separately on all rows"
+}

@@ -1,0 +1,67 @@
+{
+  "file": "artifacts/final/fruit/durian/oof-fold-1.tflite",
+  "sha256": "343f98b8402be4255a07c53e76cc620ab0aaa82410bea15efb7ada6692e20c0c",
+  "bytes": 3896,
+  "parameters_sha256": "689289e07f3dcead29ed2bd0f8930494cb8610008bb4fb8cb29478ebb99ffe7e",
+  "candidate": {
+    "block": "all",
+    "class_weight": "none",
+    "C": 1.0
+  },
+  "input_shape": [
+    1,
+    112
+  ],
+  "output_shape": [
+    1,
+    3
+  ],
+  "dtype": "float32",
+  "builtin_operator_codes": [
+    36,
+    41,
+    9,
+    25
+  ],
+  "operators": [
+    "DELEGATE",
+    "FULLY_CONNECTED",
+    "GATHER",
+    "SOFTMAX",
+    "SUB"
+  ],
+  "no_custom_or_flex_ops": true,
+  "finite_outputs": true,
+  "real_feature_rows_exercised": 27,
+  "max_absolute_error": 3.8871917285021595e-07,
+  "argmax_changes": 0,
+  "evaluated_row_indices": [
+    1,
+    9,
+    12,
+    17,
+    20,
+    21,
+    28,
+    32,
+    40,
+    41,
+    45,
+    48,
+    58,
+    74,
+    83,
+    89,
+    92,
+    94,
+    99,
+    103,
+    105,
+    109,
+    111,
+    116,
+    121,
+    124,
+    127
+  ]
+}

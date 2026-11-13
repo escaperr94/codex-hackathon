@@ -1,0 +1,1029 @@
+{
+  "tasks": [
+    {
+      "task": "durian",
+      "new_nested_fruit_metrics": {
+        "n": 133,
+        "accuracy": 0.849624060150376,
+        "balanced_accuracy": 0.8294190761456487,
+        "macro_f1": 0.8298732688189832,
+        "confusion_matrix": [
+          [
+            55,
+            2,
+            0
+          ],
+          [
+            1,
+            32,
+            8
+          ],
+          [
+            1,
+            8,
+            26
+          ]
+        ]
+      },
+      "original_fruit_metrics": {
+        "majority": {
+          "n": 133,
+          "accuracy": 0.42857142857142855,
+          "balanced_accuracy": 0.3333333333333333,
+          "macro_f1": 0.19999999999999998,
+          "confusion_matrix": [
+            [
+              57,
+              0,
+              0
+            ],
+            [
+              41,
+              0,
+              0
+            ],
+            [
+              35,
+              0,
+              0
+            ]
+          ]
+        },
+        "mfcc_spectral": {
+          "n": 133,
+          "accuracy": 0.8345864661654135,
+          "balanced_accuracy": 0.8154410416284614,
+          "macro_f1": 0.8147480465207244,
+          "confusion_matrix": [
+            [
+              54,
+              2,
+              1
+            ],
+            [
+              1,
+              31,
+              9
+            ],
+            [
+              1,
+              8,
+              26
+            ]
+          ]
+        },
+        "yamnet": {
+          "n": 133,
+          "accuracy": 0.8270676691729323,
+          "balanced_accuracy": 0.806805631966094,
+          "macro_f1": 0.8075710200288547,
+          "confusion_matrix": [
+            [
+              53,
+              1,
+              3
+            ],
+            [
+              3,
+              33,
+              5
+            ],
+            [
+              1,
+              10,
+              24
+            ]
+          ]
+        },
+        "hybrid": {
+          "n": 133,
+          "accuracy": 0.8270676691729323,
+          "balanced_accuracy": 0.8095930884120871,
+          "macro_f1": 0.8092993973365016,
+          "confusion_matrix": [
+            [
+              53,
+              2,
+              2
+            ],
+            [
+              3,
+              31,
+              7
+            ],
+            [
+              0,
+              9,
+              26
+            ]
+          ]
+        }
+      },
+      "release_fruit_metrics": {
+        "n": 133,
+        "accuracy": 0.849624060150376,
+        "balanced_accuracy": 0.8294190761456487,
+        "macro_f1": 0.8298732688189832,
+        "confusion_matrix": [
+          [
+            55,
+            2,
+            0
+          ],
+          [
+            1,
+            32,
+            8
+          ],
+          [
+            1,
+            8,
+            26
+          ]
+        ]
+      },
+      "release_baseline_parity": null,
+      "deployment": {
+        "file": "artifacts/final/fruit/durian/deployment-float32.tflite",
+        "sha256": "b12e2a701868e97ebf2fca2443c33f140a24ca3bf08e60ac12793d3121281e3d",
+        "bytes": 3896,
+        "parameters_sha256": "2e9001767370803e0463e66ed2c6fc5bd5eb87956f4c8be158e974235fc35e12",
+        "candidate": {
+          "block": "all",
+          "class_weight": "none",
+          "C": 1.0
+        },
+        "input_shape": [
+          1,
+          112
+        ],
+        "output_shape": [
+          1,
+          3
+        ],
+        "dtype": "float32",
+        "builtin_operator_codes": [
+          36,
+          41,
+          9,
+          25
+        ],
+        "operators": [
+          "DELEGATE",
+          "FULLY_CONNECTED",
+          "GATHER",
+          "SOFTMAX",
+          "SUB"
+        ],
+        "no_custom_or_flex_ops": true,
+        "finite_outputs": true,
+        "real_feature_rows_exercised": 133,
+        "max_absolute_error": 1.8783676913880498e-07,
+        "argmax_changes": 0,
+        "evaluated_row_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119,
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          132
+        ]
+      },
+      "oof_parity": {
+        "argmax_changes_recording": 0,
+        "argmax_changes_fruit": 0,
+        "max_absolute_error": 3.8871917285021595e-07,
+        "fruit_metrics": {
+          "n": 133,
+          "accuracy": 0.849624060150376,
+          "balanced_accuracy": 0.8294190761456487,
+          "macro_f1": 0.8298732688189832,
+          "confusion_matrix": [
+            [
+              55,
+              2,
+              0
+            ],
+            [
+              1,
+              32,
+              8
+            ],
+            [
+              1,
+              8,
+              26
+            ]
+          ]
+        }
+      },
+      "real_audio_records": 3,
+      "selfcheck": {
+        "class_column_ids": [
+          0,
+          1,
+          2
+        ],
+        "normalized_origin_semantics": "passed",
+        "wrong_dtype_shape_nonfinite_rejected": true
+      }
+    },
+    {
+      "task": "coconut",
+      "new_nested_fruit_metrics": {
+        "n": 127,
+        "accuracy": 0.7007874015748031,
+        "balanced_accuracy": 0.6662762159750112,
+        "macro_f1": 0.635719347980156,
+        "confusion_matrix": [
+          [
+            5,
+            3,
+            0
+          ],
+          [
+            4,
+            23,
+            9
+          ],
+          [
+            1,
+            21,
+            61
+          ]
+        ]
+      },
+      "original_fruit_metrics": {
+        "balanced_logistic": {
+          "n": 127,
+          "accuracy": 0.7007874015748031,
+          "balanced_accuracy": 0.6986836233824185,
+          "macro_f1": 0.6556655387064744,
+          "confusion_matrix_im_m_om": [
+            [
+              6,
+              2,
+              0
+            ],
+            [
+              4,
+              22,
+              10
+            ],
+            [
+              1,
+              21,
+              61
+            ]
+          ]
+        },
+        "rbf_svm": {
+          "n": 127,
+          "accuracy": 0.7165354330708661,
+          "balanced_accuracy": 0.6147367246764838,
+          "macro_f1": 0.5941487706193589,
+          "confusion_matrix_im_m_om": [
+            [
+              3,
+              5,
+              0
+            ],
+            [
+              2,
+              26,
+              8
+            ],
+            [
+              4,
+              17,
+              62
+            ]
+          ]
+        },
+        "nested_selected": {
+          "n": 127,
+          "accuracy": 0.7007874015748031,
+          "balanced_accuracy": 0.6986836233824185,
+          "macro_f1": 0.6556655387064744,
+          "confusion_matrix_im_m_om": [
+            [
+              6,
+              2,
+              0
+            ],
+            [
+              4,
+              22,
+              10
+            ],
+            [
+              1,
+              21,
+              61
+            ]
+          ]
+        },
+        "unweighted_logistic": {
+          "n": 127,
+          "accuracy": 0.7637795275590551,
+          "balanced_accuracy": 0.698404730031236,
+          "macro_f1": 0.7369525211630474,
+          "confusion_matrix_im_m_om": [
+            [
+              5,
+              3,
+              0
+            ],
+            [
+              0,
+              23,
+              13
+            ],
+            [
+              0,
+              14,
+              69
+            ]
+          ]
+        },
+        "majority": {
+          "n": 127,
+          "accuracy": 0.6535433070866141,
+          "balanced_accuracy": 0.3333333333333333,
+          "macro_f1": 0.2634920634920635,
+          "confusion_matrix_im_m_om": [
+            [
+              0,
+              0,
+              8
+            ],
+            [
+              0,
+              0,
+              36
+            ],
+            [
+              0,
+              0,
+              83
+            ]
+          ]
+        }
+      },
+      "release_fruit_metrics": {
+        "n": 127,
+        "accuracy": 0.7007874015748031,
+        "balanced_accuracy": 0.6986836233824185,
+        "macro_f1": 0.6556655387064744,
+        "confusion_matrix": [
+          [
+            6,
+            2,
+            0
+          ],
+          [
+            4,
+            22,
+            10
+          ],
+          [
+            1,
+            21,
+            61
+          ]
+        ]
+      },
+      "release_baseline_parity": {
+        "argmax_changes_recording": 0,
+        "argmax_changes_fruit": 0,
+        "max_absolute_error": 9.267298668902413e-06,
+        "fruit_metrics": {
+          "n": 127,
+          "accuracy": 0.7007874015748031,
+          "balanced_accuracy": 0.6986836233824185,
+          "macro_f1": 0.6556655387064744,
+          "confusion_matrix": [
+            [
+              6,
+              2,
+              0
+            ],
+            [
+              4,
+              22,
+              10
+            ],
+            [
+              1,
+              21,
+              61
+            ]
+          ]
+        }
+      },
+      "deployment": {
+        "file": "artifacts/final/fruit/coconut/deployment-float32.tflite",
+        "sha256": "ea1e96024a892d2a2b6f009664030a0cb42e563a098e82605d56cb0fab892c88",
+        "bytes": 3464,
+        "parameters_sha256": "ec0facb6ec34aef581818d789e164af138a6cec998f278544375a68326aac31d",
+        "candidate": {
+          "block": "all",
+          "class_weight": "balanced",
+          "C": 0.01
+        },
+        "input_shape": [
+          1,
+          98
+        ],
+        "output_shape": [
+          1,
+          3
+        ],
+        "dtype": "float32",
+        "builtin_operator_codes": [
+          36,
+          41,
+          9
+        ],
+        "operators": [
+          "DELEGATE",
+          "FULLY_CONNECTED",
+          "GATHER",
+          "SUB"
+        ],
+        "no_custom_or_flex_ops": true,
+        "finite_outputs": true,
+        "real_feature_rows_exercised": 381,
+        "max_absolute_error": 1.595526665454372e-06,
+        "argmax_changes": 0,
+        "evaluated_row_indices": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83,
+          84,
+          85,
+          86,
+          87,
+          88,
+          89,
+          90,
+          91,
+          92,
+          93,
+          94,
+          95,
+          96,
+          97,
+          98,
+          99,
+          100,
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112,
+          113,
+          114,
+          115,
+          116,
+          117,
+          118,
+          119,
+          120,
+          121,
+          122,
+          123,
+          124,
+          125,
+          126,
+          127,
+          128,
+          129,
+          130,
+          131,
+          132,
+          133,
+          134,
+          135,
+          136,
+          137,
+          138,
+          139,
+          140,
+          141,
+          142,
+          143,
+          144,
+          145,
+          146,
+          147,
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155,
+          156,
+          157,
+          158,
+          159,
+          160,
+          161,
+          162,
+          163,
+          164,
+          165,
+          166,
+          167,
+          168,
+          169,
+          170,
+          171,
+          172,
+          173,
+          174,
+          175,
+          176,
+          177,
+          178,
+          179,
+          180,
+          181,
+          182,
+          183,
+          184,
+          185,
+          186,
+          187,
+          188,
+          189,
+          190,
+          191,
+          192,
+          193,
+          194,
+          195,
+          196,
+          197,
+          198,
+          199,
+          200,
+          201,
+          202,
+          203,
+          204,
+          205,
+          206,
+          207,
+          208,
+          209,
+          210,
+          211,
+          212,
+          213,
+          214,
+          215,
+          216,
+          217,
+          218,
+          219,
+          220,
+          221,
+          222,
+          223,
+          224,
+          225,
+          226,
+          227,
+          228,
+          229,
+          230,
+          231,
+          232,
+          233,
+          234,
+          235,
+          236,
+          237,
+          238,
+          239,
+          240,
+          241,
+          242,
+          243,
+          244,
+          245,
+          246,
+          247,
+          248,
+          249,
+          250,
+          251,
+          252,
+          253,
+          254,
+          255,
+          256,
+          257,
+          258,
+          259,
+          260,
+          261,
+          262,
+          263,
+          264,
+          265,
+          266,
+          267,
+          268,
+          269,
+          270,
+          271,
+          272,
+          273,
+          274,
+          275,
+          276,
+          277,
+          278,
+          279,
+          280,
+          281,
+          282,
+          283,
+          284,
+          285,
+          286,
+          287,
+          288,
+          289,
+          290,
+          291,
+          292,
+          293,
+          294,
+          295,
+          296,
+          297,
+          298,
+          299,
+          300,
+          301,
+          302,
+          303,
+          304,
+          305,
+          306,
+          307,
+          308,
+          309,
+          310,
+          311,
+          312,
+          313,
+          314,
+          315,
+          316,
+          317,
+          318,
+          319,
+          320,
+          321,
+          322,
+          323,
+          324,
+          325,
+          326,
+          327,
+          328,
+          329,
+          330,
+          331,
+          332,
+          333,
+          334,
+          335,
+          336,
+          337,
+          338,
+          339,
+          340,
+          341,
+          342,
+          343,
+          344,
+          345,
+          346,
+          347,
+          348,
+          349,
+          350,
+          351,
+          352,
+          353,
+          354,
+          355,
+          356,
+          357,
+          358,
+          359,
+          360,
+          361,
+          362,
+          363,
+          364,
+          365,
+          366,
+          367,
+          368,
+          369,
+          370,
+          371,
+          372,
+          373,
+          374,
+          375,
+          376,
+          377,
+          378,
+          379,
+          380
+        ]
+      },
+      "oof_parity": {
+        "argmax_changes_recording": 0,
+        "argmax_changes_fruit": 0,
+        "max_absolute_error": 4.750765686623026e-06,
+        "fruit_metrics": {
+          "n": 127,
+          "accuracy": 0.7007874015748031,
+          "balanced_accuracy": 0.6662762159750112,
+          "macro_f1": 0.635719347980156,
+          "confusion_matrix": [
+            [
+              5,
+              3,
+              0
+            ],
+            [
+              4,
+              23,
+              9
+            ],
+            [
+              1,
+              21,
+              61
+            ]
+          ]
+        }
+      },
+      "real_audio_records": 9,
+      "selfcheck": {
+        "class_column_ids": [
+          0,
+          1,
+          2
+        ],
+        "normalized_origin_semantics": "passed",
+        "wrong_dtype_shape_nonfinite_rejected": true
+      }
+    }
+  ],
+  "runtime": {
+    "platform": "Windows-11-10.0.22624-SP0",
+    "python": "3.12.9",
+    "numpy": "2.1.3",
+    "scipy": "1.15.2",
+    "sklearn": "1.6.1",
+    "tensorflow": "2.19.0",
+    "threads_max": 2,
+    "physical_phone_tested": false
+  },
+  "preserved_input_sha256": {
+    "artifacts/durian-results.json": "239f2e82f2860852df6e40170f2401e011a15bbe648bb07f41de4d44ca509e91",
+    "artifacts/durian-recordings.json": "264153345f9393a748196631bc387c34052c3d4d3f2505430a4c36ad61c6eafd",
+    "artifacts/durian-features.npz": "c270f92d20ccc078aca48739c009eb29d4344f78316fcd7054dbaedf9c33ec8e",
+    "artifacts/coconut-benchmark.json": "31af66d2a7e8a30890b7cf9cd0081e60febfb0514182e445f2b9f213dd09ca0c",
+    "artifacts/coconut-features.npz": "8fbcc1e374ad61f4b561ba94e5e1869caade1500f7e0186dfac14aab4c9ec448",
+    "docs/durian-report.md": "588b36abaddeed857a8c8638b0cfaedf9c35d2d5f3c9c49d5fdb80eb66d11769"
+  },
+  "script_sha256": "a50bc6aaea1a31369d9510282ed16b16ed8b6e58bf3aa17731b33dbd2580c869"
+}

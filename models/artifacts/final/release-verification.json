@@ -1,0 +1,2283 @@
+{
+  "status": "passed",
+  "script_sha256": "b7779cb77ec0929d64fe380817ba603f0512b8514f0cfa59dfff7841af568037",
+  "tensorflow": "2.19.0",
+  "python": "3.12.9",
+  "platform": "Windows-11-10.0.22624-SP0",
+  "models": [
+    {
+      "file": "artifacts/final/classifiers/acm_s2_fillclass_logistic.tflite",
+      "sha256": "b0fb6bf99eae861d9b287e544125f91b45d260b578847780cb8ce7c3ea589234",
+      "bytes": 3092,
+      "input_shape": [
+        1,
+        90
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        56,
+        25
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 1.193629953766262e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/acm_s2_fillclass_rbf.tflite",
+      "sha256": "5b4c3d7d1cdda570b0a5c99d4a91ea0f311b74e104f0ed1bc1512d303a2eeca9",
+      "bytes": 18132,
+      "input_shape": [
+        1,
+        90
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        18,
+        22,
+        45,
+        99,
+        74,
+        47,
+        0,
+        61,
+        53,
+        63,
+        83,
+        56,
+        101,
+        42
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 9.284253321695246e-08,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/compressed_air_logistic.tflite",
+      "sha256": "af3daf2e996c982f79e45eed0ef4a49aca950353c418d2e9ddd66a78a9be53bc",
+      "bytes": 3200,
+      "input_shape": [
+        1,
+        90
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        14,
+        2,
+        45,
+        61,
+        53
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 6.714705802490784e-08,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/compressed_air_rbf.tflite",
+      "sha256": "e709d98c2b7af427470cbc1b12f7e371fde7c2abaf8890be56c6e45fe2340bb9",
+      "bytes": 16892,
+      "input_shape": [
+        1,
+        90
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        18,
+        22,
+        45,
+        99,
+        74,
+        47,
+        9,
+        59,
+        2,
+        62,
+        53
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 6.69149999854568e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/gpla12.tflite",
+      "sha256": "2ec4b89726d68b09045c16574a3d848dd654ca8d5c66d9f78898b7a62636de99",
+      "bytes": 254332,
+      "input_shape": [
+        1,
+        44
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          12
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        18,
+        22,
+        45,
+        99,
+        74,
+        47,
+        0,
+        61,
+        53,
+        63,
+        83,
+        101,
+        42,
+        56
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 5.355178416266426e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/jackfruit.tflite",
+      "sha256": "1664ff4b7b1d4e2166f90caa4707790653c4fe2488b5b5a2bea93c898a4bb758",
+      "bytes": 2696,
+      "input_shape": [
+        1,
+        27
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        14,
+        2,
+        45,
+        61,
+        53
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 1.075965858632344e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/motor_mfcc-logmel_logistic.tflite",
+      "sha256": "aa0ef19b2f31cc707bfda12625d690b1480cd87f6e00b7d83dbc8b1c7570d02d",
+      "bytes": 3200,
+      "input_shape": [
+        1,
+        90
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        14,
+        2,
+        45,
+        61,
+        53
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 2.446278180023853e-08,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/motor_mfcc-logmel_rbf_svm.tflite",
+      "sha256": "34e032a59a197a42df57a513545b0efaaa35399a2b4a7a4ae8c4c7eea72bc70f",
+      "bytes": 16892,
+      "input_shape": [
+        1,
+        90
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        18,
+        22,
+        45,
+        99,
+        74,
+        47,
+        9,
+        59,
+        2,
+        62,
+        53
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 5.339670261506058e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/motor_yamnet_logistic.tflite",
+      "sha256": "779518debc8c91e1a42ac683c39d0c507c5dfbd786e6224c3bdce2ebedd162bd",
+      "bytes": 10672,
+      "input_shape": [
+        1,
+        1024
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        14,
+        2,
+        45,
+        61,
+        53
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 4.692609167911144e-08,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/motor_yamnet_rbf_svm.tflite",
+      "sha256": "0dc6297d524a25c934370728b4af5f54a267c0667e8bf1e549539e23919a5ae8",
+      "bytes": 241588,
+      "input_shape": [
+        1,
+        1024
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        18,
+        22,
+        45,
+        99,
+        74,
+        47,
+        9,
+        59,
+        2,
+        62,
+        53
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 1.4483403385501248e-06,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/pipe_leak_logistic.tflite",
+      "sha256": "fe86e76e5531554a49fa0e4f473ffe847098913f79511ed35d155d39d1b33180",
+      "bytes": 3200,
+      "input_shape": [
+        1,
+        90
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        14,
+        2,
+        45,
+        61,
+        53
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 9.135210266020266e-08,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/pipe_leak_rbf.tflite",
+      "sha256": "00e6dd1534973aab515f8e154b1892ffb1e4e000a9384b88bb8b02dfc638c84f",
+      "bytes": 117720,
+      "input_shape": [
+        1,
+        90
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        18,
+        22,
+        45,
+        99,
+        74,
+        47,
+        9,
+        59,
+        2,
+        62,
+        53
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 1.20931485617648e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/pucks_mfcc-logmel_logistic.tflite",
+      "sha256": "5238dfdc5b310e24dc9b4ea79e51d63d101118b539cb8c2995aebfc15e495d3e",
+      "bytes": 3092,
+      "input_shape": [
+        1,
+        90
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        56,
+        25
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 2.7871285734892837e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/pucks_mfcc-logmel_rbf_svm.tflite",
+      "sha256": "260065f8c38b08f91605d858303a33f4965ab61bc2199f0cc04c50727787d625",
+      "bytes": 146932,
+      "input_shape": [
+        1,
+        90
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        18,
+        22,
+        45,
+        99,
+        74,
+        47,
+        0,
+        61,
+        53,
+        63,
+        83,
+        56,
+        101,
+        42
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 1.3427262741672052e-06,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/pucks_yamnet_logistic.tflite",
+      "sha256": "2181f63252a629daf959f09828f853e6940780e2bee5ba0dde0d4033232ce383",
+      "bytes": 18036,
+      "input_shape": [
+        1,
+        1024
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        56,
+        25
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 2.2054620658212842e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/pucks_yamnet_rbf_svm.tflite",
+      "sha256": "a8b9442725747b0a0e2cf3e84af94cafeb324aa165db1063d44c2027db8a215f",
+      "bytes": 1651268,
+      "input_shape": [
+        1,
+        1024
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        18,
+        22,
+        45,
+        99,
+        74,
+        47,
+        0,
+        61,
+        53,
+        63,
+        83,
+        56,
+        101,
+        42
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 2.354753966926637e-06,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/realimpact_material_mfcc_logmel.tflite",
+      "sha256": "e87ff9a3215e336c7cba6fb8ef780981f91cbfcfe8eb64a3759763f14d3f98de",
+      "bytes": 3964,
+      "input_shape": [
+        1,
+        154
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        56
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 4.0454751193408356e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/realimpact_material_yamnet.tflite",
+      "sha256": "97e9ee05b9b0dd0118719f91fe9e81cb9383fd5480de6cc92ae84bf79bb013d7",
+      "bytes": 17884,
+      "input_shape": [
+        1,
+        1024
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        56
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 9.822477853305145e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/sdnet_small_spectral_mlp.tflite",
+      "sha256": "515ac24d860a5869c057fca4825cb88c190a4395bb43c0faef8b80c8c8f291c5",
+      "bytes": 13644,
+      "input_shape": [
+        1,
+        84
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        28,
+        25,
+        56
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 6.026143128945449e-08,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/sdnet_spectral_svm.tflite",
+      "sha256": "7481ae74ffa184a505c65f728fe5fdf97e8c7d9648d02fc7514836a249905799",
+      "bytes": 516724,
+      "input_shape": [
+        1,
+        84
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        18,
+        22,
+        45,
+        99,
+        74,
+        47,
+        0,
+        61,
+        53,
+        63,
+        83,
+        56,
+        101,
+        42
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 2.5257188052130175e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/ycb_material_mfcc_logmel.tflite",
+      "sha256": "4531a4ff9df2fa498ca817271d1192b5caf4aef35e64755eb5bc730480dc48f1",
+      "bytes": 7684,
+      "input_shape": [
+        1,
+        154
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          9
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        56
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 6.792371380903717e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/classifiers/ycb_material_yamnet.tflite",
+      "sha256": "25db49fa8bfe5c34f41a8e9c8d3b5c92dac7cf4083e246c6953c250e181e7d88",
+      "bytes": 42484,
+      "input_shape": [
+        1,
+        1024
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          9
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        56
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "classifier",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 2.935036608420205e-06,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/coconut/baseline-oof-fold-0.tflite",
+      "sha256": "0da2f9a0524c0b5bcf34f42402d5e808e98d7800dcf0516bc71a8cc88af8b184",
+      "bytes": 3464,
+      "input_shape": [
+        1,
+        98
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/coconut/baseline-oof-fold-1.tflite",
+      "sha256": "7eb764f2249e00708f6c63cca51c47e03a4e11061a02bf1c171e75d068525bb1",
+      "bytes": 3464,
+      "input_shape": [
+        1,
+        98
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/coconut/baseline-oof-fold-2.tflite",
+      "sha256": "9005012bb11931c8a8e1c511daa5fc66cdc71e6510ae3891aaaa14eb3f5e715c",
+      "bytes": 3464,
+      "input_shape": [
+        1,
+        98
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/coconut/baseline-oof-fold-3.tflite",
+      "sha256": "9dce6258b60c1eff9c93637db1f0a16b9a395324322d66f50b6727c6823a4fd5",
+      "bytes": 3464,
+      "input_shape": [
+        1,
+        98
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/coconut/deployment-float32.tflite",
+      "sha256": "ea1e96024a892d2a2b6f009664030a0cb42e563a098e82605d56cb0fab892c88",
+      "bytes": 3464,
+      "input_shape": [
+        1,
+        98
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "fruit",
+      "real_fixture_rows": 6,
+      "max_absolute_reference_error": 3.9971362442159375e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/coconut/oof-fold-0.tflite",
+      "sha256": "0da2f9a0524c0b5bcf34f42402d5e808e98d7800dcf0516bc71a8cc88af8b184",
+      "bytes": 3464,
+      "input_shape": [
+        1,
+        98
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/coconut/oof-fold-1.tflite",
+      "sha256": "bf4fa10c4f48212fd13225715f85ff82dea810761eda7db8efc091d38a3cd879",
+      "bytes": 3404,
+      "input_shape": [
+        1,
+        98
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/coconut/oof-fold-2.tflite",
+      "sha256": "7bf39e310fcdaeb78b7962a8c48db6ba22070e957d548a84da7bfa91b6feb8de",
+      "bytes": 3464,
+      "input_shape": [
+        1,
+        98
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/coconut/oof-fold-3.tflite",
+      "sha256": "9dce6258b60c1eff9c93637db1f0a16b9a395324322d66f50b6727c6823a4fd5",
+      "bytes": 3464,
+      "input_shape": [
+        1,
+        98
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/durian/deployment-float32.tflite",
+      "sha256": "b12e2a701868e97ebf2fca2443c33f140a24ca3bf08e60ac12793d3121281e3d",
+      "bytes": 3896,
+      "input_shape": [
+        1,
+        112
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9,
+        25
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "fruit",
+      "real_fixture_rows": 6,
+      "max_absolute_reference_error": 1.1101522812140274e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/durian/oof-fold-0.tflite",
+      "sha256": "d1e184ce9b6bf5948055745a13a3b45a364b3cb2578233023f0d842354453143",
+      "bytes": 3896,
+      "input_shape": [
+        1,
+        112
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9,
+        25
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/durian/oof-fold-1.tflite",
+      "sha256": "343f98b8402be4255a07c53e76cc620ab0aaa82410bea15efb7ada6692e20c0c",
+      "bytes": 3896,
+      "input_shape": [
+        1,
+        112
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9,
+        25
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/durian/oof-fold-2.tflite",
+      "sha256": "255ea8d9d5c47b34eb1d3d577188409e39bfbf62848b0b512e22107188489e9a",
+      "bytes": 3256,
+      "input_shape": [
+        1,
+        112
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9,
+        25
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/durian/oof-fold-3.tflite",
+      "sha256": "a353144fee8d4e7c5d35088e4f04de47331ae095344bca6eb737e64b5a4e4ca2",
+      "bytes": 3896,
+      "input_shape": [
+        1,
+        112
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9,
+        25
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/fruit/durian/oof-fold-4.tflite",
+      "sha256": "d6a780ca9362b3187c8449ac53b7938f8e328bf5461dc5cd2f04c3734ac87215",
+      "bytes": 3896,
+      "input_shape": [
+        1,
+        112
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        36,
+        41,
+        9,
+        25
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "evaluation_fold",
+      "real_fixture_rows": 0,
+      "max_absolute_reference_error": null,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2020dev-section00-cosine1NN.tflite",
+      "sha256": "80f9ebd8f162ae0f1eabca21dc46751b9abd01ae90b7be0e24f67540e6c35239",
+      "bytes": 1371272,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 4.666339955550214e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2020dev-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "e182aa9a9ba75576c30b693e9f65b2ac4afffb1e1b2180a8546f505df77d49e0",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 8.463977331985006e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2020dev-section02-cosine1NN.tflite",
+      "sha256": "9b83f267778e7e733fc5b8bd5baa059b1192b63767d19175718882e997dfb344",
+      "bytes": 936584,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 4.152800857637473e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2020dev-section02-Gaussian_LedoitWolf.tflite",
+      "sha256": "b3cb593543ae0be42bd10fe242c9e52378e6202166bd9cf05ead1cf93b077ab3",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 3.562018554248425e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2020dev-section04-cosine1NN.tflite",
+      "sha256": "2066b67e62fdacedcb657bbd7d41bb6374bc4f303801d02ce93cc37ff0faff95",
+      "bytes": 1385096,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 4.83466347289685e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2020dev-section04-Gaussian_LedoitWolf.tflite",
+      "sha256": "ce3ee41ab8a5fb9442b5ce6e571a4e2e6c25c245ff394b1fea02eaece30a216d",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 3.6889125738071016e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2020dev-section06-cosine1NN.tflite",
+      "sha256": "17ba9f0f2608fb3d92970b4c2af5df099fb0987d6a5f28c520b121620ba6316b",
+      "bytes": 1372808,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 3.641649753971521e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2020dev-section06-Gaussian_LedoitWolf.tflite",
+      "sha256": "47e6414c43252ce687991ec9fdee20abf0de2d07827d7cb7eb4adac7cf9ea488",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 6.191206608718858e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2023dev-section00-cosine1NN.tflite",
+      "sha256": "edceae856860c8442e4f6dfae4da2c14d34e456023d5b6ed589b35fe75f2616f",
+      "bytes": 1538696,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 2.626820213569303e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2023dev-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "7eb9ff4e706933553f93e4494b359fcc3cdf81d73b06826080988d0c3c0b04fd",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 2.3508625872636912e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2024eval-section00-cosine1NN.tflite",
+      "sha256": "ea186f0556d98cdb5eff2cbefd930fa50c007af20640014ea0204291e7f19c9f",
+      "bytes": 1538696,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 4.172325134277344e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2024eval-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "170412b2c0b0b5b9932216ef43dba3a02430f21f32df488193c311f8ca5bc2f8",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 5.3964255499749925e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2025dev-section00-cosine1NN.tflite",
+      "sha256": "6bdf915166701f3b0d49b6c0899af02b9efc4442d96e494be58be1cf9a3c55ec",
+      "bytes": 1538696,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 6.484622313562838e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2025dev-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "60bc20076fb9f3b00ac242aeb56a0850d7211f7153384b62573695e1d59e3eb9",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 0.00012629320318069404,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2026dev-section00-cosine1NN.tflite",
+      "sha256": "0bb4032ce9b8fcf97e9a3e2df326a453ce71441e9cf063209287961a48ac0169",
+      "bytes": 1538696,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 3.289681079765572e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/DCASE2026dev-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "1f3d9c37656f36cc3d638c28269fdb0553aa51a51492e88cd3fa7dd955213f29",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 0.00020246568402626508,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDG-section00-cosine1NN.tflite",
+      "sha256": "06d448ccb1ca3d028d8497794ef0a74c571f26a851fae124881fbf33b6065908",
+      "bytes": 1538696,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 3.72543271676129e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDG-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "fe6298371de0de69069871681631bef47dc578096785539e928681cf17fd8ac8",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 4.79690855854642e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDG-section01-cosine1NN.tflite",
+      "sha256": "627670fad3f5fc386a1d5dd984ca400ed28c01175e951c614275d15bf7381c92",
+      "bytes": 1538696,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 4.58128032954086e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDG-section01-Gaussian_LedoitWolf.tflite",
+      "sha256": "0ca82ba508e98679a8e03150dc5cb94b7b6a8e2fdb22b3011fa974afd158487e",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 0.0002073175958230422,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDG-section02-cosine1NN.tflite",
+      "sha256": "d4d3b0ec04808fea714155bf2546f70843fe4f0d556bf613f199265382c8628d",
+      "bytes": 1538696,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 4.76010661554227e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDG-section02-Gaussian_LedoitWolf.tflite",
+      "sha256": "d57b76d70f48be1c91f7b15a9350da3adc36a69ae09b053cae2d8cf1a2dc9d73",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 5.5534990110572835e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDUE-section00-cosine1NN.tflite",
+      "sha256": "0e67dd3ce72b574a0d671267108f1399aa638659442f5e78fde561bdfb029e07",
+      "bytes": 1543304,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 2.839136922228036e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDUE-section00-Gaussian_LedoitWolf.tflite",
+      "sha256": "4fd0ab4406744f5650eb8a06773c21390fc0e9502ac04d71824894ff06426e02",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 5.9569961592842446e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDUE-section01-cosine1NN.tflite",
+      "sha256": "30a9fa0b22e3ac13880de48b5aa5b74d529b34225e634ec2fc924752f6333ebd",
+      "bytes": 1543304,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 3.2968050689419215e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDUE-section01-Gaussian_LedoitWolf.tflite",
+      "sha256": "029a333cadcfeb99303466df19bfbea011d80632c12623715237b90ea4831554",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 9.496636789663171e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDUE-section02-cosine1NN.tflite",
+      "sha256": "cbd372ed48dd970ba71bd6d8921c7e17837037a7825975c199e27741361c7593",
+      "bytes": 1543304,
+      "input_shape": [
+        1,
+        384
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        18,
+        74,
+        75,
+        71,
+        42,
+        123,
+        9,
+        82,
+        41,
+        57,
+        19
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 4.715679392530703e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/MIMIIDUE-section02-Gaussian_LedoitWolf.tflite",
+      "sha256": "d27c8887a5f0a4bff6bf0df54bce7a6c3de0488fdd9315ad1d75e950b16eff10",
+      "bytes": 264684,
+      "input_shape": [
+        1,
+        256
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 1.9543536836863495e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/pouring-shape-yamnet-three-bins.tflite",
+      "sha256": "73edee08bb1db099d9f9fafa556f9d1c00abe4c8ccf603cea9af22ca7f3d65b2",
+      "bytes": 50548,
+      "input_shape": [
+        1,
+        3072
+      ],
+      "output_shapes": [
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        25
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 3.9342318347568295e-07,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/valve2024-jvachier-mahalanobis.tflite",
+      "sha256": "a2c85d0522e103492de8a15795f0e7da1096f61a325f11ddf853c55253a2b386",
+      "bytes": 67564,
+      "input_shape": [
+        1,
+        128
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 6.625899498402532e-06,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/valve2024-stgram-mahalanobis.tflite",
+      "sha256": "f75faab512b1d78b93999ba62dfab3124cb36ecf0c06f666485ce7636b597adb",
+      "bytes": 67564,
+      "input_shape": [
+        1,
+        128
+      ],
+      "output_shapes": [
+        [
+          1,
+          1
+        ]
+      ],
+      "builtin_operator_codes": [
+        41,
+        9,
+        92,
+        74
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 8,
+      "max_absolute_reference_error": 2.232389135770063e-05,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/research/yamnet-waveform-embedding-f32.tflite",
+      "sha256": "420472f3eb419c7950948be7b291a6599c91f8bfe326d080151ed0364cba271f",
+      "bytes": 12872896,
+      "input_shape": [
+        15600
+      ],
+      "output_shapes": [
+        [
+          1024
+        ]
+      ],
+      "builtin_operator_codes": [
+        22,
+        36,
+        18,
+        34,
+        131,
+        135,
+        9,
+        73,
+        3,
+        4,
+        40
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 3,
+      "max_absolute_reference_error": 7.62939453125e-06,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/waveform/realimpact-material-waveform-f32.tflite",
+      "sha256": "51d7042747ea557fb7b5d158f6a4ba10a42db482db688e634e59398117ce4c40",
+      "bytes": 12891388,
+      "input_shape": [
+        16000
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "builtin_operator_codes": [
+        34,
+        22,
+        36,
+        18,
+        131,
+        135,
+        9,
+        73,
+        3,
+        4,
+        40,
+        41,
+        56
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 6,
+      "max_absolute_reference_error": 8.161045008003853e-06,
+      "status": "passed"
+    },
+    {
+      "file": "artifacts/final/waveform/ycb-material-waveform-f32.tflite",
+      "sha256": "6c0244420e9f8681001eb0b9d84ab9e5a976ad4c439333bfe59d8fb41cf82686",
+      "bytes": 12915988,
+      "input_shape": [
+        16000
+      ],
+      "output_shapes": [
+        [
+          1
+        ],
+        [
+          1,
+          9
+        ]
+      ],
+      "builtin_operator_codes": [
+        34,
+        22,
+        36,
+        18,
+        131,
+        135,
+        9,
+        73,
+        3,
+        4,
+        40,
+        41,
+        56
+      ],
+      "signature_names": [
+        "serving_default"
+      ],
+      "fixture_kind": "generic",
+      "real_fixture_rows": 6,
+      "max_absolute_reference_error": 1.116476224138907e-05,
+      "status": "passed"
+    }
+  ],
+  "physical_phone": "not measured",
+  "network_or_raw_datasets_required": false,
+  "limits": [
+    "Feature heads still require exact external DSP/encoder.",
+    "Numerical parity does not establish task validity, calibration, license permission or phone runtime."
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "linked_clips": 12,
+  "hash_links": [
+    {
+      "sha256": "0c744008a07bd2220be0196c019220bf75f23565e236292e2bf025d711c9859c",
+      "indices": [
+        502,
+        549
+      ],
+      "filename_groups": [
+        "pe-NA-0.3110 MPa-0.5 ms-noise logger",
+        "pe-NA-NA-NA-noise logger"
+      ]
+    },
+    {
+      "sha256": "98e94bd8482beca4cbdb75076d75b5e11e05a89bfb89ae73aa03ea76e051a938",
+      "indices": [
+        84,
+        91
+      ],
+      "filename_groups": [
+        "hydrant-NA-noise logger",
+        "hydrant_normal-NA-noise logger"
+      ]
+    },
+    {
+      "sha256": "b41f338d6c0bf0a1b162a77290f85e90203189b56e8f876b2573165dd00aeca0",
+      "indices": [
+        128,
+        134
+      ],
+      "filename_groups": [
+        "ductile iron-NA-0.1545 MPa-3.36 ms-noise logger",
+        "ductile iron-NA-0.1630 MPa-3.45 ms-noise logger"
+      ]
+    },
+    {
+      "sha256": "c0dda6d2318f878eb83b05d0b09aaa2d9eb617785b3a66ead86e59f1d46afe81",
+      "indices": [
+        85,
+        92
+      ],
+      "filename_groups": [
+        "hydrant-NA-noise logger",
+        "hydrant_normal-NA-noise logger"
+      ]
+    },
+    {
+      "sha256": "cbcea6ac2799d8f70990416ab4ecdce3ea04eeaf109d90f1e322860fd22da69c",
+      "indices": [
+        339,
+        561
+      ],
+      "filename_groups": [
+        "ductile iron-zone 2-0.312 MPa-0.9 ms-hydrophone",
+        "pe-zone 2-0.305 MPa-1.6 ms-noise logger"
+      ]
+    },
+    {
+      "sha256": "fd96da930b4d4b7ec27d60f04f45b5010f03f2698f6ab52fc0a04af4c7422322",
+      "indices": [
+        416,
+        421
+      ],
+      "filename_groups": [
+        "pe-NA-0.1545 MPa-3.36 ms-noise logger",
+        "pe-NA-0.1630 MPa-3.45 ms-noise logger"
+      ]
+    }
+  ],
+  "original_groups": 319,
+  "merged_connected_components": 314,
+  "method": "union filename groups connected by an identical complete-file SHA256; transitive closure before LOGO",
+  "feature_cross_group_clips": 12,
+  "feature_cross_group_sets": [
+    [
+      339,
+      561
+    ],
+    [
+      84,
+      91
+    ],
+    [
+      128,
+      134
+    ],
+    [
+      85,
+      92
+    ],
+    [
+      502,
+      549
+    ],
+    [
+      416,
+      421
+    ]
+  ],
+  "all_duplicate_clips": 72,
+  "all_duplicate_hash_sets": 36,
+  "decoded_pcm_cross_group_clips": 12,
+  "decoded_pcm_cross_group_sets": [
+    [
+      416,
+      421
+    ],
+    [
+      339,
+      561
+    ],
+    [
+      84,
+      91
+    ],
+    [
+      85,
+      92
+    ],
+    [
+      502,
+      549
+    ],
+    [
+      128,
+      134
+    ]
+  ],
+  "previous_reviewer_26_clip_count": "Not reproduced by complete-file SHA256, decoded float32 PCM SHA256 or exact feature-row hashing; observed12cross-group clips/6hash sets. All observed hash-connected groups are merged."
+}

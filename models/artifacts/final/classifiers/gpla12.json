@@ -1,0 +1,177 @@
+{
+  "name": "gpla12",
+  "path": "artifacts\\final\\classifiers\\gpla12.tflite",
+  "sha256": "2ec4b89726d68b09045c16574a3d848dd654ca8d5c66d9f78898b7a62636de99",
+  "bytes": 254332,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "ABS",
+    "ADD",
+    "ARG_MAX",
+    "CAST",
+    "DELEGATE",
+    "DIV",
+    "EXP",
+    "GREATER",
+    "LESS_EQUAL",
+    "MUL",
+    "PACK",
+    "RESHAPE",
+    "SQUARED_DIFFERENCE",
+    "STRIDED_SLICE",
+    "SUB",
+    "SUM"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      44
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ]
+  },
+  "contract": {
+    "task": "12pressure/microphone/noise combinations among leakage signals; NOT leak-vs-no-leak or package seal integrity",
+    "labels": {
+      "1": {
+        "microphone": 1,
+        "pressure_MPa": 0.2,
+        "noise": "noiseless"
+      },
+      "2": {
+        "microphone": 1,
+        "pressure_MPa": 0.2,
+        "noise": "strongly_noisy"
+      },
+      "3": {
+        "microphone": 1,
+        "pressure_MPa": 0.4,
+        "noise": "noiseless"
+      },
+      "4": {
+        "microphone": 1,
+        "pressure_MPa": 0.4,
+        "noise": "strongly_noisy"
+      },
+      "5": {
+        "microphone": 1,
+        "pressure_MPa": 0.5,
+        "noise": "noiseless"
+      },
+      "6": {
+        "microphone": 1,
+        "pressure_MPa": 0.5,
+        "noise": "strongly_noisy"
+      },
+      "7": {
+        "microphone": 2,
+        "pressure_MPa": 0.2,
+        "noise": "noiseless"
+      },
+      "8": {
+        "microphone": 2,
+        "pressure_MPa": 0.2,
+        "noise": "strongly_noisy"
+      },
+      "9": {
+        "microphone": 2,
+        "pressure_MPa": 0.4,
+        "noise": "noiseless"
+      },
+      "10": {
+        "microphone": 2,
+        "pressure_MPa": 0.4,
+        "noise": "strongly_noisy"
+      },
+      "11": {
+        "microphone": 2,
+        "pressure_MPa": 0.5,
+        "noise": "noiseless"
+      },
+      "12": {
+        "microphone": 2,
+        "pressure_MPa": 0.5,
+        "noise": "strongly_noisy"
+      }
+    },
+    "frontend": "experiments/secondary_table_benchmark.py:gpla_frontend; source1460preprocessed numeric values, not PCM",
+    "feature_order": [
+      "mean",
+      "std",
+      "min",
+      "max",
+      "q10",
+      "q25",
+      "q50",
+      "q75",
+      "q90",
+      "standardized third moment",
+      "standardized fourth moment",
+      "centered sign crossing fraction",
+      "32normalized rFFT power bands in ascending cycles/sample"
+    ],
+    "license": "Repository EPL-2.0; review dataset rights separately before product use",
+    "generalization_gate": "BLOCKED: acquisition/specimen identities absent or undocumented; repeated samples could span train/test",
+    "input_limit": "GPLA12 is12leak-only pressure/mic/noise classes, not leak detection"
+  },
+  "training": {
+    "existing_full_data_head": "artifacts\\secondary-table-gpla-v1-model.joblib",
+    "sha256": "f4a3ccce58ec3d45366d63c6261b4ad72d2265ba3e72dc038af07afb2b0b4b57",
+    "selection": "historical mean nested INNER-CV scores, not outer-score winner",
+    "historical_report": "artifacts/secondary-table-benchmark.json"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 684,
+    "maximum_absolute_score_error": 1.2624145178108392e-06,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 7,
+    "maximum_absolute_score_error": 7.336706433491713e-07,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "source": "artifacts/datasets/secondary-tables/gpla/data.csv",
+    "sha256": "00135bf5f4a417d07219dd9cd340dd3834dd2cbb75aea7b11fdacfba2f0fcba1",
+    "real_preprocessed_time_series": true,
+    "not_audio_PCM": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 5.355178416266426e-07,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\gpla12-verification.npz",
+    "sha256": "b1e3528771fdc65f68fe40169a7ed5e0792c7ccd842d4660df52a70ce20b36ba",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\gpla12.joblib",
+    "sha256": "2ae966b06ab42820dbe21694b30f6943c9fdea488a5026560469bd6af670474c"
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "summary.json": {
+    "bytes": 20280,
+    "sha256": "4347946f00c1f99993113fb746d0156e0b80223edf04919718c174e38726d96a"
+  },
+  "coconut/baseline-oof-fold-0.json": {
+    "bytes": 1757,
+    "sha256": "a729be981c5a69c0d23a02487e98e34cb6be13a164db476d864c1741fce9da95"
+  },
+  "coconut/baseline-oof-fold-0.npz": {
+    "bytes": 5261,
+    "sha256": "533f55bbffe01dd51ff0fd7c826e474530334019197400c0d5ce1e6231d0dd04"
+  },
+  "coconut/baseline-oof-fold-0.tflite": {
+    "bytes": 3464,
+    "sha256": "0da2f9a0524c0b5bcf34f42402d5e808e98d7800dcf0516bc71a8cc88af8b184"
+  },
+  "coconut/baseline-oof-fold-1.json": {
+    "bytes": 1753,
+    "sha256": "630953667a3acba9b34c84149879512bf56b393ed175dd48c497df8ce5fe48f4"
+  },
+  "coconut/baseline-oof-fold-1.npz": {
+    "bytes": 5279,
+    "sha256": "dc89eb65ad2c2861fcee873940dfd78ab48c5b88e6ca35368f306864d94edcaf"
+  },
+  "coconut/baseline-oof-fold-1.tflite": {
+    "bytes": 3464,
+    "sha256": "7eb764f2249e00708f6c63cca51c47e03a4e11061a02bf1c171e75d068525bb1"
+  },
+  "coconut/baseline-oof-fold-2.json": {
+    "bytes": 1756,
+    "sha256": "416fc5cf8b9d189f631f4a2140d7498a53fb2c1b41a33f5f93a71bf7c858f968"
+  },
+  "coconut/baseline-oof-fold-2.npz": {
+    "bytes": 5276,
+    "sha256": "012b9d6a993a86e0ef6fa7095476221fc7ee1ed3cbd43a1d9d8558dde8f6ba50"
+  },
+  "coconut/baseline-oof-fold-2.tflite": {
+    "bytes": 3464,
+    "sha256": "9005012bb11931c8a8e1c511daa5fc66cdc71e6510ae3891aaaa14eb3f5e715c"
+  },
+  "coconut/baseline-oof-fold-3.json": {
+    "bytes": 1729,
+    "sha256": "b2ef7022bdc77ee52af4dac09c7b5e62fdf58beaa9378aba25799f97f23e9d47"
+  },
+  "coconut/baseline-oof-fold-3.npz": {
+    "bytes": 5153,
+    "sha256": "4a01a0238274b4bedd4cf97228f4c97853201ba66bb3fa405fd40a7c1c372c89"
+  },
+  "coconut/baseline-oof-fold-3.tflite": {
+    "bytes": 3464,
+    "sha256": "9dce6258b60c1eff9c93637db1f0a16b9a395324322d66f50b6727c6823a4fd5"
+  },
+  "coconut/deployment-float32.json": {
+    "bytes": 4524,
+    "sha256": "929ee1974c74750102c4927849249f88e0f1dc4292076389102adc51545b3d75"
+  },
+  "coconut/deployment-float32.npz": {
+    "bytes": 5283,
+    "sha256": "ec0facb6ec34aef581818d789e164af138a6cec998f278544375a68326aac31d"
+  },
+  "coconut/deployment-float32.tflite": {
+    "bytes": 3464,
+    "sha256": "ea1e96024a892d2a2b6f009664030a0cb42e563a098e82605d56cb0fab892c88"
+  },
+  "coconut/oof-fold-0.json": {
+    "bytes": 1748,
+    "sha256": "87d6992978a016a17ca8d3072f6b6e9740f24d819b108092ab3c8fb045c2a965"
+  },
+  "coconut/oof-fold-0.npz": {
+    "bytes": 5261,
+    "sha256": "533f55bbffe01dd51ff0fd7c826e474530334019197400c0d5ce1e6231d0dd04"
+  },
+  "coconut/oof-fold-0.tflite": {
+    "bytes": 3464,
+    "sha256": "0da2f9a0524c0b5bcf34f42402d5e808e98d7800dcf0516bc71a8cc88af8b184"
+  },
+  "coconut/oof-fold-1.json": {
+    "bytes": 1754,
+    "sha256": "9f7806c6ad5585a0343567616ecad48e415091497da59d5db5b34616f9d819e5"
+  },
+  "coconut/oof-fold-1.npz": {
+    "bytes": 5154,
+    "sha256": "c2906b6240da3b77ea449008a767558b8595ae5e747919e6dcf1328fbc423dc6"
+  },
+  "coconut/oof-fold-1.tflite": {
+    "bytes": 3404,
+    "sha256": "bf4fa10c4f48212fd13225715f85ff82dea810761eda7db8efc091d38a3cd879"
+  },
+  "coconut/oof-fold-2.json": {
+    "bytes": 1746,
+    "sha256": "1f8eef3dc3b61f557e3d5e19fe82eb0a9aa714b8272f010975517f41f6ae5c01"
+  },
+  "coconut/oof-fold-2.npz": {
+    "bytes": 5273,
+    "sha256": "28a3e7cb54fb7a06227198b44e226f1bc08dd13c858243e165354ac1785e8239"
+  },
+  "coconut/oof-fold-2.tflite": {
+    "bytes": 3464,
+    "sha256": "7bf39e310fcdaeb78b7962a8c48db6ba22070e957d548a84da7bfa91b6feb8de"
+  },
+  "coconut/oof-fold-3.json": {
+    "bytes": 1720,
+    "sha256": "dc4b83b8263d877418da8686d7dbd99a4c2c8cad0d24afc794aa86e7c1143724"
+  },
+  "coconut/oof-fold-3.npz": {
+    "bytes": 5153,
+    "sha256": "4a01a0238274b4bedd4cf97228f4c97853201ba66bb3fa405fd40a7c1c372c89"
+  },
+  "coconut/oof-fold-3.tflite": {
+    "bytes": 3464,
+    "sha256": "9dce6258b60c1eff9c93637db1f0a16b9a395324322d66f50b6727c6823a4fd5"
+  },
+  "coconut/real-audio-smoke.json": {
+    "bytes": 6813,
+    "sha256": "6675d5ed1de07274109dc5a36301a160d1f4fa325b272d3b2ee2b95c6255cea4"
+  },
+  "coconut/results.json": {
+    "bytes": 1388839,
+    "sha256": "9798060edf8bd726b7d2f06becd41a540777c1ac3b1f6b45f5db42afc38e368a"
+  },
+  "coconut/verification-fixture.json": {
+    "bytes": 3057,
+    "sha256": "d5e35aef74b293e7fbcdab5b3a9cd4e6497ffb8213ca3ac4d5b41904c8adfeb8"
+  },
+  "coconut/verification-fixture.npz": {
+    "bytes": 3579,
+    "sha256": "61faf2f817c374336182882c0b3c4bf316ccb33fc4728fb04d9b23b75852f6e0"
+  },
+  "durian/deployment-float32.json": {
+    "bytes": 2065,
+    "sha256": "5b84e7c85e31a0f0ad7e926d9d74e006e802eb5ae14debcb39adfb3a533710ba"
+  },
+  "durian/deployment-float32.npz": {
+    "bytes": 5817,
+    "sha256": "2e9001767370803e0463e66ed2c6fc5bd5eb87956f4c8be158e974235fc35e12"
+  },
+  "durian/deployment-float32.tflite": {
+    "bytes": 3896,
+    "sha256": "b12e2a701868e97ebf2fca2443c33f140a24ca3bf08e60ac12793d3121281e3d"
+  },
+  "durian/oof-fold-0.json": {
+    "bytes": 1086,
+    "sha256": "946b432bdad12ca0fd4c13e271f6b3909a4b71f21fb6d612fff72f9cf91dbb91"
+  },
+  "durian/oof-fold-0.npz": {
+    "bytes": 5845,
+    "sha256": "4fa7f9c72ea961d4a75fdd2e82076e2888a82b02316c81d308f51da3c413cae1"
+  },
+  "durian/oof-fold-0.tflite": {
+    "bytes": 3896,
+    "sha256": "d1e184ce9b6bf5948055745a13a3b45a364b3cb2578233023f0d842354453143"
+  },
+  "durian/oof-fold-1.json": {
+    "bytes": 1085,
+    "sha256": "7afe6df1c50e24b7a189b842fb14f2ff2e9a49e6d8e8cd3e803ec84b46303dd2"
+  },
+  "durian/oof-fold-1.npz": {
+    "bytes": 5756,
+    "sha256": "689289e07f3dcead29ed2bd0f8930494cb8610008bb4fb8cb29478ebb99ffe7e"
+  },
+  "durian/oof-fold-1.tflite": {
+    "bytes": 3896,
+    "sha256": "343f98b8402be4255a07c53e76cc620ab0aaa82410bea15efb7ada6692e20c0c"
+  },
+  "durian/oof-fold-2.json": {
+    "bytes": 1084,
+    "sha256": "89392563540154f2324ede3d7fecd40dfb546a7ffaf67dd44a0cbee179715292"
+  },
+  "durian/oof-fold-2.npz": {
+    "bytes": 4561,
+    "sha256": "4ae1d2ae5fdbe024cac5c8e50ec3e234a6f97e126e042d5965953209c77b920a"
+  },
+  "durian/oof-fold-2.tflite": {
+    "bytes": 3256,
+    "sha256": "255ea8d9d5c47b34eb1d3d577188409e39bfbf62848b0b512e22107188489e9a"
+  },
+  "durian/oof-fold-3.json": {
+    "bytes": 1080,
+    "sha256": "917aa27863451a7c2cda8bb3fadb42b600795ae5ec6c2952fefb8760df3edd63"
+  },
+  "durian/oof-fold-3.npz": {
+    "bytes": 5785,
+    "sha256": "0a3aa5c79d1441df73df6dd5fbc12d763798c5dbc6720c38e88d958b0ce492a1"
+  },
+  "durian/oof-fold-3.tflite": {
+    "bytes": 3896,
+    "sha256": "a353144fee8d4e7c5d35088e4f04de47331ae095344bca6eb737e64b5a4e4ca2"
+  },
+  "durian/oof-fold-4.json": {
+    "bytes": 1077,
+    "sha256": "9c112dd4242535a0b73dd4623df3779dd1024c01d2f47ebaef899167da9c20ba"
+  },
+  "durian/oof-fold-4.npz": {
+    "bytes": 5838,
+    "sha256": "fa0f74403f64bf0b25c1aacd274999ccde4054f572dbb5ddde3b1c0b9978307d"
+  },
+  "durian/oof-fold-4.tflite": {
+    "bytes": 3896,
+    "sha256": "d6a780ca9362b3187c8449ac53b7938f8e328bf5461dc5cd2f04c3734ac87215"
+  },
+  "durian/real-audio-smoke.json": {
+    "bytes": 8632,
+    "sha256": "85d33ccae85d3fba469dc0267464bb39221d2b2e5d1fac19ab8e5aab9838e9d4"
+  },
+  "durian/results.json": {
+    "bytes": 968105,
+    "sha256": "a4aee5888fcb670aad295e8e715b06d0d932bf769f28b5c60af33eb996ab0e78"
+  },
+  "durian/verification-fixture.json": {
+    "bytes": 14214,
+    "sha256": "624ceb73b8b49dc1714a68cb7a916b7fbd448008a307c6438a2a916ad5929bb0"
+  },
+  "durian/verification-fixture.npz": {
+    "bytes": 3964,
+    "sha256": "dd6a9bfae4efd0f249bc447f06bf7a207fe0112a89469b7395db62d650962962"
+  }
+}

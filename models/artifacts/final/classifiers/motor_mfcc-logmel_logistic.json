@@ -1,0 +1,101 @@
+{
+  "name": "motor_mfcc-logmel_logistic",
+  "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_logistic.tflite",
+  "sha256": "aa0ef19b2f31cc707bfda12625d690b1480cd87f6e00b7d83dbc8b1c7570d02d",
+  "bytes": 3200,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "CAST",
+    "CONCATENATION",
+    "DELEGATE",
+    "FULLY_CONNECTED",
+    "GREATER",
+    "LOGISTIC",
+    "STRIDED_SLICE",
+    "SUB"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      90
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "probabilities in classes order",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      "debonded",
+      "repaired"
+    ]
+  },
+  "contract": {
+    "task": "same-motor debonded/repaired condition",
+    "frontend": "experiments/puck_motor_benchmark.py:mono16 + features",
+    "frontend_sha256": "059c11467a3aebae575644c7aaf512d8b8b1c642d9c739018cfeeabd5d080ade",
+    "feature_order": [
+      "13 MFCC means",
+      "13 MFCC population std",
+      "32 natural-log-mel means",
+      "32 natural-log-mel population std"
+    ],
+    "window": "three equally spaced4s nonoverlapping windows; model accepts one window feature vector; majority file/game vote outside model",
+    "encoder": null,
+    "license": {
+      "source": "https://data.mendeley.com/datasets/bxcnxfm94c/5",
+      "license": "CC BY 4.0",
+      "condition_names": [
+        "debonded",
+        "repaired"
+      ],
+      "independent_sources": 20,
+      "excluded_m4a": 20,
+      "duplicate_relationship": "The 20 WAV files are the decoded working copies of the same 20 M4A recordings with the first 2.0 seconds removed. Do not count formats as independent observations.",
+      "split": "Five leave-one-speed-out folds: 100, 200, 500, 750, 1000 rpm. Each held-out speed contains both directions and both conditions, every source file's windows remain together.",
+      "identifiability_limit": "One physical motor before/after rebonding and one source recording per operating condition. Speed transfer can be scored; unseen-motor, repeat-session and causal fault generalization cannot be established."
+    },
+    "limits": "20 WAVs from one physical motor; M4A counterparts excluded; no unseen-motor validation"
+  },
+  "training": {
+    "existing_full_data_head": "artifacts\\puck-motor-motor-mfcc-logmel-logistic.joblib",
+    "sha256": "fe845a43279e2af5b7502d44e47be1dec00ddd290500038171df53bdd05ad16b",
+    "selection": "both fixed C=1 families retained, no outer-score winner selection",
+    "source_cache_sha256": "153176f823c4944f5cbf28d893b1f8d52bfd229d00a167aeed9cedf2eab87379"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 60,
+    "maximum_absolute_score_error": 4.75214136930191e-08,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 9,
+    "maximum_absolute_score_error": 2.3149253236542933e-08,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "source": "artifacts\\datasets\\phone-motor\\audio_debonded_1000rpm_forward.wav",
+    "sha256": "2d64ae98a41b446345ce70a1cdb3dacf8d8fe831105ede7e6fba04314c949184",
+    "decoded_real_audio": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 1.764621082589457e-08,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_logistic-verification.npz",
+    "sha256": "96bbf9d314167a9c5ac0a556cae3dbeb54de1b0d0a8736c7da9e2f1409c14cfe",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\motor_mfcc-logmel_logistic.joblib",
+    "sha256": "17ed1df0d6f2f778b53bcef33a9d63814209e3a11ce81bf349e9f18274db7a14"
+  }
+}

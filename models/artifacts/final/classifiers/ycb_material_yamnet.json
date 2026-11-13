@@ -1,0 +1,111 @@
+{
+  "name": "ycb_material_yamnet",
+  "path": "artifacts\\final\\classifiers\\ycb_material_yamnet.tflite",
+  "sha256": "25db49fa8bfe5c34f41a8e9c8d3b5c92dac7cf4083e246c6953c250e181e7d88",
+  "bytes": 42484,
+  "format": "builtin-only float32 TFLite",
+  "operators": [
+    "ARG_MAX",
+    "DELEGATE",
+    "FULLY_CONNECTED",
+    "SUB"
+  ],
+  "input": {
+    "name": "features",
+    "shape": [
+      1,
+      1024
+    ],
+    "dtype": "float32",
+    "frontend_included": false,
+    "scaler_included": true
+  },
+  "output": {
+    "scores": "SVM margins (binary [-margin,+margin], multiclass sklearn OVR); NOT calibrated probabilities",
+    "class_index": "index into classes; use this rather than score argmax for SVC vote ties",
+    "classes": [
+      "Aluminium",
+      "Ceramic",
+      "Foam",
+      "Hard_Plastic",
+      "Other_Plastic",
+      "Paper",
+      "Soft_Plastic",
+      "Steel",
+      "Wood"
+    ]
+  },
+  "contract": {
+    "task": "material_classification",
+    "frontend": "same waveform crop + official frozen YAMNet frame-embedding mean",
+    "frontend_sha256": "153a0a7090ec572717c1916de82eaf574f49606f002f555fd95e6ffd27dfe6c2",
+    "feature_order": "YAMNet embedding indices0..1023",
+    "waveform": "1s peak20ms-centered16kHz; YCB decode and resample; RealImpact force-deconvolved48kHz->16kHz then .95 peak normalize",
+    "encoder": {
+      "path": "artifacts\\tfhub\\9616fd04ec2360621642ef9455b84f4b668e219e",
+      "saved_model_sha256": "672af6e1e34fe15a42d45d70217fd39f97e10aef9b0effbf9b0bf7826fccd462",
+      "pooling": "arithmetic mean of 1024D frame embeddings, not 521 event scores"
+    },
+    "license": "YCB source node_license null, rights review required",
+    "limits": [
+      "Small controlled robot/gripper airborne recordings, not phone material identification or tile bonding.",
+      "Each source clip contains multiple pokes; one peak-centered excerpt is scored. No claim to reproduce paper segmentation or full-dataset results.",
+      "Only three objects per class, nested tuning has one training object per class. Split uncertainty is large; objects differ in shape/content as well as material.",
+      "Soft-plastic fruit are YCB manufactured replicas, not real fruit ripeness.",
+      "Source node_license null: local research only; no redistribution or commercial license inferred.",
+      "No iPhone/Core ML conversion, latency, energy, or on-device memory measured."
+    ]
+  },
+  "training": {
+    "selection": "all-data training-only object-rank CV; no outer-score family winner",
+    "C_grid": [
+      0.01,
+      0.1,
+      1.0,
+      10.0
+    ],
+    "mean_object_macro_f1": [
+      0.35185185185185186,
+      0.33580246913580253,
+      0.33580246913580253,
+      0.33580246913580253
+    ],
+    "selected_C": 0.01,
+    "source_cache": "material-features.npz",
+    "source_cache_sha256": "05678087823bbe1f9f009ce1587feeb08ca79b1104f61dcb3035f7e27c23e1e0",
+    "historical_report": "material-benchmark.json"
+  },
+  "full_data_fit_parity_not_generalization": {
+    "rows": 131,
+    "maximum_absolute_score_error": 5.139764571282512e-06,
+    "class_disagreements": 0
+  },
+  "finite_boundary_parity": {
+    "rows": 9,
+    "maximum_absolute_score_error": 1.5075336481373824e-05,
+    "class_disagreements": 0
+  },
+  "real_input_smoke": {
+    "source": "artifacts\\datasets\\material\\audio\\002_masterchef_can_6\\Clip 1.ogx",
+    "sha256": "b8dac6656cc9de6028ff672232560f1e8da507414585abc155a4a4434eb7a831",
+    "decoded_real_audio": true,
+    "cache_row": 0,
+    "frontend_cache_maximum_absolute_error": 0.0,
+    "runtime": {
+      "rows": 1,
+      "maximum_absolute_score_error": 2.9350366066438482e-06,
+      "class_disagreements": 0
+    }
+  },
+  "physical_iphone": "not tested",
+  "performance_claim": "Deployment fitted on every cached observation. No deployment training-set accuracy presented as held-out performance.",
+  "verification_fixture": {
+    "path": "artifacts\\final\\classifiers\\ycb_material_yamnet-verification.npz",
+    "sha256": "524e7911576e72d92104479d68ee7d9540059534568de76d1b46962803d3a2ff",
+    "schema": "features float32[N,D], scores float64[N,K], class_index int32[N], classes[K], source_indices[N]; <=8 real rows"
+  },
+  "full_data_sklearn_head": {
+    "path": "artifacts\\final\\classifiers\\ycb_material_yamnet.joblib",
+    "sha256": "e4b7545baade21537a195e682faab227e2bb702141e19023e21377087f1aeddc"
+  }
+}

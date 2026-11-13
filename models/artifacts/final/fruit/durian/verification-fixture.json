@@ -1,0 +1,478 @@
+{
+  "file": "artifacts/final/fruit/durian/verification-fixture.npz",
+  "sha256": "dd6a9bfae4efd0f249bc447f06bf7a207fe0112a89469b7395db62d650962962",
+  "model": "deployment-float32.tflite",
+  "model_sha256": "b12e2a701868e97ebf2fca2443c33f140a24ca3bf08e60ac12793d3121281e3d",
+  "schema": {
+    "features": "float32[6,112]",
+    "reference_scores": "float64[6,3]",
+    "labels": "int64[6] source truth; not in-sample performance evidence",
+    "groups": "int64[6] source fruit IDs",
+    "row_indices": "int64[6] results.json perexample row indices",
+    "class_names": "unicode[3] output-column labels"
+  },
+  "score_units": "softmax probabilities",
+  "row_provenance": [
+    {
+      "member": "dataset_clean_sound/durian_001_unripe_iphone.m4a",
+      "fruit": 1,
+      "device": "iphone",
+      "timestamp": "2025-09-06 07:22:18",
+      "source_sample_num": "1",
+      "source_code": "IM_CA_UN_1",
+      "source_replicate": "R1",
+      "maturity": "Immature",
+      "source_class": "A",
+      "stratification_label": 0,
+      "nominal": 0,
+      "label": 0,
+      "terminal_stage_match": true,
+      "ambiguous_origin": false,
+      "actual_status": "Unripe",
+      "metadata_ripeness": "Unripe",
+      "source_metadata_candidates": [
+        {
+          "sample_num": "1",
+          "ripeness": "Unripe",
+          "iphone_original": "1-UN.m4a",
+          "iphone_date": "2025-09-06 07:22:18",
+          "iphone_size_bytes": "1933580",
+          "iphone_output": "durian_001_unripe_iphone.m4a",
+          "android_original": "IM_CA_UN_1.wav",
+          "android_date": "2025-09-06 15:23:06",
+          "android_size_bytes": "9584684",
+          "android_output": "durian_001_unripe_android.wav"
+        }
+      ],
+      "size_matching_origins": [
+        [
+          "1-UN.m4a",
+          "2025-09-06 07:22:18"
+        ]
+      ],
+      "duration_seconds": 50.04,
+      "impact_centers_seconds": [
+        7.03,
+        10.725,
+        11.785,
+        12.78,
+        16.075,
+        17.045,
+        18.05,
+        24.905,
+        25.835,
+        26.8,
+        30.82,
+        31.725,
+        32.695,
+        34.475,
+        35.405,
+        36.35,
+        40.285,
+        41.21
+      ],
+      "mfcc_extraction_ms": 61.514100001659244,
+      "yamnet_extraction_ms": 192.33969999913825,
+      "source_audio_sha256": "ad2e65c640d37630fe1834516d500a67ed584a6ee756435ccb46663c82b20275",
+      "contradictory_duplicate": false,
+      "cache_row": 1
+    },
+    {
+      "member": "dataset_clean_sound/durian_002_unripe_iphone.m4a",
+      "fruit": 2,
+      "device": "iphone",
+      "timestamp": "2025-09-06 07:22:13",
+      "source_sample_num": "2",
+      "source_code": "IM_CA_UN_2",
+      "source_replicate": "R2",
+      "maturity": "Immature",
+      "source_class": "A",
+      "stratification_label": 0,
+      "nominal": 0,
+      "label": 0,
+      "terminal_stage_match": true,
+      "ambiguous_origin": false,
+      "actual_status": "Unripe",
+      "metadata_ripeness": "Unripe",
+      "source_metadata_candidates": [
+        {
+          "sample_num": "2",
+          "ripeness": "Unripe",
+          "iphone_original": "2-UN.m4a",
+          "iphone_date": "2025-09-06 07:22:13",
+          "iphone_size_bytes": "1723395",
+          "iphone_output": "durian_002_unripe_iphone.m4a",
+          "android_original": "IM_CA_UN_2.wav",
+          "android_date": "2025-09-06 15:16:02",
+          "android_size_bytes": "9031724",
+          "android_output": "durian_002_unripe_android.wav"
+        }
+      ],
+      "size_matching_origins": [
+        [
+          "2-UN.m4a",
+          "2025-09-06 07:22:13"
+        ]
+      ],
+      "duration_seconds": 43.8353125,
+      "impact_centers_seconds": [
+        1.155,
+        2.245,
+        3.34,
+        8.88,
+        11.165,
+        12.155,
+        13.145,
+        18.02,
+        19.13,
+        22.39,
+        23.395,
+        24.45,
+        27.375,
+        28.385,
+        29.395,
+        33.365,
+        37.175,
+        42.25
+      ],
+      "mfcc_extraction_ms": 43.7919999967562,
+      "yamnet_extraction_ms": 161.9764999995823,
+      "source_audio_sha256": "ba52734448fa7ce2fc3ff17521f913ceae4ce5944ed8bf0b0c23c67bed2242ef",
+      "contradictory_duplicate": false,
+      "cache_row": 3
+    },
+    {
+      "member": "dataset_clean_sound/durian_008_ripe_iphone.m4a",
+      "fruit": 8,
+      "device": "iphone",
+      "timestamp": "2025-09-12 09:56:01",
+      "source_sample_num": "8",
+      "source_code": "IM_CA_RI_8",
+      "source_replicate": "R8",
+      "maturity": "Immature",
+      "source_class": "A",
+      "stratification_label": 1,
+      "nominal": 1,
+      "label": 1,
+      "terminal_stage_match": true,
+      "ambiguous_origin": false,
+      "actual_status": "Ripe",
+      "metadata_ripeness": "Ripe",
+      "source_metadata_candidates": [
+        {
+          "sample_num": "8",
+          "ripeness": "Ripe",
+          "iphone_original": "8-RI.m4a",
+          "iphone_date": "2025-09-12 09:56:01",
+          "iphone_size_bytes": "1152869",
+          "iphone_output": "durian_008_ripe_iphone.m4a",
+          "android_original": "IM_CA_RI_8.wav",
+          "android_date": "2025-09-06 15:39:54",
+          "android_size_bytes": "7249964",
+          "android_output": "durian_008_ripe_android.wav"
+        },
+        {
+          "sample_num": "8",
+          "ripeness": "Ripe",
+          "iphone_original": "8-RI.m4a",
+          "iphone_date": "2025-09-12 09:56:01",
+          "iphone_size_bytes": "1152869",
+          "iphone_output": "durian_008_ripe_iphone.m4a",
+          "android_original": "IM_CC_OR_8.wav",
+          "android_date": "2025-09-12 17:56:32",
+          "android_size_bytes": "5652524",
+          "android_output": "durian_008_ripe_android.wav"
+        }
+      ],
+      "size_matching_origins": [
+        [
+          "8-RI.m4a",
+          "2025-09-12 09:56:01"
+        ]
+      ],
+      "duration_seconds": 29.7715625,
+      "impact_centers_seconds": [
+        1.685,
+        3.33,
+        5.685,
+        6.5,
+        8.065,
+        8.905,
+        9.735,
+        11.265,
+        12.85,
+        14.36,
+        15.125,
+        18.32,
+        19.125,
+        20.765,
+        23.955,
+        24.74,
+        25.49,
+        28.73
+      ],
+      "mfcc_extraction_ms": 62.26690000039525,
+      "yamnet_extraction_ms": 193.15350000033504,
+      "source_audio_sha256": "6df40273c8c437fa47c694bd7029caad806858055ca96ef055816109c8e27f47",
+      "contradictory_duplicate": false,
+      "cache_row": 13
+    },
+    {
+      "member": "dataset_clean_sound/durian_009_ripe_iphone.m4a",
+      "fruit": 9,
+      "device": "iphone",
+      "timestamp": "2025-09-12 09:52:57",
+      "source_sample_num": "9",
+      "source_code": "IM_CA_RI_9",
+      "source_replicate": "R9",
+      "maturity": "Immature",
+      "source_class": "A",
+      "stratification_label": 1,
+      "nominal": 1,
+      "label": 1,
+      "terminal_stage_match": true,
+      "ambiguous_origin": false,
+      "actual_status": "Ripe",
+      "metadata_ripeness": "Ripe",
+      "source_metadata_candidates": [
+        {
+          "sample_num": "9",
+          "ripeness": "Ripe",
+          "iphone_original": "9-RI.m4a",
+          "iphone_date": "2025-09-12 09:52:57",
+          "iphone_size_bytes": "1192939",
+          "iphone_output": "durian_009_ripe_iphone.m4a",
+          "android_original": "IM_CA_RI_9.wav",
+          "android_date": "2025-09-06 15:35:00",
+          "android_size_bytes": "7710764",
+          "android_output": "durian_009_ripe_android.wav"
+        },
+        {
+          "sample_num": "9",
+          "ripeness": "Ripe",
+          "iphone_original": "9-RI.m4a",
+          "iphone_date": "2025-09-12 09:52:57",
+          "iphone_size_bytes": "1192939",
+          "iphone_output": "durian_009_ripe_iphone.m4a",
+          "android_original": "IM_CC_OR_9.wav",
+          "android_date": "2025-09-12 17:53:28",
+          "android_size_bytes": "5806124",
+          "android_output": "durian_009_ripe_android.wav"
+        }
+      ],
+      "size_matching_origins": [
+        [
+          "9-RI.m4a",
+          "2025-09-12 09:52:57"
+        ]
+      ],
+      "duration_seconds": 30.64525,
+      "impact_centers_seconds": [
+        2.47,
+        3.28,
+        5.675,
+        8.11,
+        8.925,
+        9.75,
+        13.035,
+        14.735,
+        15.53,
+        16.345,
+        17.93,
+        18.745,
+        22.95,
+        24.52,
+        25.32,
+        26.135,
+        28.57,
+        29.355
+      ],
+      "mfcc_extraction_ms": 53.97209999864572,
+      "yamnet_extraction_ms": 186.41180000122404,
+      "source_audio_sha256": "17e0a99b2708d26ebfd9c5d4b86118544b0c7a8db2b361302a6e7f6f16860bdb",
+      "contradictory_duplicate": false,
+      "cache_row": 17
+    },
+    {
+      "member": "dataset_clean_sound/durian_016_overripe_iphone.m4a",
+      "fruit": 16,
+      "device": "iphone",
+      "timestamp": "2025-09-15 09:46:52",
+      "source_sample_num": "16",
+      "source_code": "IM_CA_OR_16",
+      "source_replicate": "R16",
+      "maturity": "Immature",
+      "source_class": "A",
+      "stratification_label": 2,
+      "nominal": 2,
+      "label": 2,
+      "terminal_stage_match": true,
+      "ambiguous_origin": false,
+      "actual_status": "Overripe",
+      "metadata_ripeness": "Overripe",
+      "source_metadata_candidates": [
+        {
+          "sample_num": "16",
+          "ripeness": "Overripe",
+          "iphone_original": "16-OR.m4a",
+          "iphone_date": "2025-09-15 09:46:52",
+          "iphone_size_bytes": "1108839",
+          "iphone_output": "durian_016_overripe_iphone.m4a",
+          "android_original": "IM_CA_OR_16.wav",
+          "android_date": "2025-09-06 16:54:30",
+          "android_size_bytes": "6758444",
+          "android_output": "durian_016_overripe_android.wav"
+        },
+        {
+          "sample_num": "16",
+          "ripeness": "Overripe",
+          "iphone_original": "16-OR.m4a",
+          "iphone_date": "2025-09-15 09:46:52",
+          "iphone_size_bytes": "1108839",
+          "iphone_output": "durian_016_overripe_iphone.m4a",
+          "android_original": "IM_CC_RI_16.wav",
+          "android_date": "2025-09-15 17:47:21",
+          "android_size_bytes": "5591084",
+          "android_output": "durian_016_overripe_android.wav"
+        }
+      ],
+      "size_matching_origins": [
+        [
+          "16-OR.m4a",
+          "2025-09-15 09:46:52"
+        ]
+      ],
+      "duration_seconds": 29.8894375,
+      "impact_centers_seconds": [
+        3.085,
+        5.59,
+        6.45,
+        7.285,
+        9.1,
+        9.96,
+        10.795,
+        13.38,
+        15.985,
+        16.88,
+        19.525,
+        20.37,
+        21.26,
+        23.12,
+        23.99,
+        24.89,
+        26.62,
+        28.335
+      ],
+      "mfcc_extraction_ms": 54.88319999858504,
+      "yamnet_extraction_ms": 190.4395999990811,
+      "source_audio_sha256": "7b5a89280784d0fefba00431da60f8ca3765d2a35d55adbe9af73775b78e66aa",
+      "contradictory_duplicate": false,
+      "cache_row": 41
+    },
+    {
+      "member": "dataset_clean_sound/durian_020_overripe_iphone.m4a",
+      "fruit": 20,
+      "device": "iphone",
+      "timestamp": "2025-09-12 09:19:59",
+      "source_sample_num": "20",
+      "source_code": "IM_CA_OR_20",
+      "source_replicate": "R20",
+      "maturity": "Immature",
+      "source_class": "A",
+      "stratification_label": 2,
+      "nominal": 2,
+      "label": 2,
+      "terminal_stage_match": true,
+      "ambiguous_origin": false,
+      "actual_status": "Overripe",
+      "metadata_ripeness": "Overripe",
+      "source_metadata_candidates": [
+        {
+          "sample_num": "20",
+          "ripeness": "Overripe",
+          "iphone_original": "20-OR.m4a",
+          "iphone_date": "2025-09-12 09:19:59",
+          "iphone_size_bytes": "1130863",
+          "iphone_output": "durian_020_overripe_iphone.m4a",
+          "android_original": "IM_CA_OR_20.wav",
+          "android_date": "2025-09-06 16:40:59",
+          "android_size_bytes": "6389804",
+          "android_output": "durian_020_overripe_android.wav"
+        },
+        {
+          "sample_num": "20",
+          "ripeness": "Overripe",
+          "iphone_original": "20-OR.m4a",
+          "iphone_date": "2025-09-12 09:19:59",
+          "iphone_size_bytes": "1130863",
+          "iphone_output": "durian_020_overripe_iphone.m4a",
+          "android_original": "IM_CC_OR_20.wav",
+          "android_date": "2025-09-12 17:20:30",
+          "android_size_bytes": "5775404",
+          "android_output": "durian_020_overripe_android.wav"
+        }
+      ],
+      "size_matching_origins": [
+        [
+          "20-OR.m4a",
+          "2025-09-12 09:19:59"
+        ]
+      ],
+      "duration_seconds": 30.1769375,
+      "impact_centers_seconds": [
+        5.72,
+        6.555,
+        9.175,
+        10.025,
+        10.89,
+        12.775,
+        13.64,
+        14.475,
+        17.275,
+        18.155,
+        20.01,
+        20.83,
+        21.69,
+        23.54,
+        24.405,
+        25.265,
+        27.005,
+        27.85
+      ],
+      "mfcc_extraction_ms": 45.95070000141277,
+      "yamnet_extraction_ms": 164.05589999703807,
+      "source_audio_sha256": "6868e93e70a6aad09a90c7eda6e504938921e21d16540bbea0279630fdbded49",
+      "contradictory_duplicate": false,
+      "cache_row": 55
+    }
+  ],
+  "contract": {
+    "input_shape": [
+      1,
+      112
+    ],
+    "output_shape": [
+      1,
+      3
+    ],
+    "dtype": "float32",
+    "builtin_operator_codes": [
+      36,
+      41,
+      9,
+      25
+    ],
+    "operators": [
+      "DELEGATE",
+      "FULLY_CONNECTED",
+      "GATHER",
+      "SOFTMAX",
+      "SUB"
+    ],
+    "no_custom_or_flex_ops": true,
+    "finite_outputs": true,
+    "real_feature_rows_exercised": 6
+  },
+  "max_absolute_error": 1.1101522812140274e-07,
+  "argmax_changes": 0
+}
