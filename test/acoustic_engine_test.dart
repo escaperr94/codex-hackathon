@@ -73,19 +73,46 @@ void main() {
     expect(result.impacts, isEmpty);
     expect(result.qualityIssues.any((s) => s.contains('separate background')), isTrue);
   });
-  test('speech scan covers between taps and median pools actual outputs', () async {
-    var calls = 0;
-    final result = await encodeAcousticRecording(taps([.2, 1.1, 2]), rate, (window) async {
-      final call = calls++;
+  test('speech overlapping one tap drops it; speech between taps is ignored', () async {
+    final pcm = taps([.2, 1.1, 2]);
+    // 300 Hz marker (1.0–1.5 s) stands in for speech; it overlaps only the middle tap.
+    for (var i = rate; i < rate * 1.5; i++) {
+      pcm[i] += .1 * math.sin(2 * math.pi * 300 * i / rate);
+    }
+    Future<List<double>> infer(window) async {
+      var marker = 0.0;
+      for (var i = 0; i < window.length; i++) {
+        marker += window[i] * math.sin(2 * math.pi * 300 * i / rate);
+      }
+      final speech = marker.abs() > 10;
       final output = List<double>.filled(audioEncoderOutputLength, 0);
-      for (var i = 0; i < audioEmbeddingLength; i++) { output[i] = call == 2 ? 100 : call.toDouble(); }
-      if (call == 5) output[audioEmbeddingLength] = .9;
+      output[0] = speech ? 100 : 1;
+      output[audioEmbeddingLength] = speech ? .9 : .01;
       return output;
-    }, impactSamples: [3200, 17600, 32000]);
-    expect(result.embedding.first, 1);
-    expect(result.speechEvidence.contaminated, isTrue);
-    expect(calls, 7); // Three impact windows plus four full-recording patches.
-    expect(result.speechEvidence.windows, calls);
+    }
+    final impacts = [3200, 17600, 32000];
+    final isolated = await encodeAcousticRecording(pcm, rate, infer,
+        impactSamples: impacts, isolateImpacts: true);
+    expect(isolated.speechImpacts, [17600]);
+    expect(isolated.speechEvidence.contaminated, isFalse);
+    expect(isolated.embedding.first, 1);
+    expect(isolated.speechEvidence.windows, 7); // 3 impact windows + 4 full-recording patches
+    final strict = await encodeAcousticRecording(pcm, rate, infer, impactSamples: impacts);
+    expect(strict.speechEvidence.contaminated, isTrue);
+    expect(strict.speechImpacts, isEmpty);
+    // All taps contaminated: no isolation, the take is rejected.
+    final all = await encodeAcousticRecording(pcm, rate, (w) async => List<double>.filled(
+        audioEncoderOutputLength, 0)..[audioEmbeddingLength] = .9,
+        impactSamples: impacts, isolateImpacts: true);
+    expect(all.speechImpacts, isEmpty);
+    expect(all.speechEvidence.contaminated, isTrue);
+  });
+  test('analysis excludes ignored onsets from features', () {
+    final both = analyzeAcoustics(taps([.2, 1.1]), sampleRate: rate,
+        speechEvidence: SpeechEvidence(.01, 4), ignoreOnsets: {17600});
+    expect(both.impacts, hasLength(1));
+    expect(both.impacts.single.onset / rate, closeTo(.2, .01));
+    expect(both.usable, isTrue);
   });
   test('joint encoder rejects malformed classifier scores', () async {
     await expectLater(encodeAcousticRecording(taps([.2]), rate, (_) async =>

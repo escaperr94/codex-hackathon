@@ -120,13 +120,29 @@ List<double> checkedAudioEmbedding(List<double> embedding) {
 class AudioEncoding {
   final List<double> embedding;
   final SpeechEvidence speechEvidence;
-  const AudioEncoding(this.embedding, this.speechEvidence);
+  /// Impact centers excluded because a speech-family event overlapped them.
+  final List<int> speechImpacts;
+  const AudioEncoding(this.embedding, this.speechEvidence, [this.speechImpacts = const []]);
+}
+
+/// Official class map: Speech, Child speech, Conversation, Narration,
+/// Babbling, Speech synthesizer, Shout..Screaming, Whispering (0..12).
+double _speechScore(List<double> output) {
+  var maximum = 0.0;
+  for (var event = 0; event <= 12; event++) {
+    maximum = math.max(maximum, output[audioEmbeddingLength + event]);
+  }
+  return maximum;
 }
 
 /// Median pooling protects repeated-tap features from one unusual strike.
+/// With [isolateImpacts], an impact whose window or an overlapping full-recording
+/// patch is speech-classified is excluded (see [AudioEncoding.speechImpacts])
+/// instead of rejecting the whole recording; speech away from every tap is ignored.
+/// If every impact is contaminated, nothing is excluded and the take is rejected.
 Future<AudioEncoding> encodeAcousticRecording(List<double> pcm, int sampleRate,
     Future<List<double>> Function(Float32List) infer,
-    {List<int>? impactSamples}) async {
+    {List<int>? impactSamples, bool isolateImpacts = false}) async {
   // Validate the complete input once even when explicit impact windows are used.
   final primary = audioEncoderWindow(pcm, sampleRate);
   final centers = impactSamples == null || impactSamples.isEmpty
@@ -135,20 +151,20 @@ Future<AudioEncoding> encodeAcousticRecording(List<double> pcm, int sampleRate,
     throw ArgumentError('At most 32 impact embeddings per recording');
   }
   final embeddings = <List<double>>[];
+  final impactSpeech = <double>[];
+  final patches = <(int, double)>[];
   var maximumSpeech = 0.0;
   var windows = 0;
-  void observe(List<double> output) {
+  double observe(List<double> output) {
     if (output.length != audioEncoderOutputLength ||
         output.any((x) => !x.isFinite) ||
         output.skip(audioEmbeddingLength).any((x) => x < 0 || x > 1)) {
       throw StateError('Invalid YAMNet embedding/event output');
     }
-    // Official class map: Speech, Child speech, Conversation, Narration,
-    // Babbling, Speech synthesizer, Shout..Screaming, Whispering (0..12).
-    for (var event = 0; event <= 12; event++) {
-      maximumSpeech = math.max(maximumSpeech, output[audioEmbeddingLength + event]);
-    }
     windows++;
+    final score = _speechScore(output);
+    maximumSpeech = math.max(maximumSpeech, score);
+    return score;
   }
   if (centers == null) {
     final output = await infer(primary);
@@ -157,20 +173,45 @@ Future<AudioEncoding> encodeAcousticRecording(List<double> pcm, int sampleRate,
   } else {
     for (final center in centers) {
       final output = await infer(_audioEncoderWindow(pcm, sampleRate, centerSample: center));
-      observe(output);
+      impactSpeech.add(observe(output));
       embeddings.add(output.sublist(0, audioEmbeddingLength));
     }
   }
-  // The impact-centered patch alone can miss a person talking between taps.
+  // An impact-centered patch alone can miss a person talking between taps.
   final stride = (sampleRate * audioEncoderWindowLength / audioEncoderSampleRate).round();
   for (var start = 0; start < pcm.length; start += stride) {
     final center = math.min(pcm.length - 1, start + stride ~/ 2);
-    observe(await infer(_audioEncoderWindow(pcm, sampleRate, centerSample: center)));
+    patches.add((center, observe(await infer(_audioEncoderWindow(pcm, sampleRate, centerSample: center)))));
+  }
+  var pooledSource = embeddings;
+  var score = maximumSpeech;
+  final dropped = <int>[];
+  if (isolateImpacts && centers != null) {
+    final kept = <List<double>>[];
+    var keptSpeech = 0.0;
+    for (var i = 0; i < centers.length; i++) {
+      var speech = impactSpeech[i];
+      for (final (center, patchSpeech) in patches) {
+        if ((center - centers[i]).abs() <= stride ~/ 2) speech = math.max(speech, patchSpeech);
+      }
+      if (speech >= SpeechEvidence.threshold) {
+        dropped.add(centers[i]);
+      } else {
+        kept.add(embeddings[i]);
+        keptSpeech = math.max(keptSpeech, speech);
+      }
+    }
+    if (kept.isEmpty) {
+      dropped.clear();
+    } else {
+      pooledSource = kept;
+      score = keptSpeech;
+    }
   }
   final pooled = List<double>.generate(audioEmbeddingLength, (i) {
-    final values = embeddings.map((e) => e[i]).toList()..sort();
+    final values = pooledSource.map((e) => e[i]).toList()..sort();
     final middle = values.length ~/ 2;
     return values.length.isOdd ? values[middle] : (values[middle - 1] + values[middle]) / 2;
   }, growable: false);
-  return AudioEncoding(checkedAudioEmbedding(pooled), SpeechEvidence(maximumSpeech, windows));
+  return AudioEncoding(checkedAudioEmbedding(pooled), SpeechEvidence(score, windows), dropped);
 }

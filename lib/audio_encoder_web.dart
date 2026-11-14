@@ -40,8 +40,9 @@ class AudioEncoder {
       (await encodeWithEvidence(pcm, sampleRate)).embedding;
 
   Future<AudioEncoding> encodeWithEvidence(List<double> pcm, int sampleRate,
-      {List<int>? impactSamples}) => encodeAcousticRecording(
-        pcm, sampleRate, _infer, impactSamples: impactSamples);
+      {List<int>? impactSamples, bool isolateImpacts = false}) =>
+      encodeAcousticRecording(pcm, sampleRate, _infer,
+          impactSamples: impactSamples, isolateImpacts: isolateImpacts);
 
   Future<List<double>> _infer(Float32List window) {
     if (_disposed) throw StateError('AudioEncoder has been disposed');

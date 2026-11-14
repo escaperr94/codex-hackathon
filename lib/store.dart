@@ -1217,9 +1217,14 @@ class CaptureService {
             (i) => math.min(pcm.length - 1, i * _sampleRate + _sampleRate ~/ 2))
         : analysis.impacts.where((i) => !i.duplicate).map((i) => i.onset).toList();
     final encoding = await _encoder.encodeWithEvidence(pcm, _sampleRate,
-        impactSamples: centers.isEmpty ? null : centers);
+        impactSamples: centers.isEmpty ? null : centers, isolateImpacts: !operating);
+    // Re-measure without speech-contaminated taps so features match the pooled embedding.
+    final clean = encoding.speechImpacts.isEmpty
+        ? analysis
+        : analyzeAcoustics(pcm, sampleRate: _sampleRate, mode: AcousticMode.impact,
+            ignoreOnsets: encoding.speechImpacts.toSet());
     return analyzePcm(pcm, module, operating: operating, source: source,
-        acousticAnalysis: analysis.withSpeechEvidence(encoding.speechEvidence))
+        acousticAnalysis: clean.withSpeechEvidence(encoding.speechEvidence))
         .withEmbedding(encoding.embedding);
   }
 

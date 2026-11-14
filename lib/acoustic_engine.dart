@@ -14,11 +14,12 @@ class SpeechEvidence {
       throw ArgumentError('Invalid speech classifier evidence');
     }
   }
+  static const threshold = .30;
   // Conservative capture-quality policy, not a calibrated speech probability.
-  bool get contaminated => score >= .30;
+  bool get contaminated => score >= threshold;
   Map<String, Object> toJson() => {
     'score': score, 'windows': windows, 'classifier': classifier,
-    'threshold': .30,
+    'threshold': threshold,
   };
 }
 
@@ -85,9 +86,11 @@ class AcousticAnalysis {
 
 /// Bounded to 30 seconds, 32 detected impacts, 64 STFT rows and radix-2 FFTs.
 /// Invalid PCM throws; inadequate evidence returns an explicit rejected result.
+/// [ignoreOnsets] holds onset samples of impacts already rejected (e.g. speech);
+/// they are dropped before duplicate detection and aggregation.
 AcousticAnalysis analyzeAcoustics(List<double> pcm, {
   int sampleRate = 48000, AcousticMode mode = AcousticMode.impact,
-  SpeechEvidence? speechEvidence,
+  SpeechEvidence? speechEvidence, Set<int> ignoreOnsets = const {},
 }) {
   if (sampleRate < 16000 || sampleRate > 192000 ||
       pcm.length < sampleRate ~/ 10 || pcm.length > sampleRate * 30) {
@@ -143,6 +146,11 @@ AcousticAnalysis analyzeAcoustics(List<double> pcm, {
       onsets.add(i);
       if (onsets.length == 32) { issues.add('Reject: too many impacts; shorten the recording'); break; }
     }
+  }
+  if (mode == AcousticMode.impact && ignoreOnsets.isNotEmpty) {
+    final before = onsets.length;
+    onsets.removeWhere((frame) => ignoreOnsets.contains(frame * hop));
+    if (onsets.length < before) issues.add('${before - onsets.length} tap(s) with speech excluded');
   }
   final impacts = <ImpactWindow>[];
   final features = <_Features>[];
