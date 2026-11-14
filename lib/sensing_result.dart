@@ -5,6 +5,76 @@ import 'design.dart';
 import 'store.dart';
 import 'sensing_flow.dart';
 
+/// Consumer summary of acoustic evidence, never a safety certification.
+class InspectionVerdict {
+  const InspectionVerdict(this.title, this.advice, {this.caution = true});
+  final String title, advice;
+  final bool caution;
+
+  static InspectionVerdict from(Measurement m, SensingIntent intent) {
+    if (!ReferenceAnchor.clean(m)) {
+      return const InspectionVerdict(
+          'Try another tap', 'Move somewhere quiet. Tap once and let it ring.');
+    }
+    if (intent == SensingIntent.fruit) {
+      return const InspectionVerdict('Ripeness not determined',
+          'This scan cannot tell ripe, unripe or spoiled. Check color, smell and texture; do not use it to decide food safety.');
+    }
+    if (intent == SensingIntent.scope) {
+      return const InspectionVerdict(
+          'Sound captured', 'Open the signal to explore this recording.',
+          caution: false);
+    }
+    if (intent == SensingIntent.vessel) {
+      final fill = double.tryParse(m.context['estimatedFillPercent'] ?? '');
+      if (fill != null && fill.isFinite && fill >= 0 && fill <= 100) {
+        return InspectionVerdict('About ${fill.round()}% full',
+            'Estimated against your known-fill samples for this container.',
+            caution: false);
+      }
+      return const InspectionVerdict('Fill not determined',
+          'Choose this container’s empty, half-full and full samples, then scan again.');
+    }
+    final status = m.context['classifierStatus'];
+    if (status == 'ambiguous' || status == 'outside-reference-range') {
+      return const InspectionVerdict('Inconclusive',
+          'The sound does not clearly match your samples. Tap again nearby or check manually.');
+    }
+    final label = status == 'matched' ? m.context['classifierLabel'] : null;
+    if (label == 'Hollow') {
+      return const InspectionVerdict('Possible hollow tile',
+          'Sounds like your hollow sample. Mark this spot and have the bond checked.');
+    }
+    if (label == 'Suspect' || label == 'Anomaly') {
+      return const InspectionVerdict('Possible defect',
+          'Sounds like your suspect sample. Set it aside for a closer inspection.');
+    }
+    final difference = m.context['suspicion'] == 'Measured difference';
+    if (difference) {
+      return const InspectionVerdict('Needs inspection',
+          'Sounds different from your sample. Repeat the tap; a difference alone does not confirm a defect.');
+    }
+    final baseline = m.context['referenceLabel'];
+    final healthyBaseline = baseline == 'Solid' ||
+        baseline == 'Original' ||
+        (intent == SensingIntent.devices && baseline == 'Reference');
+    if (label == 'Solid' ||
+        label == 'Original' ||
+        (label == 'Reference' && intent == SensingIntent.devices) ||
+        (healthyBaseline && m.context['suspicion'] == 'Reference match')) {
+      return const InspectionVerdict('No defect signs detected',
+          'Sounds like your good sample. This tap cannot rule out hidden faults.',
+          caution: false);
+    }
+    if (m.context['suspicion'] == 'Reference match') {
+      return const InspectionVerdict('Matches your sample',
+          'A similar sound alone does not tell whether this object is good or defective. Use labeled samples.');
+    }
+    return const InspectionVerdict('Not assessed yet',
+        'Choose known good and defective samples for the same object type to check this tap.');
+  }
+}
+
 class _PrototypeMatch {
   const _PrototypeMatch(
       {required this.label,
@@ -326,14 +396,14 @@ class _SensingResultState extends State<SensingResult> {
         }
 
         score = math.sqrt(
-            (math.pow(deviation((t) => t.peakHz, referencePeak! * .05), 2) +
+            (math.pow(deviation((t) => t.peakHz, referencePeak * .05), 2) +
                     math.pow(deviation((t) => t.decayMs, 10), 2) +
                     math.pow(deviation((t) => t.hiiDb, 3), 2)) /
                 3);
-        peakShift = 100 * (m.peakHz / referencePeak! - 1);
-        decayShift = m.decayMs - referenceDecay!;
-        hiiShift = m.hiiDb - referenceHii!;
-        different = score! > 3;
+        peakShift = 100 * (m.peakHz / referencePeak - 1);
+        decayShift = m.decayMs - referenceDecay;
+        hiiShift = m.hiiDb - referenceHii;
+        different = score > 3;
         suspicion = different ? 'Measured difference' : 'Reference match';
         title = different ? 'Check this spot' : 'Reference match';
       }
@@ -428,7 +498,7 @@ class _SensingResultState extends State<SensingResult> {
             'referenceProfiles',
             'referenceLabel'
           }.contains(key));
-    final record = m.withIntent(widget.intent.name).withContext({
+    final measuredRecord = m.withIntent(widget.intent.name).withContext({
       ...savedContext,
       'resultVersion': '2',
       'quality': quality,
@@ -486,6 +556,12 @@ class _SensingResultState extends State<SensingResult> {
       if (decayShift != null) 'decayShiftMs': '$decayShift',
       if (hiiShift != null) 'hiiShiftDb': '$hiiShift',
     });
+    final verdict = InspectionVerdict.from(measuredRecord, widget.intent);
+    final record = measuredRecord.withContext({
+      ...measuredRecord.context,
+      'interpretation': verdict.title,
+      'nextAction': verdict.advice,
+    });
     final setup = needsReference || retryReference;
     final mapPrimary =
         !retry && !setup && (widget.intent == SensingIntent.slab || different);
@@ -523,10 +599,10 @@ class _SensingResultState extends State<SensingResult> {
         ? Icons.refresh_rounded
         : setup
             ? Icons.add_rounded
-            : different
-                ? Icons.location_on_outlined
-                : widget.intent == SensingIntent.scope
-                    ? Icons.graphic_eq_rounded
+            : widget.intent == SensingIntent.scope
+                ? Icons.graphic_eq_rounded
+                : verdict.caution
+                    ? Icons.help_outline_rounded
                     : Icons.check_rounded;
     final theme = Theme.of(context);
 
@@ -568,8 +644,8 @@ class _SensingResultState extends State<SensingResult> {
                   duration: Duration(
                       milliseconds:
                           MediaQuery.disableAnimationsOf(context) ? 0 : 240),
-                  child: Text(title,
-                      key: ValueKey(title),
+                  child: Text(verdict.title,
+                      key: ValueKey(verdict.title),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           color: accent,
@@ -577,71 +653,84 @@ class _SensingResultState extends State<SensingResult> {
                           height: 1.12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: -.7))),
+              const SizedBox(height: 12),
+              Text(verdict.advice,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      color: C.muted, fontSize: 15, height: 1.45)),
               if (retry) ...[
                 const SizedBox(height: 10),
                 Text(quality == 'Tap again' ? 'No clear ring' : quality,
                     style: const TextStyle(color: C.muted, fontSize: 15)),
               ] else ...[
-                if (firmness != null) ...[
-                  const SizedBox(height: 8),
-                  Text(firmness.toStringAsFixed(0),
-                      style: TextStyle(
-                          color: accent,
-                          fontSize: 52,
-                          height: 1.1,
-                          fontWeight: FontWeight.w600)),
-                ],
-                const SizedBox(height: 16),
-                Row(children: [
-                  Metric('Frequency', '${m.peakHz.round()} Hz', accent: accent),
-                  Metric('Ring time', '${m.decayMs.round()} ms',
-                      accent: accent),
-                  if (score != null)
-                    Metric(classification == null ? 'Deviation' : 'Distance',
-                        score.toStringAsFixed(1),
-                        accent: accent),
-                  if (widget.intent == SensingIntent.scope)
-                    Metric('SNR', '${m.snrDb.toStringAsFixed(0)} dB',
-                        accent: accent),
-                ]),
-                if (widget.intent == SensingIntent.fruit) ...[
-                  const SizedBox(height: 8),
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Expanded(
-                        child: DropdownButtonFormField<String>(
-                            initialValue: fruit,
-                            isExpanded: true,
-                            decoration: const InputDecoration(
-                                labelText: 'Fruit', isDense: true),
-                            items: fruitTypes
-                                .map((type) => DropdownMenuItem(
-                                    value: type, child: Text(type)))
-                                .toList(),
-                            onChanged: (value) {
-                              if (value != null) setState(() => fruit = value);
-                            })),
-                    const SizedBox(width: 12),
-                    Expanded(
-                        child: TextField(
-                            controller: mass,
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
-                            decoration: InputDecoration(
-                                labelText: 'Mass',
-                                suffixText: 'g',
-                                isDense: true,
-                                errorText:
-                                    mass.text.trim().isNotEmpty && !validMass
-                                        ? 'Positive mass required'
-                                        : null),
-                            onChanged: (_) => setState(() {}))),
-                  ]),
-                  if (!validMass && mass.text.trim().isEmpty)
-                    const Padding(
-                        padding: EdgeInsets.only(top: 8),
-                        child: Text('Add mass for firmness',
-                            style: TextStyle(color: C.muted, fontSize: 12))),
-                ],
+                ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: const Text('Measurement details'),
+                  children: [
+                    Row(children: [
+                      Metric('Frequency', '${m.peakHz.round()} Hz',
+                          accent: accent),
+                      Metric('Ring time', '${m.decayMs.round()} ms',
+                          accent: accent),
+                      if (score != null)
+                        Metric('Difference', score.toStringAsFixed(1),
+                            accent: accent),
+                    ]),
+                    if (firmness != null)
+                      Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Text(
+                              'Firmness index: ${firmness.toStringAsFixed(0)}. Not a ripeness or spoilage verdict.')),
+                    if (selected != null) Text('Compared with: $selected'),
+                    const SizedBox(height: 12),
+                    Text(method,
+                        style: const TextStyle(color: C.muted, fontSize: 12)),
+                    if (widget.intent == SensingIntent.fruit) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                                child: DropdownButtonFormField<String>(
+                                    initialValue: fruit,
+                                    isExpanded: true,
+                                    decoration: const InputDecoration(
+                                        labelText: 'Fruit', isDense: true),
+                                    items: fruitTypes
+                                        .map((type) => DropdownMenuItem(
+                                            value: type, child: Text(type)))
+                                        .toList(),
+                                    onChanged: (value) {
+                                      if (value != null)
+                                        setState(() => fruit = value);
+                                    })),
+                            const SizedBox(width: 12),
+                            Expanded(
+                                child: TextField(
+                                    controller: mass,
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    decoration: InputDecoration(
+                                        labelText: 'Mass',
+                                        suffixText: 'g',
+                                        isDense: true,
+                                        errorText:
+                                            mass.text.trim().isNotEmpty &&
+                                                    !validMass
+                                                ? 'Positive mass required'
+                                                : null),
+                                    onChanged: (_) => setState(() {}))),
+                          ]),
+                      if (!validMass && mass.text.trim().isEmpty)
+                        const Padding(
+                            padding: EdgeInsets.only(top: 8),
+                            child: Text('Add mass for firmness',
+                                style:
+                                    TextStyle(color: C.muted, fontSize: 12))),
+                    ],
+                  ],
+                ),
                 if (error != null)
                   Row(children: [
                     Expanded(

@@ -621,6 +621,7 @@ class ThudStore extends ChangeNotifier {
         out.writeln('Comparison: ${m.context['suspicion']}');
       }
       const fields = {
+        'nextAction': 'Recommended action',
         'fruitType': 'Fruit',
         'massGrams': 'Mass (g)',
         'referenceObject': 'Reference object',

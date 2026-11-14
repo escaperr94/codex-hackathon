@@ -828,51 +828,8 @@ class _Evidence extends StatelessWidget {
       !m.decayMs.isFinite ||
       m.decayMs <= 0;
 
-  static String headline(Measurement m) {
-    if (needsRetry(m)) return 'Tap again';
-    if (m.context['resultVersion'] != '2') return 'Signature captured';
-    final classifier = m.context['classifierStatus'];
-    if (classifier == 'matched' &&
-        const {
-          'Solid-like',
-          'Hollow-like',
-          'Original match',
-          'Suspect match',
-          'Reference match',
-          'Anomaly match',
-        }.contains(m.context['interpretation']))
-      return m.context['interpretation']!;
-    if (classifier == 'outside-reference-range') return 'Outside references';
-    if (classifier == 'ambiguous') return 'Mixed signature';
-    final result = (m.context['interpretation'] ?? '').toLowerCase();
-    final comparison = m.context['suspicion'];
-    if (comparison == 'Measured difference' || result.contains('different')) {
-      return 'Check this spot';
-    }
-    if (comparison == 'Reference match' ||
-        result.contains('matches reference')) {
-      return 'Reference match';
-    }
-    if (result.contains('refresh reference') ||
-        comparison == 'Reference decay missing') {
-      return 'Refresh reference';
-    }
-    if (comparison == 'Loading references') return 'Loading references';
-    if (comparison == 'Reference needed' ||
-        comparison == 'Reference setup needed') {
-      return 'Reference needed';
-    }
-    if (comparison == 'Outside reference range') return 'Outside range';
-    if (intentOf(m) == SensingIntent.vessel) {
-      final fill = double.tryParse(m.context['estimatedFillPercent'] ?? '');
-      if (fill != null && fill.isFinite) return '${fill.round()}% fill';
-    }
-    if (intentOf(m) == SensingIntent.fruit) {
-      final firmness = double.tryParse(m.context['firmnessIndex'] ?? '');
-      if (firmness != null && firmness.isFinite) return 'Firmness index';
-    }
-    return 'Signature captured';
-  }
+  static String headline(Measurement m) =>
+      InspectionVerdict.from(m, intentOf(m)).title;
 
   static String displayLabel(Measurement m) {
     final label = m.label.trim();
@@ -953,31 +910,40 @@ class _Evidence extends StatelessWidget {
                     height: 1.1,
                     letterSpacing: -.8,
                     fontWeight: FontWeight.w600)),
+            if (!retry) ...[
+              _small,
+              Text(InspectionVerdict.from(m, intent).advice, style: _body),
+            ],
             if (retry) ...[
               _small,
               Text(_retryReason, style: _body),
             ],
             if (!retry && readings.isNotEmpty) ...[
               _gap,
-              Wrap(spacing: 24, runSpacing: 16, children: [
-                for (final reading in readings)
-                  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(reading.$1,
-                            style:
-                                const TextStyle(color: C.muted, fontSize: 12)),
-                        const SizedBox(height: 4),
-                        Text(reading.$2,
-                            style: TextStyle(
-                                color: intent.color,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                fontFeatures: const [
-                                  FontFeature.tabularFigures()
-                                ])),
-                      ]),
-              ]),
+              ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: const Text('Measurement details'),
+                  children: [
+                    Wrap(spacing: 24, runSpacing: 16, children: [
+                      for (final reading in readings)
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(reading.$1,
+                                  style: const TextStyle(
+                                      color: C.muted, fontSize: 12)),
+                              const SizedBox(height: 4),
+                              Text(reading.$2,
+                                  style: TextStyle(
+                                      color: intent.color,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      fontFeatures: const [
+                                        FontFeature.tabularFigures()
+                                      ])),
+                            ]),
+                    ])
+                  ]),
             ],
             if (chips.isNotEmpty) ...[
               _gap,
