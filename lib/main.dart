@@ -79,7 +79,7 @@ class ThudHome extends StatefulWidget {
 }
 
 class _ThudHomeState extends State<ThudHome> {
-  int tab = 0;
+  int tab = 1;
   Offset sceneOffset = Offset.zero;
   Module module = Module.slab;
   SensingIntent intent = SensingIntent.slab;
@@ -193,6 +193,7 @@ class _ThudHomeState extends State<ThudHome> {
                             initialIntent: intent,
                             projectId: project,
                             cell: cell,
+                            onHandover: () => setState(() => tab = 1),
                             onModule: (m) {
                               module = m;
                             },
@@ -246,7 +247,7 @@ class _ThudHomeState extends State<ThudHome> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           nav(0, Icons.graphic_eq_rounded, 'Listen'),
-                          nav(1, Icons.grid_view_rounded, 'Dossiers'),
+                          nav(1, Icons.grid_view_rounded, 'Handover'),
                           nav(2, Icons.layers_rounded, 'Tools'),
                         ]),
                   ]),
