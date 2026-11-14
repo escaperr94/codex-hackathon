@@ -215,6 +215,9 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     if (value.contains('permission')) return 'Enable microphone access';
     if (value.contains('no usable audio')) return 'No sound · tap again';
     if (value.contains('too short')) return 'Tap too short';
+    if (value.contains('yamnet') || value.contains('encoder') || value.contains('tflite') || value.contains('wasm')) {
+      return 'Neural audio model failed · $error';
+    }
     if (value.contains('format') || value.contains('pcm16')) {
       return 'Reconnect microphone';
     }
@@ -818,35 +821,7 @@ class _Evidence extends StatelessWidget {
 
   static String headline(Measurement m) {
     if (needsRetry(m)) return 'Tap again';
-    if (m.context['resultVersion'] != '2') return 'Signature captured';
-    final result = (m.context['interpretation'] ?? '').toLowerCase();
-    final comparison = m.context['suspicion'];
-    if (comparison == 'Measured difference' || result.contains('different')) {
-      return 'Check this spot';
-    }
-    if (comparison == 'Reference match' ||
-        result.contains('matches reference')) {
-      return 'Reference match';
-    }
-    if (result.contains('refresh reference') ||
-        comparison == 'Reference decay missing') {
-      return 'Refresh reference';
-    }
-    if (comparison == 'Loading references') return 'Loading references';
-    if (comparison == 'Reference needed' ||
-        comparison == 'Reference setup needed') {
-      return 'Reference needed';
-    }
-    if (comparison == 'Outside reference range') return 'Outside range';
-    if (intentOf(m) == SensingIntent.vessel) {
-      final fill = double.tryParse(m.context['estimatedFillPercent'] ?? '');
-      if (fill != null && fill.isFinite) return '${fill.round()}% fill';
-    }
-    if (intentOf(m) == SensingIntent.fruit) {
-      final firmness = double.tryParse(m.context['firmnessIndex'] ?? '');
-      if (firmness != null && firmness.isFinite) return 'Firmness index';
-    }
-    return 'Signature captured';
+    return m.context['interpretation'] ?? 'Signature captured';
   }
 
   static String displayLabel(Measurement m) {

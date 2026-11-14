@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart';
-import 'package:record/record.dart';
+import 'package:record/record.dart' hide AudioEncoder;
+import 'package:record/record.dart' as record show AudioEncoder;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'audio_encoder.dart';
 
 enum Module { slab, vessel, scope }
 
@@ -26,6 +27,8 @@ class Measurement {
       this.projectId,
       this.cell,
       this.intent,
+      this.embedding = const [],
+      this.encoderVersion,
       this.context = const {}});
 
   final String id, label, source;
@@ -38,6 +41,13 @@ class Measurement {
   final int? cell;
   final String? intent;
   final Map<String, String> context;
+  final List<double> embedding;
+  final String? encoderVersion;
+  bool get hasEmbedding => encoderVersion == embeddingVersion &&
+      embedding.length == 1024 && embedding.every((x) => x.isFinite);
+
+  Measurement withEmbedding(List<double> values) => _assigned(projectId, cell,
+      embedding: List.unmodifiable(values), encoderVersion: embeddingVersion);
 
   Measurement withIntent(String value) =>
       _assigned(projectId, cell, intent: value);
@@ -62,6 +72,8 @@ class Measurement {
         'cell': cell,
         'intent': intent,
         'context': context,
+        'embedding': embedding,
+        'encoderVersion': encoderVersion,
       };
 
   factory Measurement.fromJson(Map<String, dynamic> value) => Measurement(
@@ -84,12 +96,16 @@ class Measurement {
         projectId: value['projectId'] as String?,
         cell: value['cell'] as int?,
         intent: value['intent'] as String?,
+        embedding: List<double>.unmodifiable(
+            (value['embedding'] as List? ?? const []).map((e) => (e as num).toDouble())),
+        encoderVersion: value['encoderVersion'] as String?,
         context: Map<String, String>.unmodifiable(
             (value['context'] as Map?)?.cast<String, String>() ?? const {}),
       );
 
   Measurement _assigned(String? projectId, int? cell,
-          {String? intent, Map<String, String>? context}) =>
+          {String? intent, Map<String, String>? context,
+          List<double>? embedding, String? encoderVersion}) =>
       Measurement(
         id: id,
         label: label,
@@ -108,6 +124,8 @@ class Measurement {
         cell: cell,
         intent: intent ?? this.intent,
         context: context ?? this.context,
+        embedding: embedding ?? this.embedding,
+        encoderVersion: encoderVersion ?? this.encoderVersion,
       );
 }
 
@@ -481,7 +499,7 @@ class ThudStore extends ChangeNotifier {
       out.writeln('${m.label} · ${m.created.toIso8601String()}');
       out.writeln('Source: ${m.source}');
       if (m.intent != null) out.writeln('Intent: ${m.intent}');
-      if (m.context['resultVersion'] == '2') {
+      if (m.context['interpretation'] != null) {
         out.writeln('Result: ${m.context['interpretation']}');
         out.writeln('Comparison: ${m.context['suspicion']}');
       }
@@ -493,6 +511,11 @@ class ThudStore extends ChangeNotifier {
         'referencePeakHz': 'Reference peak (Hz)',
         'referenceDecayMs': 'Reference ring time (ms)',
         'referenceHiiDb': 'Reference HII (dB)',
+        'maturityClass': 'Learned maturity class',
+        'embeddingDistance': 'Neural reference distance',
+        'learnedThreshold': 'Fitted reference threshold',
+        'modelStatus': 'Learned model status',
+        'methodNote': 'Inference method',
       };
       for (final field in fields.entries) {
         if (m.context[field.key] case final value?) {
@@ -748,6 +771,7 @@ class CaptureService {
   static const _sampleRate = 48000;
   static const _maxSamples = _sampleRate * 30;
   AudioRecorder? _recorder;
+  final AudioEncoder _encoder = AudioEncoder();
   final ValueNotifier<List<double>> live = ValueNotifier(const []);
   bool recording = false;
   bool _closing = false, _hasTake = false, _overflow = false;
@@ -786,14 +810,14 @@ class CaptureService {
         if (_closing || epoch != _epoch) {
           throw Exception('Recording was cancelled.');
         }
-        if (!await recorder.isEncoderSupported(AudioEncoder.pcm16bits)) {
+        if (!await recorder.isEncoderSupported(record.AudioEncoder.pcm16bits)) {
           throw Exception(
               'This device does not support PCM16 microphone streaming.');
         }
         await recorder.setOnConfigChanged((config) {
           if (config.sampleRate != _sampleRate ||
               config.numChannels != 1 ||
-              config.encoder != AudioEncoder.pcm16bits) {
+              config.encoder != record.AudioEncoder.pcm16bits) {
             _streamError = Exception(
                 'The microphone changed format. Reconnect a 48 kHz mono input and retry.');
           }
@@ -809,7 +833,7 @@ class CaptureService {
           ..reset()
           ..start();
         final stream = await recorder.startStream(const RecordConfig(
-          encoder: AudioEncoder.pcm16bits,
+          encoder: record.AudioEncoder.pcm16bits,
           sampleRate: _sampleRate,
           numChannels: 1,
           autoGain: false,
@@ -892,7 +916,9 @@ class CaptureService {
           throw Exception(
               'Recording exceeded 30 seconds. Record a shorter tap.');
         }
-        return analyzePcm(Float64List.sublistView(_pcm!, 0, _length), module);
+        final pcm = Float64List.sublistView(_pcm!, 0, _length);
+        final measurement = analyzePcm(pcm, module);
+        return measurement.withEmbedding(await _encoder.encode(pcm, _sampleRate));
       } catch (error) {
         throw Exception('Could not analyze microphone recording: $error');
       } finally {
@@ -953,10 +979,11 @@ class CaptureService {
           // Quantize exactly as signed PCM16, including the quiet noise floor.
           pcm[i] = (value.clamp(-1.0, .999969) * 32768).round() / 32768;
         }
-        return analyzePcm(pcm, module,
+        final measurement = analyzePcm(pcm, module,
             source: fillFraction == null
                 ? 'Synthetic · deterministic ${module.name} ${resonant ? "long" : "short"}-decay PCM16 sample'
                 : 'Synthetic · known fill ${(fillFraction * 100).toStringAsFixed(1)}% · deterministic vessel PCM16 sample');
+        return measurement.withEmbedding(await _encoder.encode(pcm, _sampleRate));
       });
 
   Future<void> cancel() {
@@ -994,11 +1021,15 @@ class CaptureService {
       try {
         if (_hasTake) await _recorder?.cancel();
       } finally {
-        await _clear();
         try {
-          await _recorder?.dispose();
+          await _encoder.dispose();
         } finally {
-          live.dispose();
+          await _clear();
+          try {
+            await _recorder?.dispose();
+          } finally {
+            live.dispose();
+          }
         }
       }
     });

@@ -24,9 +24,9 @@ Open http://localhost:8091. Microphone use requires localhost or HTTPS. iOS/macO
 
 - Listen: direct horizontal swipe across Slab, Vessel, Fruit, Devices, Material and Scope. Each mode has a distinct color, subject glyph, tactile page motion and animated shell transition. Mode selection stays locked during microphone capture. The capture/result column is capped at 540 px on wide displays.
 - Results: one mode-colored status symbol, a short verdict, and at most three main metrics. Retry shows one prioritized reason with Record again and View signal; rejected readings have no save/map action. Reference controls use a compact setup sheet. Demo recordings retain a short Demo label.
-- Slab / Devices / Material: three-tap named references and regularized deviation from peak, ring time and HII. Slab matching/differing results lead to Add to handover; other comparisons lead to save/review. Material compares a sample against an original reference.
-- Vessel: at least three strictly decreasing known-fill anchors for the same container; piecewise interpolation inside the measured range. Other readings show resonance and anchor setup.
-- Fruit: resonance, ring time and mass-based firmness `peakHz² × massKg^(2/3)`. Fruit type and mass remain attached to the saved result.
+- Slab / Devices / Material: three-tap named calibration fits a normal-only model on 1,024D pretrained YAMNet embeddings. New captures are scored against its learned centroid and leave-one-out threshold; acoustic metrics are displayed, not used for verdicts. A difference is not a defect/material certification.
+- Vessel: at least three known-fill levels for the exact container, three taps per level, fit a regularized local regressor on neural embeddings. Out-of-support or extrapolated readings are rejected instead of peak-frequency interpolation.
+- Fruit: user-labelled Unripe/Ripe/Overripe examples train a local nearest-centroid classifier on neural embeddings. Teach at least two classes, three taps per class, under one fruit type/cultivar name. More independent fruits are needed for useful generalization; this is not food-safety advice.
 - Dossiers: room grids, notes, review/defect/accepted marks, linked readings, camera/gallery photos and normalized pins. Slab result → dossier → cell → saved finding → Handover report. Report summary uses actual inspector marks; export includes results, metrics, references, room map and photos. Saved Slab readings link back to their report.
 - Scope: WAVE / SPECTRUM / DECAY views of stored signal data. DECAY is explicitly a peak-binned absolute envelope, not a reconstructed Schroeder curve or RT60. Stored waveform time is relative because full recording duration is not retained.
 - Reports: coverage, human-marked map, measured evidence, intent/input context, photos and pins embedded in a Unicode-font PDF. Synthetic provenance and human/automatic distinctions carry into reports.
@@ -36,17 +36,19 @@ The shell uses mode-specific color, the white `thud.` wordmark, rounded utility 
 
 ## Measurement and storage
 
-The microphone drives acoustic metrics. The camera/gallery attaches inspection photos with normalized image pins. Slab, Devices and Material compare recorded signatures against a named reference; Vessel interpolates between known-fill anchors; Fruit computes the mass-based firmness index. Synthetic examples run deterministic PCM through the same analysis path and retain Demo provenance.
+Captures and demos both run the bundled pretrained YAMNet TFLite encoder: 975 ms, mono 16 kHz float32 → 1,024 learned features. Input is centered on the strongest impact in the loudest 20 ms block, padded at boundaries, and anti-aliased using windowed-sinc polyphase resampling. Native Android/iOS use `tflite_flutter`; web uses a dedicated worker with locally bundled official TensorFlow.js TFLite WASM files. No inference CDN or cloud upload is required.
 
-Capture requests 48 kHz mono PCM16 with processing disabled. The analyzer uses a 4096-point Hann FFT, band-energy ratio HII, observed 20 dB ring-down time, estimated SNR and digital dBFS levels.
+Calibration fits lightweight models on-device; YAMNet weights remain frozen. Fitted parameters, raw neural embeddings, exact encoder provenance, example IDs, intent/object and demo/real separation persist in `thud.calibration.v2`. Legacy `thud.anchors.v1` traces remain readable but must be re-recorded because their original PCM was discarded. Records remain in `thud.store.v1`, including embeddings and inference context; clearing site/app data removes local calibration.
 
-Derived traces, metadata, projects, marks, compressed photos and notes persist locally using SharedPreferences. References use `thud.anchors.v1`; records use `thud.store.v1`. Photos are bounded to 2 MB each. Storage errors roll back writes. Image pins use normalized photo coordinates. Full-resolution PCM is released after analysis. Clearing app/site data removes saved records.
+Capture requests 48 kHz mono PCM16 with processing disabled. FFT frequency, band-energy ratio, ring-down, SNR and dBFS remain diagnostic measurements and capture-quality gates, not handcrafted decision fallbacks. Demos exercise the same encoder but prove software behavior only. Physical task accuracy and dataset/encoder license review remain deployment gates. See [MODEL_APP_HANDOFF.md](MODEL_APP_HANDOFF.md).
+
+The camera/gallery attaches inspection photos with normalized pins. Photos remain bounded to 2 MB each. Storage writes report errors. Full-resolution PCM is released after neural encoding; derived traces and embeddings persist locally.
 
 ## Verification
 
-Web smoke at 390×844 exercised touch-swipe selection, Fruit mass proxy/save, Slab three-tap reference and contrast anomaly, Vessel 0/50/100 synthetic anchors with 50% interpolation, all Scope views, map creation, human marking, gallery upload, image pin, persistence after reload and unsaved-edit protection. PDF bytes were captured and parsed: map, synthetic provenance, saved context and photo page present. Browser native download was not observed. Reduce Motion navigation was exercised. Physical microphone accuracy, iPhone frame rate, native camera permissions, haptics and native sharing still require real-device verification. A Flutter web keyboard-event error occurred during automated text entry; subsequent photo/save/report paths completed.
+Current learned-calibration checks: `flutter analyze`; `flutter test` (preprocessing, learned fitting/OOD, persistence/migration, and UI verdict independence from acoustic scalar metrics). Encoder parity runs the actual TFLite on three real waveform fixtures in desktop TensorFlow and the bundled browser WASM runtime. Interactive app smoke evidence and platform limits are recorded in [MODEL_APP_HANDOFF.md](MODEL_APP_HANDOFF.md).
 
-Current compact-result smoke at 390×844: direct mode swipe; Fruit mass/type persistence; Devices reference match/difference; Material three-tap teaching; Slab result-to-handover, accepted cell mark and saved report navigation. An injected steady audio stream exercised the microphone pipeline's noisy retry state, with no metrics/save/map controls in the retry recap. Exported PDF blob (23,823 bytes) was parsed with pdftotext: handover counts, reference match, measured frequency/ring/HII/SNR, map and photo present. Analyzer and release web build passed; final browser run had no reported errors.
+Earlier signal-only UI/PDF smoke results predate the learned-calibration cutover and are not evidence of current ML field accuracy.
 
 ## Design references
 
