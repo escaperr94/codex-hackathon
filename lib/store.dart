@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:record/record.dart';
@@ -125,14 +127,16 @@ class DefectAnnotation {
       this.measurementSource,
       this.photoBase64,
       this.x,
-      this.y});
+      this.y,
+      this.planX,
+      this.planY});
 
   static const maxPhotoBytes = 2 * 1024 * 1024;
   final String id, projectId, note;
   final int cell;
   final AnnotationStatus status;
   final String? measurementId, measurementSource, photoBase64;
-  final double? x, y;
+  final double? x, y, planX, planY;
   String get provenance => 'Human annotation';
 
   DefectAnnotation _linked(
@@ -147,7 +151,9 @@ class DefectAnnotation {
           measurementSource: measurementSource,
           photoBase64: photoBase64,
           x: x,
-          y: y);
+          y: y,
+          planX: planX,
+          planY: planY);
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -160,6 +166,8 @@ class DefectAnnotation {
         'photoBase64': photoBase64,
         'x': x,
         'y': y,
+        'planX': planX,
+        'planY': planY,
         'provenance': provenance,
       };
 
@@ -174,7 +182,35 @@ class DefectAnnotation {
           measurementSource: value['measurementSource'] as String?,
           photoBase64: value['photoBase64'] as String?,
           x: (value['x'] as num?)?.toDouble(),
-          y: (value['y'] as num?)?.toDouble());
+          y: (value['y'] as num?)?.toDouble(),
+          planX: (value['planX'] as num?)?.toDouble(),
+          planY: (value['planY'] as num?)?.toDouble());
+}
+
+/// An imported architectural image. Coordinates refer to its decoded pixels.
+class FloorPlan {
+  FloorPlan(
+      {required this.imageBase64,
+      required this.name,
+      required this.width,
+      required this.height});
+  static const maxBytes = 2 * 1024 * 1024;
+  final String imageBase64, name;
+  final int width, height;
+  late final Uint8List bytes = base64Decode(imageBase64);
+
+  Map<String, dynamic> toJson() => {
+        'imageBase64': imageBase64,
+        'name': name,
+        'width': width,
+        'height': height,
+      };
+  factory FloorPlan.fromJson(Map<String, dynamic> value) => FloorPlan(
+        imageBase64: value['imageBase64'] as String,
+        name: value['name'] as String,
+        width: value['width'] as int,
+        height: value['height'] as int,
+      );
 }
 
 class Project {
@@ -184,10 +220,12 @@ class Project {
       required this.room,
       required this.rows,
       required this.columns,
-      this.notes = ''});
+      this.notes = '',
+      this.floorPlan});
   final String id, name, room;
   final int rows, columns;
   String notes;
+  FloorPlan? floorPlan;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -195,7 +233,8 @@ class Project {
         'room': room,
         'rows': rows,
         'columns': columns,
-        'notes': notes
+        'notes': notes,
+        'floorPlan': floorPlan?.toJson(),
       };
   factory Project.fromJson(Map<String, dynamic> value) => Project(
         id: value['id'] as String,
@@ -204,6 +243,10 @@ class Project {
         rows: value['rows'] as int,
         columns: value['columns'] as int,
         notes: value['notes'] as String? ?? '',
+        floorPlan: value['floorPlan'] == null
+            ? null
+            : FloorPlan.fromJson(
+                Map<String, dynamic>.from(value['floorPlan'] as Map)),
       );
 }
 
@@ -267,6 +310,7 @@ class ThudStore extends ChangeNotifier {
       final oldMeasurements = List<Measurement>.of(measurements);
       final oldAnnotations = List<DefectAnnotation>.of(annotations);
       final oldNotes = {for (final p in projects) p.id: p.notes};
+      final oldPlans = {for (final p in projects) p.id: p.floorPlan};
       final oldReference = reference;
       final oldHaptics = haptics, oldSounds = sounds;
       try {
@@ -290,6 +334,7 @@ class ThudStore extends ChangeNotifier {
         annotations = oldAnnotations;
         for (final p in projects) {
           p.notes = oldNotes[p.id]!;
+          p.floorPlan = oldPlans[p.id];
         }
         reference = oldReference;
         haptics = oldHaptics;
@@ -328,6 +373,80 @@ class ThudStore extends ChangeNotifier {
         if (index < 0) throw Exception('This project is no longer available.');
         projects[index].notes = notes;
       });
+
+  /// Validates real image bytes before atomically replacing the plan and pins.
+  /// Existing pins must be explicitly reset: a new image has a new coordinate space.
+  Future<void> updateFloorPlan(Project project,
+      {required Uint8List bytes,
+      required String name,
+      bool resetPins = false}) async {
+    if (bytes.isEmpty || bytes.length > FloorPlan.maxBytes) {
+      throw Exception('Use a JPEG, PNG or WebP plan below 2 MB.');
+    }
+    final jpeg = bytes.length >= 3 &&
+        bytes[0] == 255 &&
+        bytes[1] == 216 &&
+        bytes[2] == 255;
+    final png = bytes.length >= 8 &&
+        bytes[0] == 137 &&
+        bytes[1] == 80 &&
+        bytes[2] == 78 &&
+        bytes[3] == 71 &&
+        bytes[4] == 13 &&
+        bytes[5] == 10 &&
+        bytes[6] == 26 &&
+        bytes[7] == 10;
+    final webp = bytes.length >= 12 &&
+        ascii.decode(bytes.sublist(0, 4), allowInvalid: true) == 'RIFF' &&
+        ascii.decode(bytes.sublist(8, 12), allowInvalid: true) == 'WEBP';
+    if (!(jpeg || png || webp)) {
+      throw Exception('Use a JPEG, PNG or WebP architectural plan.');
+    }
+    final codec = await ui.instantiateImageCodec(bytes);
+    late final int width, height;
+    try {
+      final frame = await codec.getNextFrame();
+      width = frame.image.width;
+      height = frame.image.height;
+      frame.image.dispose();
+    } finally {
+      codec.dispose();
+    }
+    final plan = FloorPlan(
+        imageBase64: base64Encode(bytes),
+        name: name.trim().isEmpty ? 'Imported plan' : name.trim(),
+        width: width,
+        height: height);
+    await _change(() {
+      final target = projects.where((p) => p.id == project.id).firstOrNull;
+      if (target == null)
+        throw Exception('This project is no longer available.');
+      final hasPins =
+          annotations.any((a) => a.projectId == project.id && a.planX != null);
+      if (hasPins && !resetPins) {
+        throw Exception(
+            'Confirm resetting existing plan pins before replacing the plan.');
+      }
+      target.floorPlan = plan;
+      if (hasPins) {
+        annotations = annotations
+            .map((a) => a.projectId != project.id
+                ? a
+                : DefectAnnotation(
+                    id: a.id,
+                    projectId: a.projectId,
+                    cell: a.cell,
+                    status: a.status,
+                    note: a.note,
+                    measurementId: a.measurementId,
+                    measurementSource: a.measurementSource,
+                    photoBase64: a.photoBase64,
+                    x: a.x,
+                    y: a.y))
+            .toList();
+      }
+    });
+  }
 
   Future<void> saveMeasurement(Measurement value,
           {String? projectId, int? cell}) =>
@@ -422,6 +541,18 @@ class ThudStore extends ChangeNotifier {
           throw Exception(
               'A photo pin needs an image and coordinates from 0 to 1.');
         }
+        if ((value.planX == null) != (value.planY == null) ||
+            (value.planX != null &&
+                (project.floorPlan == null ||
+                    !value.planX!.isFinite ||
+                    !value.planY!.isFinite ||
+                    value.planX! < 0 ||
+                    value.planX! > 1 ||
+                    value.planY! < 0 ||
+                    value.planY! > 1))) {
+          throw Exception(
+              'A plan pin needs an imported plan and coordinates from 0 to 1.');
+        }
         if (measurement != null &&
             value.measurementId != null &&
             value.measurementId != measurement.id) {
@@ -475,6 +606,10 @@ class ThudStore extends ChangeNotifier {
   String reportText(Project p) {
     final out = StringBuffer(
         'THUD / Handover inspection\n${p.name}\nRoom: ${p.room}\nGrid: ${p.rows} × ${p.columns}\n\n${p.notes.isEmpty ? "" : "Notes: ${p.notes}\n\n"}');
+    if (p.floorPlan case final plan?) {
+      out.writeln(
+          'Architectural plan: ${plan.name} (${plan.width} × ${plan.height} pixels).');
+    }
     final records = forProject(p.id);
     if (records.isEmpty) out.writeln('No saved measurements.');
     for (final m in records) {
@@ -493,6 +628,15 @@ class ThudStore extends ChangeNotifier {
         'referencePeakHz': 'Reference peak (Hz)',
         'referenceDecayMs': 'Reference ring time (ms)',
         'referenceHiiDb': 'Reference HII (dB)',
+        'methodNote': 'Interpretation method',
+        'classifierMethod': 'Reference classifier',
+        'classifierLabel': 'Nearest reference label',
+        'classifierScore': 'Reference distance',
+        'classifierMargin': 'Reference margin',
+        'classifierStatus': 'Reference decision',
+        'referenceLabels': 'Labeled reference classes',
+        'referenceProfiles': 'Reference profile metadata',
+        'classifierPrototypes': 'Reference means and scales',
       };
       for (final field in fields.entries) {
         if (m.context[field.key] case final value?) {
@@ -512,8 +656,14 @@ class ThudStore extends ChangeNotifier {
     out.writeln('\nInspection marks');
     final marks = annotationsForProject(p.id);
     if (marks.isEmpty) out.writeln('No human annotations.');
-    for (final a in marks) {
+    for (final (index, a) in marks.indexed) {
       out.writeln('${a.provenance} · Cell ${a.cell + 1} · ${a.status.name}');
+      if (a.planX != null && a.planY != null) {
+        out.writeln(
+            'Plan pin #${index + 1}: x=${a.planX!.toStringAsFixed(6)}, y=${a.planY!.toStringAsFixed(6)} (normalized plan coordinates).');
+      } else {
+        out.writeln('Not positioned on architectural plan.');
+      }
       out.writeln('Note: ${a.note.isEmpty ? "No note." : a.note}');
       if (a.measurementSource != null) {
         out.writeln('Linked source: ${a.measurementSource} '

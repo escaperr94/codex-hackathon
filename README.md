@@ -42,6 +42,22 @@ Capture requests 48 kHz mono PCM16 with processing disabled. The analyzer uses a
 
 Derived traces, metadata, projects, marks, compressed photos and notes persist locally using SharedPreferences. References use `thud.anchors.v1`; records use `thud.store.v1`. Photos are bounded to 2 MB each. Storage errors roll back writes. Image pins use normalized photo coordinates. Full-resolution PCM is released after analysis. Clearing app/site data removes saved records.
 
+### Reference library schema
+
+Reference profiles are local, user-supplied data; THUD does not seed fabricated labels. Storage key: `thud.anchors.v1`. The Reference Library accepts either one anchor, an anchor array, or the exported wrapper:
+
+```json
+{"schema":"thud.reference-library","version":1,"anchors":[...]}
+```
+
+Each anchor contains `intent`, `object`, exactly three clean `taps`, and optional `level`, `label`, and `metadata`. Slab labels are `Solid` / `Hollow`; Material labels are `Original` / `Suspect`; Devices labels are `Reference` / `Anomaly`. Legacy unlabeled anchors remain usable as a single `Reference` baseline. Imports validate the whole batch before an atomic local write; invalid data leaves the previous library unchanged. Results persist classifier method, label/status, score, margin, prototypes, selected profiles and tap IDs for auditability. Demo and microphone/imported references remain separate.
+
+### Architectural floor plans
+
+Projects may store one validated JPEG, PNG or WebP floor plan under `thud.store.v1` (maximum 2 MB), including decoded pixel dimensions. Findings retain normalized `planX` / `planY` independently from normalized photo `x` / `y`. Replacing a plan requires explicit reset of existing plan pins; storage failures roll back the plan and annotations. Handover PDF rendering uses the same contain-fit geometry and numbered status-colored pins as the interactive map.
+
+The floor-plan API is `ThudStore.updateFloorPlan(project, {bytes, name, resetPins})`. A plan pin requires a project plan and a finite normalized coordinate pair; a photo pin still requires its own photo and coordinate pair.
+
 ## Verification
 
 Web smoke at 390×844 exercised touch-swipe selection, Fruit mass proxy/save, Slab three-tap reference and contrast anomaly, Vessel 0/50/100 synthetic anchors with 50% interpolation, all Scope views, map creation, human marking, gallery upload, image pin, persistence after reload and unsaved-edit protection. PDF bytes were captured and parsed: map, synthetic provenance, saved context and photo page present. Browser native download was not observed. Reduce Motion navigation was exercised. Physical microphone accuracy, iPhone frame rate, native camera permissions, haptics and native sharing still require real-device verification. A Flutter web keyboard-event error occurred during automated text entry; subsequent photo/save/report paths completed.

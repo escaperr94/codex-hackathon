@@ -1,8 +1,120 @@
+import 'dart:convert';
 import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 import 'design.dart';
 import 'store.dart';
 import 'sensing_flow.dart';
+
+class _PrototypeMatch {
+  const _PrototypeMatch(
+      {required this.label,
+      required this.status,
+      required this.score,
+      required this.margin,
+      required this.prototypes,
+      required this.reference});
+  final String? label;
+  final String status;
+  final double score, margin;
+  final String prototypes;
+  final List<Measurement> reference;
+
+  static _PrototypeMatch? classify(
+      List<ReferenceAnchor> anchors, Measurement tap) {
+    final groups = <String, List<Measurement>>{};
+    for (final a in anchors) {
+      if (a.label != null && a.taps.every(ReferenceAnchor.clean)) {
+        groups.putIfAbsent(a.label!, () => []).addAll(a.taps);
+      }
+    }
+    if (groups.length < 2 || !ReferenceAnchor.clean(tap)) return null;
+    List<double> features(Measurement m) => [m.peakHz, m.decayMs, m.hiiDb];
+    final means = <String, List<double>>{};
+    final variances = <String, List<double>>{};
+    final pooled = List<double>.filled(3, 0);
+    var degrees = 0;
+    for (final entry in groups.entries) {
+      final n = entry.value.length;
+      final mean = List<double>.filled(3, 0);
+      for (final m in entry.value) {
+        final v = features(m);
+        for (var i = 0; i < 3; i++) {
+          mean[i] += v[i] / n;
+        }
+      }
+      means[entry.key] = mean;
+      final variance = List<double>.filled(3, 0);
+      for (final m in entry.value) {
+        final v = features(m);
+        for (var i = 0; i < 3; i++) {
+          final delta = v[i] - mean[i];
+          variance[i] += delta * delta / (n - 1);
+          pooled[i] += delta * delta;
+        }
+      }
+      degrees += n - 1;
+      variances[entry.key] = variance;
+    }
+    final averagePeak =
+        means.values.map((v) => v[0]).reduce((a, b) => a + b) / means.length;
+    final floors = [averagePeak * .05, 10.0, 3.0];
+    final scales = List<double>.generate(
+        3, (i) => math.sqrt(pooled[i] / degrees + floors[i] * floors[i]));
+    double distance(List<double> a, List<double> b, List<double> scale) {
+      var sum = 0.0;
+      for (var i = 0; i < 3; i++) {
+        final d = (a[i] - b[i]) / scale[i];
+        sum += d * d;
+      }
+      return math.sqrt(sum / 3);
+    }
+
+    final v = features(tap);
+    final ranked = means.keys.toList()
+      ..sort((a, b) => distance(v, means[a]!, scales)
+          .compareTo(distance(v, means[b]!, scales)));
+    final nearest = ranked.first;
+    final score = distance(v, means[nearest]!, scales);
+    final runnerUp = distance(v, means[ranked[1]]!, scales);
+    final margin = runnerUp - score;
+    final ownScale = List<double>.generate(
+        3, (i) => math.sqrt(variances[nearest]![i] + floors[i] * floors[i]));
+    final ownDistance = distance(v, means[nearest]!, ownScale);
+    final separation = distance(means[nearest]!, means[ranked[1]]!, scales);
+    final outside = !score.isFinite ||
+        !ownDistance.isFinite ||
+        score > 3 ||
+        ownDistance > 3;
+    final ambiguous = !margin.isFinite || margin < .5 || separation < 1;
+    return _PrototypeMatch(
+        label: outside || ambiguous ? null : nearest,
+        status: outside
+            ? 'outside-reference-range'
+            : ambiguous
+                ? 'ambiguous'
+                : 'matched',
+        score: score,
+        margin: margin,
+        reference: groups[nearest]!,
+        prototypes: jsonEncode({
+          'features': ['peakHz', 'decayMs', 'hiiDb'],
+          'pooledRegularizedScales': scales,
+          'floors': floors,
+          'maximumDistance': 3,
+          'minimumMargin': .5,
+          'minimumSeparation': 1,
+          'nearestOwnClassDistance': ownDistance,
+          'classes': {
+            for (final key in means.keys)
+              key: {
+                'mean': means[key],
+                'variance': variances[key],
+                'tapIds': groups[key]!.map((m) => m.id).toList(),
+              }
+          },
+        }));
+  }
+}
 
 class SensingResult extends StatefulWidget {
   const SensingResult(
@@ -63,30 +175,19 @@ class _SensingResultState extends State<SensingResult> {
           a.object.trim().isNotEmpty &&
           a.taps.length >= 3 &&
           a.taps.every((t) =>
-              t.flags.isEmpty &&
-              t.peakHz.isFinite &&
-              t.peakHz > 0 &&
+              ReferenceAnchor.clean(t) &&
               t.source.toLowerCase().contains('synthetic') == _demo))
       .toList();
 
-  Future<void> _load({bool afterTeaching = false}) async {
+  Future<void> _load() async {
     try {
       final all = await AnchorRepository.load();
       if (!mounted) return;
       final eligible = _eligible(all);
       final names = eligible.map((a) => a.object).toSet().toList()..sort();
-      String signature(ReferenceAnchor a) =>
-          '${a.object}|${a.level}|${a.taps.map((t) => t.id).join(',')}';
-      final previous = _eligible(anchors).map(signature).toSet();
-      final updatedNames = eligible
-          .where((a) => !previous.contains(signature(a)))
-          .map((a) => a.object)
-          .toSet();
       setState(() {
         anchors = all;
-        if (afterTeaching && updatedNames.length == 1) {
-          object = updatedNames.single;
-        } else if (!names.contains(object)) {
+        if (!names.contains(object)) {
           object = names.length == 1 ? names.single : null;
         }
         loadingReferences = false;
@@ -102,10 +203,13 @@ class _SensingResultState extends State<SensingResult> {
     }
   }
 
-  Future<void> _teachReference() async {
-    await Navigator.of(context).push(sensingRoute<void>(context,
-        GuidedReferenceScreen(intent: widget.intent, store: widget.store)));
-    if (mounted) await _load(afterTeaching: true);
+  Future<void> _openLibrary() async {
+    final selected = await Navigator.of(context).push(sensingRoute<String>(
+        context,
+        ReferenceLibraryScreen(intent: widget.intent, store: widget.store)));
+    if (!mounted) return;
+    if (selected != null) setState(() => object = selected);
+    await _load();
   }
 
   @override
@@ -122,47 +226,6 @@ class _SensingResultState extends State<SensingResult> {
     return 'Tap again';
   }
 
-  void _referenceSetup(List<String> names, String? selected) {
-    showModalBottomSheet<void>(
-        context: context,
-        showDragHandle: true,
-        builder: (sheet) => SafeArea(
-            child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  const SectionTitle('Reference'),
-                  const SizedBox(height: 16),
-                  if (names.length > 1) ...[
-                    DropdownButtonFormField<String>(
-                        initialValue: selected,
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                            labelText: 'Reference object'),
-                        items: names
-                            .map((name) => DropdownMenuItem(
-                                value: name,
-                                child: Text(name,
-                                    overflow: TextOverflow.ellipsis)))
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() => object = value);
-                          Navigator.of(sheet).pop();
-                        }),
-                    const SizedBox(height: 12),
-                  ] else if (selected != null)
-                    Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Text(selected)),
-                  TextButton.icon(
-                      onPressed: () {
-                        Navigator.of(sheet).pop();
-                        _teachReference();
-                      },
-                      icon: const Icon(Icons.add_rounded),
-                      label: const Text('Record reference')),
-                ]))));
-  }
-
   @override
   Widget build(BuildContext context) {
     final m = widget.measurement;
@@ -171,9 +234,18 @@ class _SensingResultState extends State<SensingResult> {
     final names = eligible.map((a) => a.object).toSet().toList()..sort();
     final selected = names.contains(object) ? object : null;
     final refs = eligible.where((a) => a.object == selected).toList();
-    final reference = _compares && refs.isNotEmpty ? refs.last.taps : null;
-    final hasDecay = m.decayMs.isFinite && m.decayMs > 0;
-    final retry = m.flags.isNotEmpty || !hasDecay;
+    final baselineLabel = ReferenceAnchor.labelsFor(widget.intent).first;
+    final baseline = refs.where((a) => a.label == baselineLabel).toList();
+    final legacy = refs.where((a) => a.label == null).toList();
+    final baselineAnchor = baseline.isNotEmpty
+        ? baseline.last
+        : legacy.isNotEmpty
+            ? legacy.last
+            : refs.isNotEmpty
+                ? refs.last
+                : null;
+    var reference = _compares ? baselineAnchor?.taps : null;
+    final retry = !ReferenceAnchor.clean(m);
     final quality = retry ? _qualityLabel(m) : 'Clean signal';
     var suspicion = 'Signature recorded';
     var title = 'Signature captured';
@@ -185,13 +257,49 @@ class _SensingResultState extends State<SensingResult> {
     double? fill, firmness;
     List<ReferenceAnchor> fillPoints = [];
     var retryReference = false;
+    _PrototypeMatch? classification;
     final grams = double.tryParse(mass.text.trim());
     final validMass = grams != null && grams.isFinite && grams > 0;
 
     if (_compares) {
       method = 'D = √mean((Δ / √(s² + floor²))²), peak / decay / HII. '
           'Floors: 5% reference peak, 10 ms, 3 dB. Difference: D > 3.';
-      if (reference == null) {
+      classification = !retry ? _PrototypeMatch.classify(refs, m) : null;
+      if (classification != null) {
+        method =
+            'Regularized nearest-class prototype on peakHz / decayMs / hiiDb. '
+            'Class means; pooled within-class variance + squared floors '
+            '(5% mean peak, 10 ms, 3 dB). RMS normalized distance. '
+            'Accept only nearest pooled and own-class distances ≤ 3, '
+            'runner-up margin ≥ 0.5 and class separation ≥ 1.';
+        score = classification.score;
+        reference = classification.reference;
+        final label = classification.label;
+        title = label == null
+            ? classification.status == 'outside-reference-range'
+                ? 'Outside references'
+                : 'Mixed signature'
+            : switch (label) {
+                'Solid' => 'Solid-like',
+                'Hollow' => 'Hollow-like',
+                'Original' => 'Original match',
+                'Suspect' => 'Suspect match',
+                'Anomaly' => 'Anomaly match',
+                _ => 'Reference match',
+              };
+        different = label == 'Hollow' ||
+            label == 'Suspect' ||
+            label == 'Anomaly' ||
+            label == null;
+        suspicion = label == null ? title : 'Labeled reference match';
+        referencePeak = reference.map((t) => t.peakHz).reduce((a, b) => a + b) /
+            reference.length;
+        referenceDecay =
+            reference.map((t) => t.decayMs).reduce((a, b) => a + b) /
+                reference.length;
+        referenceHii = reference.map((t) => t.hiiDb).reduce((a, b) => a + b) /
+            reference.length;
+      } else if (reference == null) {
         needsReference = !loadingReferences;
         title = loadingReferences ? 'Loading references' : 'Reference needed';
         suspicion = title;
@@ -200,30 +308,32 @@ class _SensingResultState extends State<SensingResult> {
         title = 'Refresh reference';
         suspicion = 'Reference decay missing';
       } else if (!retry) {
+        final baselineReference = reference;
         double mean(double Function(Measurement) read) =>
-            reference.map(read).reduce((a, b) => a + b) / reference.length;
+            baselineReference.map(read).reduce((a, b) => a + b) /
+            baselineReference.length;
         referencePeak = mean((t) => t.peakHz);
         referenceDecay = mean((t) => t.decayMs);
         referenceHii = mean((t) => t.hiiDb);
         double deviation(double Function(Measurement) read, double floor) {
           final average = mean(read);
-          final variance = reference
+          final variance = baselineReference
                   .map((t) => math.pow(read(t) - average, 2))
                   .reduce((a, b) => a + b) /
-              (reference.length - 1);
+              (baselineReference.length - 1);
           return (read(m) - average).abs() /
               math.sqrt(variance + floor * floor);
         }
 
         score = math.sqrt(
-            (math.pow(deviation((t) => t.peakHz, referencePeak * .05), 2) +
+            (math.pow(deviation((t) => t.peakHz, referencePeak! * .05), 2) +
                     math.pow(deviation((t) => t.decayMs, 10), 2) +
                     math.pow(deviation((t) => t.hiiDb, 3), 2)) /
                 3);
-        peakShift = 100 * (m.peakHz / referencePeak - 1);
-        decayShift = m.decayMs - referenceDecay;
-        hiiShift = m.hiiDb - referenceHii;
-        different = score > 3;
+        peakShift = 100 * (m.peakHz / referencePeak! - 1);
+        decayShift = m.decayMs - referenceDecay!;
+        hiiShift = m.hiiDb - referenceHii!;
+        different = score! > 3;
         suspicion = different ? 'Measured difference' : 'Reference match';
         title = different ? 'Check this spot' : 'Reference match';
       }
@@ -307,7 +417,16 @@ class _SensingResultState extends State<SensingResult> {
             'methodNote',
             'quality',
             'suspicion',
-            'resultVersion'
+            'resultVersion',
+            'classifierMethod',
+            'classifierLabel',
+            'classifierScore',
+            'classifierMargin',
+            'classifierStatus',
+            'classifierPrototypes',
+            'referenceLabels',
+            'referenceProfiles',
+            'referenceLabel'
           }.contains(key));
     final record = m.withIntent(widget.intent.name).withContext({
       ...savedContext,
@@ -321,9 +440,39 @@ class _SensingResultState extends State<SensingResult> {
         'fruitType': fruit,
       },
       if (selected != null) 'referenceObject': selected,
+      if (_compares &&
+          baselineAnchor != null &&
+          classification == null &&
+          !retry) ...{
+        'referenceLabel': baselineAnchor.displayLabel,
+        'classifierMethod': 'regularized-reference-deviation-v1',
+        if (score != null) 'classifierScore': '$score',
+      },
       if (refs.isNotEmpty)
         'referenceTapIds':
             refs.expand((a) => a.taps.map((t) => t.id)).join(','),
+      if (refs.isNotEmpty) ...{
+        'referenceLabels': refs.map((a) => a.displayLabel).toSet().join(','),
+        'referenceProfiles': jsonEncode(refs
+            .map((a) => {
+                  'intent': a.intent.name,
+                  'object': a.object,
+                  'label': a.label,
+                  'metadata': a.metadata,
+                  'tapIds': a.taps.map((t) => t.id).toList(),
+                  'source': a.synthetic ? 'demo' : 'microphone',
+                })
+            .toList()),
+      },
+      if (classification != null) ...{
+        'classifierMethod': 'regularized-nearest-prototype-v1',
+        if (classification.label != null)
+          'classifierLabel': classification.label!,
+        'classifierScore': '${classification.score}',
+        'classifierMargin': '${classification.margin}',
+        'classifierStatus': classification.status,
+        'classifierPrototypes': classification.prototypes,
+      },
       if (referencePeak != null) 'referencePeakHz': '$referencePeak',
       if (referenceDecay != null) 'referenceDecayMs': '$referenceDecay',
       if (referenceHii != null) 'referenceHiiDb': '$referenceHii',
@@ -344,7 +493,7 @@ class _SensingResultState extends State<SensingResult> {
     final primaryLabel = retry
         ? 'Record again'
         : setup
-            ? (retryReference ? 'Refresh reference' : 'Set reference')
+            ? (retryReference ? 'Refresh reference' : 'Choose reference')
             : mapPrimary
                 ? widget.intent == SensingIntent.slab
                     ? 'Add to handover'
@@ -364,9 +513,7 @@ class _SensingResultState extends State<SensingResult> {
     final VoidCallback primaryAction = retry
         ? widget.onAgain
         : setup
-            ? (selected == null && names.length > 1
-                ? () => _referenceSetup(names, selected)
-                : _teachReference)
+            ? _openLibrary
             : mapPrimary
                 ? () => widget.onMap(record)
                 : tracePrimary
@@ -404,9 +551,7 @@ class _SensingResultState extends State<SensingResult> {
                         tooltip: selected == null
                             ? 'Reference setup'
                             : 'Reference: $selected',
-                        onPressed: loadingReferences
-                            ? null
-                            : () => _referenceSetup(names, selected),
+                        onPressed: loadingReferences ? null : _openLibrary,
                         icon:
                             Icon(Icons.tune_rounded, color: accent, size: 20)),
                 ]),
@@ -452,7 +597,8 @@ class _SensingResultState extends State<SensingResult> {
                   Metric('Ring time', '${m.decayMs.round()} ms',
                       accent: accent),
                   if (score != null)
-                    Metric('Deviation', score.toStringAsFixed(1),
+                    Metric(classification == null ? 'Deviation' : 'Distance',
+                        score.toStringAsFixed(1),
                         accent: accent),
                   if (widget.intent == SensingIntent.scope)
                     Metric('SNR', '${m.snrDb.toStringAsFixed(0)} dB',
