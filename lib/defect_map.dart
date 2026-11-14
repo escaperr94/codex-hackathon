@@ -6,7 +6,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'design.dart';
+import 'floor_plan.dart';
+import 'tile_inspection.dart';
+
 import 'store.dart';
+
+export 'floor_plan.dart';
 
 /// Human inspection marks are deliberately separate from acoustic evidence.
 class DefectMapScreen extends StatefulWidget {
@@ -30,13 +35,14 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
   final _picker = ImagePicker();
   int _cell = 0;
   String _id = '';
-  String? _linkId, _sourceSnapshot, _error;
+  String? _linkId, _sourceSnapshot, _error, _tileId;
   AnnotationStatus _status = AnnotationStatus.review;
   Uint8List? _photo;
-  double? _x, _y;
-  bool _busy = false;
+  double? _x, _y, _planX, _planY;
+  bool _busy = false, _showPlan = true;
   Object? _baseline;
-  Object get _draft => (_note.text, _status, _linkId, _photo, _x, _y);
+  Object get _draft =>
+      (_cell, _note.text, _status, _linkId, _photo, _x, _y, _planX, _planY, _tileId);
   bool get _dirty => _draft != _baseline;
 
   @override
@@ -82,6 +88,8 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
       _sourceSnapshot = widget.measurement?.source;
       _photo = null;
       _x = _y = null;
+      _planX = _planY = null;
+      _tileId = null;
       _error = null;
       _baseline = _draft;
     });
@@ -104,6 +112,9 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
         _photo = bytes;
         _x = mark.x;
         _y = mark.y;
+        _planX = mark.planX;
+        _planY = mark.planY;
+        _tileId = mark.tileId;
         _error = null;
         _baseline = _draft;
       });
@@ -119,7 +130,7 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
             builder: (context) => AlertDialog(
                     title: const Text('Discard unsaved changes?'),
                     content: const Text(
-                        'Your note, status, photo and pin have not been saved.'),
+                        'Your cell, note, status, photo and plan pins have not been saved.'),
                     actions: [
                       TextButton(
                           onPressed: () => Navigator.pop(context, false),
@@ -143,6 +154,114 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
     } else {
       await _open(existing, confirmed: true);
     }
+  }
+
+  void _assignCell(int cell) {
+    setState(() {
+      _cell = cell;
+      final linked =
+          widget.store.measurements.where((m) => m.id == _linkId).firstOrNull;
+      if (linked != null &&
+          linked.cell != cell &&
+          widget.measurement?.id != _linkId) {
+        _linkId = null;
+        _sourceSnapshot = null;
+      }
+    });
+  }
+
+  Future<void> _importPlan([ImageSource source = ImageSource.gallery]) async {
+    if (!await _canDiscard() || !mounted) return;
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      final file = await _picker.pickImage(
+          source: source, maxWidth: 2048, maxHeight: 2048,
+          imageQuality: 88, requestFullMetadata: false);
+      if (file == null) return;
+      if (await file.length() > FloorPlan.maxBytes) {
+        throw Exception(
+            'Plan exceeds 2 MB. Choose a smaller JPEG, PNG or WebP image.');
+      }
+      final bytes = await file.readAsBytes();
+      if (!mounted) return;
+      final hasPins = widget.store
+          .annotationsForProject(widget.project.id)
+          .any((a) => a.planX != null || a.tileId != null);
+      if (hasPins || widget.project.floorPlan?.tileLayout != null) {
+        final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+                    title: const Text('Replace plan and reset pins?'),
+                    content: const Text(
+                        'The new image uses a different coordinate space. '
+                        'All saved plan locations and tile links will be cleared. Findings, grid cells, '
+                        'photos and recordings stay unchanged. The tile map is also replaced.'),
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Keep current plan')),
+                      TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Replace and reset pins')),
+                    ]));
+        if (confirmed != true) return;
+      }
+      await widget.store.updateFloorPlan(widget.project,
+          bytes: bytes, name: file.name, resetPins: hasPins);
+      if (!mounted) return;
+      await _newMark(confirmed: true);
+      setState(() => _showPlan = true);
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Architectural plan saved on this device.')));
+      if (source == ImageSource.camera && mounted) await _editTiles();
+    } catch (error) {
+      if (mounted) setState(() => _error = 'Plan was not changed. $error');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _editTiles() async {
+    if (!await _canDiscard() || !mounted) return;
+    await _newMark(confirmed: true);
+    await Navigator.push(context, MaterialPageRoute<void>(builder: (_) =>
+        TileInspectionEditor(store: widget.store, project: widget.project)));
+    if (!mounted) return;
+    final ids = widget.project.floorPlan?.tileLayout?.tiles.map((t) => t.id).toSet() ?? <String>{};
+    setState(() {
+      if (!ids.contains(_tileId)) _tileId = null;
+      _baseline = _draft;
+    });
+  }
+
+  Future<void> _location() async {
+    final building = TextEditingController(text: widget.project.building);
+    final floor = TextEditingController(text: widget.project.floor);
+    final unit = TextEditingController(text: widget.project.unit);
+    final save = await showDialog<bool>(context: context, builder: (context) =>
+        AlertDialog(title: const Text('Indoor location'), content: Column(
+          mainAxisSize: MainAxisSize.min, children: [
+            Text('Project: ${widget.project.name} · Room: ${widget.project.room}'),
+            TextField(controller: building, decoration: const InputDecoration(labelText: 'Building')),
+            TextField(controller: floor, decoration: const InputDecoration(labelText: 'Floor')),
+            TextField(controller: unit, decoration: const InputDecoration(labelText: 'Apartment / unit')),
+          ]), actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Save')),
+          ]));
+    if (save == true) {
+      try {
+        await widget.store.updateProjectLocation(widget.project,
+            building: building.text.trim(), floor: floor.text.trim(), unit: unit.text.trim());
+      } catch (error) {
+        if (mounted) setState(() => _error = 'Location was not saved. $error');
+      }
+    }
+    building.dispose(); floor.dispose(); unit.dispose();
   }
 
   Future<void> _pick(ImageSource source) async {
@@ -200,12 +319,15 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
               id: _id,
               projectId: widget.project.id,
               cell: _cell,
+              tileId: _tileId,
               status: _status,
               note: _note.text.trim(),
               measurementId: _linkId,
               photoBase64: _photo == null ? null : base64Encode(_photo!),
               x: _x,
-              y: _y),
+              y: _y,
+              planX: _planX,
+              planY: _planY),
           measurement: supplied?.id == _linkId ? supplied : null);
       if (!mounted) return;
       setState(() {
@@ -237,12 +359,22 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
       },
       child: Scaffold(
         backgroundColor: C.bg,
-        appBar: AppBar(title: const Text('Defect map'), backgroundColor: C.bg),
+        appBar: AppBar(
+            title: const Text('Defect map'),
+            backgroundColor: C.bg,
+            actions: [
+              IconButton(
+                  onPressed: _busy ? null : _importPlan,
+                  tooltip: 'Import architectural plan',
+                  icon: const Icon(Icons.add_photo_alternate_outlined))
+            ]),
         body: AnimatedBuilder(
             animation: widget.store,
             builder: (context, _) {
               final project = widget.project;
               final marks = widget.store.annotationsForProject(project.id);
+              final selectedTile = project.floorPlan?.tileLayout?.tiles
+                  .where((tile) => tile.id == _tileId).firstOrNull;
               final records = widget.store.forProject(project.id);
               final here = marks.where((a) => a.cell == _cell).toList();
               final choices = <String, Measurement>{
@@ -257,129 +389,222 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                     PageHeading(project.name,
                         subtitle:
                             '${project.room.isEmpty ? 'Inspection grid' : project.room} · ${project.rows} × ${project.columns}'),
+                    TextButton.icon(onPressed: _location,
+                        icon: const Icon(Icons.location_on_outlined, size: 16),
+                        label: Text([project.building, project.floor, project.unit]
+                            .where((v) => v.isNotEmpty).join(' · ').isEmpty
+                            ? 'Set building / floor / unit'
+                            : [project.building, project.floor, project.unit]
+                                .where((v) => v.isNotEmpty).join(' · '))),
                     const SizedBox(height: 20),
-                    const Text('Your findings · select a cell to edit',
-                        style: TextStyle(color: C.muted, fontSize: 12)),
-                    SizedBox(
-                        height: 280,
-                        child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: SizedBox(
-                                width: (project.columns * 60.0)
-                                    .clamp(280.0, 6000.0),
-                                child: GridView.builder(
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: project.columns,
-                                            mainAxisSpacing: 6,
-                                            crossAxisSpacing: 6,
-                                            childAspectRatio: 1),
-                                    itemCount: project.rows * project.columns,
-                                    itemBuilder: (context, cell) {
-                                      final cellMarks = marks
-                                          .where((a) => a.cell == cell)
-                                          .toList();
-                                      final cellRecords = records
-                                          .where((m) => m.cell == cell)
-                                          .toList();
-                                      final invalid = cellRecords
-                                          .any((m) => m.flags.isNotEmpty);
-                                      final synthetic = cellRecords.any((m) => m
-                                              .source
-                                              .toLowerCase()
-                                              .contains('synthetic')) ||
-                                          cellMarks.any((a) =>
-                                              a.measurementSource
-                                                  ?.toLowerCase()
-                                                  .contains('synthetic') ??
-                                              false);
-                                      final selected = cell == _cell;
-                                      return Semantics(
-                                          button: true,
-                                          selected: selected,
-                                          label:
-                                              '${_cellName(cell)}, ${cellMarks.length} findings${invalid ? ", flagged recording" : ""}${synthetic ? ", Demo" : ""}',
-                                          child: InkWell(
-                                            onTap: () => _selectCell(cell),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            child: AnimatedContainer(
-                                                duration: Duration(
-                                                    milliseconds: MediaQuery
-                                                            .disableAnimationsOf(
-                                                                context)
-                                                        ? 0
-                                                        : 180),
-                                                decoration:
-                                                    BoxDecoration(
-                                                        color: selected
-                                                            ? C.blue
-                                                            : Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        border: Border.all(
-                                                            color: selected
-                                                                ? C.blue
-                                                                : C.line,
-                                                            width: selected
-                                                                ? 2
-                                                                : 1)),
-                                                child: Stack(children: [
-                                                  Center(
-                                                      child: Text('${cell + 1}',
-                                                          style: TextStyle(
-                                                              color: selected
-                                                                  ? Colors.white
-                                                                  : C.ink,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600))),
-                                                  if (cellMarks.isNotEmpty)
-                                                    Positioned(
-                                                        top: 5,
-                                                        right: 5,
-                                                        child: Container(
-                                                            width: 9,
-                                                            height: 9,
-                                                            decoration: BoxDecoration(
-                                                                color: _statusColor(
-                                                                    cellMarks
-                                                                        .first
-                                                                        .status),
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                border: Border.all(
-                                                                    color: Colors
-                                                                        .white)))),
-                                                  if (invalid)
-                                                    Positioned(
-                                                        bottom: 3,
-                                                        left: 3,
-                                                        child: Icon(
-                                                            Icons
-                                                                .warning_amber_rounded,
-                                                            size: 14,
-                                                            color: selected
-                                                                ? Colors.white
-                                                                : C.amber)),
-                                                  if (synthetic)
-                                                    Positioned(
-                                                        bottom: 3,
-                                                        right: 5,
-                                                        child: Text('D',
+                    Row(children: [
+                      ChoiceChip(
+                          label: const Text('Plan'),
+                          selected: _showPlan,
+                          onSelected: (_) => setState(() => _showPlan = true)),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                          label: const Text('Grid'),
+                          selected: !_showPlan,
+                          onSelected: (_) => setState(() => _showPlan = false)),
+                      const Spacer(),
+                      TextButton.icon(
+                          onPressed: _importPlan,
+                          icon: const Icon(Icons.upload_outlined, size: 18),
+                          label: Text(project.floorPlan == null
+                              ? 'Import plan'
+                              : 'Replace')),
+                    ]),
+                    const SizedBox(height: 12),
+                    Wrap(spacing: 8, runSpacing: 8, children: [
+                      OutlinedButton.icon(onPressed: () => _importPlan(ImageSource.camera),
+                          icon: const Icon(Icons.camera_alt_outlined), label: const Text('Scan tiled floor')),
+                      if (project.floorPlan != null)
+                        OutlinedButton.icon(onPressed: _editTiles,
+                            icon: const Icon(Icons.grid_on),
+                            label: Text('Tile map · ${project.floorPlan!.tileLayout?.tiles.length ?? 0} visible')),
+                    ]),
+                    const SizedBox(height: 12),
+                    if (_showPlan && project.floorPlan == null)
+                      Panel(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                            const Text('Use your architectural floor plan',
+                                style: TextStyle(fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 8),
+                            const Text(
+                                'Import a JPEG, PNG or WebP image up to 2 MB. '
+                                'Place findings on the actual plan; grid cells remain available.',
+                                style: TextStyle(color: C.muted, height: 1.5)),
+                            const SizedBox(height: 12),
+                            OutlinedButton.icon(
+                                onPressed: _importPlan,
+                                icon: const Icon(
+                                    Icons.add_photo_alternate_outlined),
+                                label: const Text('Import architectural plan')),
+                          ])),
+                    if (_showPlan && project.floorPlan != null) ...[
+                      FloorPlanCanvas(
+                          plan: project.floorPlan!,
+                          marks: marks,
+                          selectedId: _id,
+                          draftX: _planX,
+                          draftY: _planY,
+                          selectedTileId: _tileId,
+                          onTileSelect: (tile) => setState(() {
+                                _tileId = tile.id;
+                                _planX = tile.center.x;
+                                _planY = tile.center.y;
+                              }),
+                          onSelect: _open,
+                          onPoint: (x, y) => setState(() {
+                                _planX = x;
+                                _planY = y;
+                                _tileId = null;
+                              })),
+                      const SizedBox(height: 8),
+                      Text(
+                          '${project.floorPlan!.name} · Tap a tile or pin a finding · Pinch to zoom',
+                          style: const TextStyle(color: C.muted, fontSize: 12)),
+                      const SizedBox(height: 8),
+                      const Text(
+                          'Review · amber   Defect · red   Accepted · green',
+                          style: TextStyle(color: C.muted, fontSize: 12)),
+                      if (_tileId != null)
+                        Text('Selected tile $_tileId · row ${(selectedTile?.row ?? 0) + 1}, column ${(selectedTile?.column ?? 0) + 1} · saved with this finding',
+                            style: const TextStyle(color: C.blue, fontSize: 12)),
+                      if (_planX != null)
+                        TextButton(
+                            onPressed: () =>
+                                setState(() { _planX = _planY = null; _tileId = null; }),
+                            child: const Text('Clear this finding’s plan pin')),
+                    ],
+                    if (!_showPlan)
+                      const Text('Your findings · select a cell to edit',
+                          style: TextStyle(color: C.muted, fontSize: 12)),
+                    if (!_showPlan)
+                      SizedBox(
+                          height: 280,
+                          child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: SizedBox(
+                                  width: (project.columns * 60.0)
+                                      .clamp(280.0, 6000.0),
+                                  child: GridView.builder(
+                                      gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: project.columns,
+                                              mainAxisSpacing: 6,
+                                              crossAxisSpacing: 6,
+                                              childAspectRatio: 1),
+                                      itemCount: project.rows * project.columns,
+                                      itemBuilder: (context, cell) {
+                                        final cellMarks = marks
+                                            .where((a) => a.cell == cell)
+                                            .toList();
+                                        final cellRecords = records
+                                            .where((m) => m.cell == cell)
+                                            .toList();
+                                        final invalid = cellRecords
+                                            .any((m) => m.flags.isNotEmpty);
+                                        final synthetic = cellRecords.any((m) =>
+                                                m.source
+                                                    .toLowerCase()
+                                                    .contains('synthetic')) ||
+                                            cellMarks.any((a) =>
+                                                a.measurementSource
+                                                    ?.toLowerCase()
+                                                    .contains('synthetic') ??
+                                                false);
+                                        final selected = cell == _cell;
+                                        return Semantics(
+                                            button: true,
+                                            selected: selected,
+                                            label:
+                                                '${_cellName(cell)}, ${cellMarks.length} findings${invalid ? ", flagged recording" : ""}${synthetic ? ", Demo" : ""}',
+                                            child: InkWell(
+                                              onTap: () => _selectCell(cell),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              child: AnimatedContainer(
+                                                  duration: Duration(
+                                                      milliseconds: MediaQuery
+                                                              .disableAnimationsOf(
+                                                                  context)
+                                                          ? 0
+                                                          : 180),
+                                                  decoration: BoxDecoration(
+                                                      color: selected
+                                                          ? C.blue
+                                                          : Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      border: Border.all(
+                                                          color: selected
+                                                              ? C.blue
+                                                              : C.line,
+                                                          width: selected
+                                                              ? 2
+                                                              : 1)),
+                                                  child: Stack(children: [
+                                                    Center(
+                                                        child: Text(
+                                                            '${cell + 1}',
                                                             style: TextStyle(
-                                                                fontSize: 10,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
                                                                 color: selected
                                                                     ? Colors
                                                                         .white
-                                                                    : C.muted))),
-                                                ])),
-                                          ));
-                                    })))),
+                                                                    : C.ink,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600))),
+                                                    if (cellMarks.isNotEmpty)
+                                                      Positioned(
+                                                          top: 5,
+                                                          right: 5,
+                                                          child: Container(
+                                                              width: 9,
+                                                              height: 9,
+                                                              decoration: BoxDecoration(
+                                                                  color: _statusColor(
+                                                                      cellMarks
+                                                                          .first
+                                                                          .status),
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  border: Border.all(
+                                                                      color: Colors
+                                                                          .white)))),
+                                                    if (invalid)
+                                                      Positioned(
+                                                          bottom: 3,
+                                                          left: 3,
+                                                          child: Icon(
+                                                              Icons
+                                                                  .warning_amber_rounded,
+                                                              size: 14,
+                                                              color: selected
+                                                                  ? Colors.white
+                                                                  : C.amber)),
+                                                    if (synthetic)
+                                                      Positioned(
+                                                          bottom: 3,
+                                                          right: 5,
+                                                          child: Text('D',
+                                                              style: TextStyle(
+                                                                  fontSize: 10,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: selected
+                                                                      ? Colors
+                                                                          .white
+                                                                      : C.muted))),
+                                                  ])),
+                                            ));
+                                      })))),
                     const SizedBox(height: 24),
                     SectionTitle(_cellName(_cell),
                         trailing: TextButton.icon(
@@ -422,6 +647,60 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                           Text(_id.isEmpty ? 'Add finding' : 'Edit finding',
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 16),
+                          const Text(
+                              'Grid location · retained for recording compatibility',
+                              style: TextStyle(color: C.muted, fontSize: 12)),
+                          const SizedBox(height: 8),
+                          Row(children: [
+                            Expanded(
+                                child: DropdownButtonFormField<int>(
+                                    key: ValueKey('row:$_cell'),
+                                    initialValue: _cell ~/ project.columns,
+                                    decoration:
+                                        const InputDecoration(labelText: 'Row'),
+                                    items: [
+                                      for (var row = 0;
+                                          row < project.rows;
+                                          row++)
+                                        DropdownMenuItem(
+                                            value: row,
+                                            child: Text('${row + 1}'))
+                                    ],
+                                    onChanged: (row) {
+                                      if (row != null)
+                                        _assignCell(row * project.columns +
+                                            _cell % project.columns);
+                                    })),
+                            const SizedBox(width: 12),
+                            Expanded(
+                                child: DropdownButtonFormField<int>(
+                                    key: ValueKey('col:$_cell'),
+                                    initialValue: _cell % project.columns,
+                                    decoration: const InputDecoration(
+                                        labelText: 'Column'),
+                                    items: [
+                                      for (var col = 0;
+                                          col < project.columns;
+                                          col++)
+                                        DropdownMenuItem(
+                                            value: col,
+                                            child: Text('${col + 1}'))
+                                    ],
+                                    onChanged: (col) {
+                                      if (col != null)
+                                        _assignCell((_cell ~/ project.columns) *
+                                                project.columns +
+                                            col);
+                                    })),
+                          ]),
+                          const SizedBox(height: 16),
+                          Text(
+                              _planX == null
+                                  ? 'No plan location assigned.'
+                                  : 'Plan location: ${(_planX! * 100).toStringAsFixed(1)}%, ${(_planY! * 100).toStringAsFixed(1)}%',
+                              style: const TextStyle(
+                                  color: C.muted, fontSize: 12)),
                           const SizedBox(height: 16),
                           Wrap(spacing: 8, runSpacing: 8, children: [
                             for (final status in AnnotationStatus.values)

@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'design.dart';
 import 'store.dart';
-import 'learned_calibration.dart';
 
 enum SensingIntent {
   slab('Slab', 'Apartment handover', 'Listen beneath\nthe surface.',
@@ -14,7 +13,7 @@ enum SensingIntent {
   vessel(
       'Vessel', 'Liquid inventory', 'Hear how much\nremains.', Module.vessel),
   fruit(
-      'Fruit', 'Learned fruit maturity', 'Find the\nfruit’s signature.', Module.scope),
+      'Fruit', 'Relative fruit firmness', 'Find the\nfruit’s signature.', Module.scope),
   devices(
       'Devices', 'Electronics inspection', 'Hear the\nhardware.', Module.scope),
   materials('Material', 'Material comparison', 'Meet your\nmaterial match.',
@@ -138,9 +137,9 @@ class _ChooseObjectScreenState extends State<ChooseObjectScreen> {
                                         SensingIntent.vessel =>
                                           'Estimate fill with local references.',
                                         SensingIntent.fruit =>
-                                          'Teach known maturity. Compare neural signatures.',
+                                          'Compare labelled firmness references of one fruit type.',
                                         SensingIntent.devices =>
-                                          'Compare the casing. Power off first.',
+                                          'Compare normal operating sound or powered-off casing taps.',
                                         SensingIntent.materials =>
                                           'Compare a sample with your original.',
                                         SensingIntent.scope =>
@@ -335,21 +334,47 @@ class MaterialStudy extends CustomPainter {
   bool shouldRepaint(covariant MaterialStudy old) => old.intent != intent;
 }
 
+/// A user-recorded profile; absent labels preserve legacy reference matching.
 class ReferenceAnchor {
-  const ReferenceAnchor(this.intent, this.object, this.level, this.taps, {this.classLabel});
+  const ReferenceAnchor(this.intent, this.object, this.level, this.taps,
+      {this.label, this.metadata = const {}});
   final SensingIntent intent;
   final String object;
   final double? level;
-  final String? classLabel;
   final List<Measurement> taps;
+  final String? label;
+  final Map<String, String> metadata;
+  String get displayLabel => label ?? 'Reference';
+  double get peak =>
+      taps.map((m) => m.peakHz).reduce((a, b) => a + b) / taps.length;
   bool get synthetic =>
       taps.any((m) => m.source.toLowerCase().contains('synthetic'));
+  static List<String> labelsFor(SensingIntent intent) => switch (intent) {
+        SensingIntent.slab => const ['Supported', 'Suspected Unsupported'],
+        SensingIntent.materials => const ['Original', 'Suspect'],
+        SensingIntent.devices => const ['Normal'],
+        SensingIntent.fruit => const ['Firmer', 'Softer'],
+        _ => const ['Reference'],
+      };
+  static String? normalizedLabel(String? value) => switch (value) {
+        'Solid' => 'Supported', 'Hollow' => 'Suspected Unsupported',
+        _ => value,
+      };
+  static bool clean(Measurement m) =>
+      (m.context.containsKey('captureUsable')
+          ? m.context['captureUsable'] == 'true' && !m.flags.any((f) => f.startsWith('Reject:'))
+          : m.flags.isEmpty) &&
+      m.peakHz.isFinite && m.peakHz > 0 && m.hiiDb.isFinite &&
+      m.decayMs.isFinite && (m.context['captureUsable'] == 'true' ||
+          m.context['captureMode'] == 'operating' || m.decayMs > 0);
+  bool get usable => taps.length >= 3 && taps.every((m) => clean(m) && m.hasEmbedding);
   Map<String, dynamic> toJson() => {
         'intent': intent.name,
         'object': object,
         'level': level,
-        'classLabel': classLabel,
-        'taps': taps.map((m) => m.toJson()).toList()
+        'taps': taps.map((m) => m.toJson()).toList(),
+        if (label != null) 'label': label,
+        if (metadata.isNotEmpty) 'metadata': metadata,
       };
   factory ReferenceAnchor.fromJson(Map<String, dynamic> j) => ReferenceAnchor(
       SensingIntent.values.byName(j['intent'] as String),
@@ -357,90 +382,423 @@ class ReferenceAnchor {
       (j['level'] as num?)?.toDouble(),
       (j['taps'] as List)
           .map((m) => Measurement.fromJson(Map<String, dynamic>.from(m as Map)))
-          .toList(), classLabel: j['classLabel'] as String?);
+          .toList(),
+      label: normalizedLabel((j['label'] ?? j['classLabel']) as String?),
+      metadata: j['metadata'] == null
+          ? const {}
+          : Map<String, String>.from(j['metadata'] as Map));
 }
 
 class AnchorRepository {
-  static const _key = 'thud.calibration.v2';
-  static String modelKey(SensingIntent intent, String object, bool demo) =>
-      jsonEncode([intent.name, object, demo]);
-
-  static Future<Map<String, dynamic>> _read() async {
+  static const key = 'thud.anchors.v1';
+  static Future<void> _pending = Future<void>.value();
+  static Future<List<ReferenceAnchor>> load() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_key);
-    if (raw != null) return Map<String, dynamic>.from(jsonDecode(raw) as Map);
-    // Old traces have no PCM to re-encode; retain them but require new teaching.
-    final legacy = prefs.getString('thud.anchors.v1');
-    return {'anchors': legacy == null ? [] : jsonDecode(legacy), 'models': {}};
+    final raw = prefs.getString(key);
+    final learned = prefs.getString('thud.calibration.v2');
+    final merged = <String, ReferenceAnchor>{};
+    for (final row in [
+      if (learned != null) ...((jsonDecode(learned) as Map)['anchors'] as List),
+      if (raw != null) ...(jsonDecode(raw) as List),
+    ]) {
+      final anchor = ReferenceAnchor.fromJson(Map<String, dynamic>.from(row as Map));
+      merged[_identity(anchor)] = anchor;
+    }
+    return merged.values.toList();
   }
 
-  static Future<List<ReferenceAnchor>> load() async =>
-      ((await _read())['anchors'] as List)
-          .map((j) => ReferenceAnchor.fromJson(Map<String, dynamic>.from(j as Map)))
-          .toList();
-
-  static Future<Map<String, dynamic>> models() async =>
-      Map<String, dynamic>.from((await _read())['models'] as Map);
-
-  static Future<Map<String, dynamic>?> model(
-      SensingIntent intent, String object, bool demo) async {
-    final models = (await _read())['models'] as Map;
-    final value = models[modelKey(intent, object, demo)];
-    return value == null ? null : Map<String, dynamic>.from(value as Map);
-  }
-
-  static Future<void> save(ReferenceAnchor anchor) async {
-    if (anchor.object.trim().isEmpty || anchor.taps.length != 3 ||
-        anchor.taps.any((m) => m.flags.isNotEmpty || !m.hasEmbedding)) {
-      throw Exception('A calibration needs three clean neural-encoded taps.');
+  static void validate(ReferenceAnchor anchor) {
+    if (anchor.object.trim().isEmpty || !anchor.usable) {
+      throw const FormatException('Each profile needs a name and at least three clean neural-encoded recordings. Signal-only or incompatible references must be recorded again.');
+    }
+    if (anchor.label != null && anchor.label!.trim().isEmpty) {
+      throw const FormatException('Reference labels must not be empty.');
     }
     if (anchor.taps.any((m) =>
         m.source.toLowerCase().contains('synthetic') != anchor.synthetic)) {
-      throw Exception('Do not mix demo and microphone calibration.');
+      throw const FormatException('Do not mix demo and microphone taps.');
     }
     if (anchor.intent == SensingIntent.vessel &&
-        (anchor.level == null || !anchor.level!.isFinite ||
-            anchor.level! < 0 || anchor.level! > 100)) {
-      throw Exception('Known fill must be between 0 and 100%.');
+        (anchor.level == null ||
+            !anchor.level!.isFinite ||
+            anchor.level! < 0 ||
+            anchor.level! > 100)) {
+      throw const FormatException('Known fill must be between 0 and 100%.');
     }
-    if (anchor.intent == SensingIntent.fruit &&
-        !const ['Unripe', 'Ripe', 'Overripe'].contains(anchor.classLabel)) {
-      throw Exception('Choose the independently known fruit maturity label.');
+    if (anchor.level != null && !anchor.level!.isFinite) {
+      throw const FormatException('Reference level must be finite.');
     }
-    final state = await _read();
-    final all = (state['anchors'] as List)
-        .map((j) => ReferenceAnchor.fromJson(Map<String, dynamic>.from(j as Map)))
+    if (anchor.intent != SensingIntent.vessel && anchor.level != null) {
+      throw const FormatException('Only vessel references have a fill level.');
+    }
+    final capacity = anchor.metadata['capacityMl'];
+    if (capacity != null && (double.tryParse(capacity) == null ||
+        !double.parse(capacity).isFinite || double.parse(capacity) <= 0)) {
+      throw const FormatException('Container capacity must be positive ml.');
+    }
+  }
+
+  static List<ReferenceAnchor> decodeImport(String raw) {
+    final decoded = jsonDecode(raw);
+    final dynamic rows = decoded is Map && decoded.containsKey('anchors')
+        ? decoded['anchors']
+        : decoded is Map
+            ? [decoded]
+            : decoded;
+    if (rows is! List || rows.isEmpty) {
+      throw const FormatException(
+          'Paste an anchor, an anchor list, or a database with anchors.');
+    }
+    final batch = rows
+        .map((j) =>
+            ReferenceAnchor.fromJson(Map<String, dynamic>.from(j as Map)))
         .toList();
-    all.removeWhere((a) => anchor.intent != SensingIntent.fruit &&
-        a.intent == anchor.intent && a.object == anchor.object &&
-        a.level == anchor.level && a.synthetic == anchor.synthetic);
-    all.add(anchor);
-    final group = all.where((a) => a.intent == anchor.intent &&
-        a.object == anchor.object && a.synthetic == anchor.synthetic &&
-        a.taps.every((m) => m.hasEmbedding)).toList();
-    final x = group.expand((a) => a.taps.map((t) => t.embedding)).toList();
-    final models = Map<String, dynamic>.from(state['models'] as Map);
-    final key = modelKey(anchor.intent, anchor.object, anchor.synthetic);
-    models.remove(key);
-    if (anchor.intent == SensingIntent.vessel) {
-      if (group.map((a) => a.level).toSet().length >= 3) {
-        models[key] = LearnedCalibration.fitFill(x,
-            group.expand((a) => a.taps.map((_) => a.level!)).toList()).toJson();
+    final identities = <String>{};
+    for (final anchor in batch) {
+      validate(anchor);
+      if (!identities.add(_identity(anchor))) {
+        throw const FormatException(
+            'Duplicate profile and label in this import.');
       }
-    } else if (anchor.intent == SensingIntent.fruit) {
-      if (group.map((a) => a.classLabel).toSet().length >= 2) {
-        models[key] = LearnedCalibration.fitClasses(x,
-            group.expand((a) => a.taps.map((_) => a.classLabel!)).toList()).toJson();
+    }
+    return batch;
+  }
+
+  static String _identity(ReferenceAnchor a) => jsonEncode([
+        a.intent.name,
+        a.object.trim().toLowerCase(),
+        a.level,
+        a.synthetic,
+        a.label,
+        a.metadata['specimenId'],
+        a.metadata['captureMode'] ?? 'impact',
+      ]);
+
+  static Future<void> save(ReferenceAnchor anchor) => saveBatch([anchor]);
+
+  static Future<void> saveBatch(List<ReferenceAnchor> batch) {
+    // Serialize read/merge/write so simultaneous screens cannot lose profiles.
+    final operation = _pending.then((_) async {
+      if (batch.isEmpty)
+        throw const FormatException('No references to import.');
+      final identities = <String>{};
+      for (final a in batch) {
+        validate(a);
+        if (!identities.add(_identity(a))) {
+          throw const FormatException(
+              'Duplicate profile and label in this import.');
+        }
       }
-    } else {
-      models[key] = LearnedCalibration.fitReference(x).toJson();
+      final all = await load();
+      for (final anchor in batch) {
+        final named = all.where((a) =>
+            a.intent == anchor.intent &&
+            a.object.trim().toLowerCase() ==
+                anchor.object.trim().toLowerCase());
+        final name =
+            named.isEmpty ? anchor.object.trim() : named.first.object.trim();
+        final normalized = ReferenceAnchor(
+            anchor.intent, name, anchor.level, anchor.taps,
+            label: anchor.label, metadata: anchor.metadata);
+        all.removeWhere((a) => _identity(a) == _identity(normalized));
+        all.add(normalized);
+      }
+      final prefs = await SharedPreferences.getInstance();
+      final previous = prefs.getString(key);
+      try {
+        if (!await prefs.setString(
+            key, jsonEncode(all.map((a) => a.toJson()).toList()))) {
+          throw Exception('Could not save reference database.');
+        }
+        await prefs.remove('thud.calibration.v2');
+      } catch (_) {
+        if (previous == null) {
+          await prefs.remove(key);
+        } else {
+          await prefs.setString(key, previous);
+        }
+        rethrow;
+      }
+    });
+    _pending =
+        operation.then<void>((_) {}, onError: (Object _, StackTrace __) {});
+    return operation;
+  }
+
+  static Future<void> delete(ReferenceAnchor anchor) {
+    final operation = _pending.then((_) async {
+      final all = await load();
+      all.removeWhere((a) => _identity(a) == _identity(anchor));
+      final prefs = await SharedPreferences.getInstance();
+      if (!await prefs.setString(key, jsonEncode(all.map((a) => a.toJson()).toList()))) {
+        throw Exception('Could not delete reference.');
+      }
+      await prefs.remove('thud.calibration.v2');
+    });
+    _pending = operation.then<void>((_) {}, onError: (Object _, StackTrace __) {});
+    return operation;
+  }
+}
+
+/// Local user recordings and imported references; selection returns the profile name.
+class ReferenceLibraryScreen extends StatefulWidget {
+  const ReferenceLibraryScreen(
+      {required this.intent, required this.store, super.key});
+  final SensingIntent intent;
+  final ThudStore store;
+  @override
+  State<ReferenceLibraryScreen> createState() => _ReferenceLibraryScreenState();
+}
+
+class _ReferenceLibraryScreenState extends State<ReferenceLibraryScreen> {
+  List<ReferenceAnchor> anchors = [];
+  String query = '';
+  String? error;
+  bool loading = true, demo = false, writing = false;
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final loaded = await AnchorRepository.load();
+      if (mounted)
+        setState(() {
+          anchors = loaded;
+          loading = false;
+          error = null;
+        });
+    } catch (e) {
+      if (mounted)
+        setState(() {
+          loading = false;
+          error = e.toString();
+        });
     }
-    final prefs = await SharedPreferences.getInstance();
-    if (!await prefs.setString(_key, jsonEncode({
-      'anchors': all.map((a) => a.toJson()).toList(), 'models': models,
-    }))) {
-      throw Exception('Could not save learned calibration.');
+  }
+
+  Future<void> _teach() async {
+    final selected = await Navigator.of(context).push(sensingRoute<String>(
+        context,
+        GuidedReferenceScreen(intent: widget.intent, store: widget.store)));
+    if (!mounted) return;
+    await _load();
+    if (selected != null && mounted) {
+      final saved = anchors
+          .where((a) =>
+              a.intent == widget.intent &&
+              a.object.trim().toLowerCase() == selected.trim().toLowerCase())
+          .toList();
+      if (saved.isNotEmpty) setState(() => demo = saved.last.synthetic);
     }
+  }
+
+  Future<void> _import() async {
+    final input = TextEditingController();
+    List<ReferenceAnchor>? batch;
+    try {
+      batch = await showDialog<List<ReferenceAnchor>>(
+          context: context,
+          builder: (dialog) {
+            String? issue;
+            return StatefulBuilder(
+                builder: (context, update) => AlertDialog(
+                        title: const Text('Import reference database'),
+                        content: SizedBox(
+                            width: 480,
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text(
+                                      'Paste exported JSON or an existing anchor list. All profiles are checked before saving.'),
+                                  const SizedBox(height: 12),
+                                  TextField(
+                                      controller: input,
+                                      minLines: 5,
+                                      maxLines: 10,
+                                      decoration: const InputDecoration(
+                                          labelText: 'Reference JSON')),
+                                  if (issue != null)
+                                    Padding(
+                                        padding: const EdgeInsets.only(top: 12),
+                                        child: Text(issue!,
+                                            style:
+                                                const TextStyle(color: C.red))),
+                                ])),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Navigator.pop(dialog),
+                              child: const Text('Cancel')),
+                          TextButton(
+                              onPressed: () {
+                                try {
+                                  final parsed =
+                                      AnchorRepository.decodeImport(input.text);
+                                  Navigator.pop(dialog, parsed);
+                                } catch (e) {
+                                  update(() => issue = e.toString());
+                                }
+                              },
+                              child: const Text('Import')),
+                        ]));
+          });
+    } finally {
+      input.dispose();
+    }
+    if (batch == null || !mounted) return;
+    setState(() => writing = true);
+    try {
+      await AnchorRepository.saveBatch(batch
+          .map((a) => ReferenceAnchor(a.intent, a.object, a.level, a.taps,
+                  label: a.label,
+                  metadata: {
+                    ...a.metadata,
+                    'importedAt': DateTime.now().toUtc().toIso8601String()
+                  }))
+          .toList());
+      await _load();
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${batch.length} references imported')));
+    } catch (e) {
+      if (mounted) setState(() => error = e.toString());
+    } finally {
+      if (mounted) setState(() => writing = false);
+    }
+  }
+
+  Future<void> _export() async {
+    try {
+      final all = await AnchorRepository.load();
+      final current = all.where((a) => a.intent == widget.intent).toList();
+      await Clipboard.setData(ClipboardData(
+          text: jsonEncode({
+        'schema': 'thud.reference-library',
+        'version': 1,
+        'anchors': current.map((a) => a.toJson()).toList(),
+      })));
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Reference JSON copied')));
+    } catch (e) {
+      if (mounted) setState(() => error = e.toString());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final current = anchors
+        .where((a) => a.intent == widget.intent && a.synthetic == demo)
+        .toList();
+    final groups = <String, List<ReferenceAnchor>>{};
+    for (final a in current) {
+      groups.putIfAbsent(a.object, () => []).add(a);
+    }
+    final names = groups.keys.where((name) {
+      final text = [
+        name,
+        ...groups[name]!
+            .map((a) => '${a.displayLabel} ${a.metadata.values.join(' ')}')
+      ].join(' ').toLowerCase();
+      return text.contains(query.trim().toLowerCase());
+    }).toList()
+      ..sort();
+    return Scaffold(
+        appBar: AppBar(title: Text('${widget.intent.title} library'), actions: [
+          IconButton(
+              tooltip: 'Export JSON',
+              onPressed: loading ||
+                      writing ||
+                      anchors.every((a) => a.intent != widget.intent)
+                  ? null
+                  : _export,
+              icon: const Icon(Icons.ios_share_rounded)),
+        ]),
+        body: AppPage(children: [
+          PageHeading('Choose a reference.',
+              subtitle:
+                  '${groups.length} profiles · ${current.length} labeled references'),
+          const SizedBox(height: 20),
+          TextField(
+              onChanged: (value) => setState(() => query = value),
+              decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.search_rounded),
+                  hintText: 'Search name, material or label')),
+          SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Demo references'),
+              subtitle: Text(demo
+                  ? 'Synthetic taps · separate from recordings'
+                  : 'Recorded and imported microphone taps'),
+              value: demo,
+              onChanged: (value) => setState(() => demo = value)),
+          if (error != null) ...[
+            Text(error!, style: const TextStyle(color: C.red)),
+            TextButton(onPressed: _load, child: const Text('Reload')),
+          ],
+          if (loading)
+            const Center(child: CircularProgressIndicator())
+          else if (names.isEmpty)
+            Padding(
+                padding: const EdgeInsets.symmetric(vertical: 28),
+                child: Text(
+                    current.isEmpty
+                        ? 'No references yet. Teach an object or import your database.'
+                        : 'No matching profiles.',
+                    style: const TextStyle(color: C.muted)))
+          else
+            ...names.map((name) {
+              final refs = groups[name]!;
+              final usable = refs.any((a) => a.usable);
+              final labels =
+                  refs.map((a) => a.displayLabel).toSet().join(' / ');
+              final details = refs
+                  .expand((a) => a.metadata.entries
+                      .where((e) => e.key == 'material' || e.key == 'geometry')
+                      .map((e) => e.value))
+                  .toSet()
+                  .join(' · ');
+              final sources = refs
+                  .map((a) => a.synthetic
+                      ? 'Demo'
+                      : a.metadata.containsKey('importedAt')
+                          ? 'Imported'
+                          : 'Recorded')
+                  .toSet()
+                  .join(' / ');
+              return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(name),
+                  subtitle: Text(
+                      '$labels · ${refs.fold<int>(0, (n, a) => n + a.taps.length)} taps\n$sources${details.isEmpty ? '' : ' · $details'}${usable ? '' : ' · Refresh reference'}'),
+                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                    IconButton(tooltip: 'Delete profile', icon: const Icon(Icons.delete_outline_rounded),
+                      onPressed: writing ? null : () async {
+                        final remove = await showDialog<bool>(context: context, builder: (dialog) => AlertDialog(
+                          title: Text('Delete $name?'),
+                          content: Text('Remove all ${refs.length} references in this profile? Saved measurements remain unchanged.'),
+                          actions: [TextButton(onPressed: () => Navigator.pop(dialog, false), child: const Text('Cancel')),
+                            TextButton(onPressed: () => Navigator.pop(dialog, true), child: const Text('Delete'))]));
+                        if (remove != true || !mounted) return;
+                        setState(() => writing = true);
+                        try { for (final a in refs) { await AnchorRepository.delete(a); } await _load(); }
+                        catch (e) { if (mounted) setState(() => error = e.toString()); }
+                        finally { if (mounted) setState(() => writing = false); }
+                      }),
+                    const Icon(Icons.chevron_right_rounded),
+                  ]),
+                  onTap: usable ? () => Navigator.pop(context, name) : null);
+            }),
+          const SizedBox(height: 24),
+          ActionButton('Teach reference',
+              icon: Icons.mic_rounded, onPressed: writing ? null : _teach),
+          TextButton.icon(
+              onPressed: writing ? null : _import,
+              icon: const Icon(Icons.file_download_outlined),
+              label: const Text('Import database')),
+        ]));
   }
 }
 
@@ -458,14 +816,21 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
   final capture = CaptureService();
   final object = TextEditingController();
   final level = TextEditingController();
+  final material = TextEditingController();
+  final capacity = TextEditingController();
+  final specimen = TextEditingController();
+  final customLabel = TextEditingController();
+  bool operating = false;
+  final geometry = TextEditingController();
+  late String label;
   final taps = <Measurement>[];
   bool busy = false, recording = false, saved = false;
   bool? synthetic;
-  String classLabel = 'Ripe';
   String? error;
   @override
   void initState() {
     super.initState();
+    label = ReferenceAnchor.labelsFor(widget.intent).first;
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -523,18 +888,13 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
         return;
       }
       final m = demo
-          ? await capture.sample(widget.intent.module,
-              fillFraction: widget.intent == SensingIntent.vessel
-                  ? knownFill! / 100
-                  : null)
-          : await capture.stop(widget.intent.module);
+          ? await capture.sample(widget.intent.module, operating: operating,
+              fillFraction: widget.intent == SensingIntent.vessel ? knownFill! / 100 : null)
+          : await capture.stop(widget.intent.module, operating: operating);
       if (!mounted) return;
       setState(() => recording = false);
-      if (m.flags.isNotEmpty) {
-        throw Exception('Retry this tap: ${m.flags.join(', ')}');
-      }
-      if (!m.hasEmbedding) {
-        throw Exception('Neural audio encoding is missing. Record again.');
+      if (!m.hasEmbedding || !ReferenceAnchor.clean(m)) {
+        throw Exception('Clean neural audio encoding is required. Record again.');
       }
       setState(() {
         synthetic = demo;
@@ -569,7 +929,21 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
           object.text.trim(),
           widget.intent == SensingIntent.vessel ? fill : null,
           List.of(taps),
-          classLabel: widget.intent == SensingIntent.fruit ? classLabel : null));
+          label: widget.intent == SensingIntent.materials && customLabel.text.trim().isNotEmpty
+              ? customLabel.text.trim() : label,
+          metadata: {
+            'source': synthetic == true ? 'demo' : 'microphone',
+            'recordedAt': DateTime.now().toUtc().toIso8601String(),
+            'encoderVersion': taps.first.encoderVersion!,
+            'captureMode': operating ? 'operating' : 'impact',
+            if (capacity.text.trim().isNotEmpty) 'capacityMl': capacity.text.trim(),
+            if (specimen.text.trim().isNotEmpty) 'specimenId': specimen.text.trim(),
+            if (widget.intent == SensingIntent.fruit) 'fruitType': object.text.trim(),
+            if (material.text.trim().isNotEmpty)
+              'material': material.text.trim(),
+            if (geometry.text.trim().isNotEmpty)
+              'geometry': geometry.text.trim(),
+          }));
       if (mounted) setState(() => saved = true);
     } catch (e) {
       if (mounted) setState(() => error = e.toString());
@@ -584,6 +958,11 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
     capture.dispose();
     object.dispose();
     level.dispose();
+    material.dispose();
+    geometry.dispose();
+    capacity.dispose();
+    specimen.dispose();
+    customLabel.dispose();
     super.dispose();
   }
 
@@ -603,15 +982,46 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
                 subtitle: widget.intent == SensingIntent.vessel
                     ? 'Teach at least three known fill levels. Three taps per level train a local regressor.'
                     : widget.intent == SensingIntent.fruit
-                        ? 'Use the same fruit type/cultivar name. Teach at least two known maturity classes using separate labelled fruits; three taps per class.'
+                        ? 'Use one fruit type/cultivar per profile. Teach labelled firmer/softer examples; relative similarity only, never food safety or exact maturity.'
                         : widget.intent == SensingIntent.devices
-                            ? 'Power off. Unplug. Three casing taps train the neural reference model.'
+                            ? 'Record normal operation without touching moving/live parts, or power off and unplug before gentle casing taps. Keep device load and phone position fixed.'
                             : 'Three taps train your local neural reference. Keep spot, tool and distance consistent.'),
             const SizedBox(height: 24),
             TextField(
                 controller: object,
                 enabled: taps.isEmpty && !recording,
                 decoration: const InputDecoration(labelText: 'Reference name')),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+                initialValue: label,
+                decoration: const InputDecoration(labelText: 'Known label'),
+                items: ReferenceAnchor.labelsFor(widget.intent)
+                    .map((value) =>
+                        DropdownMenuItem(value: value, child: Text(value)))
+                    .toList(),
+                onChanged: taps.isEmpty && !recording && !saved
+                    ? (value) => setState(() => label = value!)
+                    : null),
+            if (widget.intent == SensingIntent.materials)
+              TextField(controller: customLabel, enabled: taps.isEmpty && !recording && !saved,
+                decoration: const InputDecoration(labelText: 'Object / material class label (optional)')),
+            if (widget.intent == SensingIntent.devices)
+              SwitchListTile(title: const Text('Operating sound'),
+                subtitle: const Text('Listen only; do not touch moving or live equipment.'), value: operating,
+                onChanged: taps.isEmpty && !recording && !saved ? (value) => setState(() => operating = value) : null),
+            if (widget.intent == SensingIntent.slab || widget.intent == SensingIntent.fruit)
+              TextField(controller: specimen, enabled: taps.isEmpty && !recording && !saved,
+                decoration: InputDecoration(labelText: widget.intent == SensingIntent.slab ? 'Physical tile ID (for whole-tile evaluation)' : 'Individual fruit ID (optional)')),
+            TextField(
+                controller: material,
+                enabled: taps.isEmpty && !recording && !saved,
+                decoration: const InputDecoration(
+                    labelText: 'Material / type (optional)')),
+            TextField(
+                controller: geometry,
+                enabled: taps.isEmpty && !recording && !saved,
+                decoration: const InputDecoration(
+                    labelText: 'Size / geometry (optional)')),
             if (widget.intent == SensingIntent.vessel)
               TextField(
                   controller: level,
@@ -619,17 +1029,10 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
                   keyboardType: TextInputType.number,
                   decoration:
                       const InputDecoration(labelText: 'Known fill (%)')),
-            if (widget.intent == SensingIntent.fruit)
-              DropdownButtonFormField<String>(
-                initialValue: classLabel,
-                decoration: const InputDecoration(labelText: 'Known maturity'),
-                items: const ['Unripe', 'Ripe', 'Overripe']
-                    .map((label) => DropdownMenuItem(value: label, child: Text(label)))
-                    .toList(),
-                onChanged: taps.isNotEmpty || recording ? null : (value) {
-                  if (value != null) setState(() => classLabel = value);
-                },
-              ),
+            if (widget.intent == SensingIntent.vessel)
+              TextField(controller: capacity, enabled: taps.isEmpty && !recording && !saved,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Container capacity (ml, optional)')),
             const SizedBox(height: 32),
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -670,7 +1073,7 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Text(error!, style: const TextStyle(color: C.red))),
             if (!saved && taps.length < 3) ...[
-              ActionButton(recording ? 'Stop & analyze tap' : 'Record next tap',
+              ActionButton(recording ? 'Stop & analyze recording' : 'Record next sample',
                   onPressed: busy ? null : () => _take(false),
                   icon: recording ? Icons.stop_rounded : Icons.mic_rounded),
               if (recording)
@@ -685,9 +1088,9 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
             if (taps.length == 3 && !saved)
               ActionButton('Train & save calibration', onPressed: busy ? null : _save),
             if (saved)
-              ActionButton('Back to measurement',
-                  onPressed: () => Navigator.pop(context)),
-            if (saved && (widget.intent == SensingIntent.vessel || widget.intent == SensingIntent.fruit))
+              ActionButton('Use this profile',
+                  onPressed: () => Navigator.pop(context, object.text.trim())),
+            if (saved)
               TextButton(
                   onPressed: () => setState(() {
                         saved = false;
@@ -696,8 +1099,7 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
                         level.clear();
                         error = null;
                       }),
-                  child: Text(widget.intent == SensingIntent.fruit
-                      ? 'Teach another maturity class' : 'Teach another fill level')),
+                  child: const Text('Teach another labelled example / fill level')),
             if (taps.isNotEmpty && !recording && !saved)
               TextButton(
                   onPressed: busy
@@ -709,44 +1111,4 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
                           }),
                   child: const Text('Reset taps')),
           ])));
-}
-
-class ReferenceLibraryScreen extends StatefulWidget {
-  const ReferenceLibraryScreen({required this.intent, required this.store, super.key});
-  final SensingIntent intent;
-  final ThudStore store;
-  @override
-  State<ReferenceLibraryScreen> createState() => _ReferenceLibraryScreenState();
-}
-
-class _ReferenceLibraryScreenState extends State<ReferenceLibraryScreen> {
-  late Future<List<ReferenceAnchor>> anchors = AnchorRepository.load();
-  Future<void> _teach() async {
-    await Navigator.of(context).push(sensingRoute<void>(context,
-        GuidedReferenceScreen(intent: widget.intent, store: widget.store)));
-    if (mounted) setState(() => anchors = AnchorRepository.load());
-  }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text('${widget.intent.title} learned references')),
-    body: AppPage(children: [
-      const Text('References train local models on YAMNet neural audio features. Signal-only references must be recorded again.'),
-      const SizedBox(height: 16),
-      ActionButton('Train with examples', onPressed: _teach),
-      FutureBuilder<List<ReferenceAnchor>>(future: anchors, builder: (context, state) {
-        if (state.hasError) return Text('Could not load calibration: ${state.error}');
-        if (!state.hasData) return const CircularProgressIndicator();
-        final groups = <String, List<ReferenceAnchor>>{};
-        for (final a in state.data!.where((a) => a.intent == widget.intent)) {
-          groups.putIfAbsent(a.object, () => []).add(a);
-        }
-        return Column(children: [for (final e in groups.entries)
-          ListTile(title: Text(e.key), subtitle: Text(e.value.every((a) => a.taps.every((t) => t.hasEmbedding))
-              ? '${e.value.length} learned example sets' : 'Older reference · re-record to train'),
-            onTap: () => Navigator.pop(context, e.key)),
-        ]);
-      }),
-    ]),
-  );
 }

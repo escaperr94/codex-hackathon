@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'dart:js_interop';
 import 'package:web/web.dart' as web;
 import 'audio_encoder_preprocessing.dart';
@@ -20,8 +21,8 @@ class AudioEncoder {
         completer.completeError(StateError('YAMNet: ${message[2]}'));
       } else {
         try {
-          final embedding = (message[1] as List).map((v) => (v as num).toDouble()).toList();
-          completer.complete(checkedAudioEmbedding(embedding));
+          final output = (message[1] as List).map((v) => (v as num).toDouble()).toList();
+          completer.complete(output);
         } catch (error, stack) {
           completer.completeError(error, stack);
         }
@@ -35,9 +36,15 @@ class AudioEncoder {
     }).toJS;
   }
 
-  Future<List<double>> encode(List<double> pcm, int sampleRate) {
+  Future<List<double>> encode(List<double> pcm, int sampleRate) async =>
+      (await encodeWithEvidence(pcm, sampleRate)).embedding;
+
+  Future<AudioEncoding> encodeWithEvidence(List<double> pcm, int sampleRate,
+      {List<int>? impactSamples}) => encodeAcousticRecording(
+        pcm, sampleRate, _infer, impactSamples: impactSamples);
+
+  Future<List<double>> _infer(Float32List window) {
     if (_disposed) throw StateError('AudioEncoder has been disposed');
-    final window = audioEncoderWindow(pcm, sampleRate);
     if (_worker == null) _start();
     final id = _nextId++;
     final completer = Completer<List<double>>();

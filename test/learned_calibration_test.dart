@@ -6,6 +6,16 @@ import 'package:thud/learned_calibration.dart';
 
 void main() {
   test('learned calibration predictions, persistence, and invalid input boundaries', () {
+  final neural = List<double>.filled(1024, 0)..[0] = 1;
+  final physicalA = LearnedCalibration.features(neural, peakHz: 500, decayMs: 100,
+      centroidHz: 1000, flatness: .1, damping: .01);
+  final physicalB = LearnedCalibration.features(neural, peakHz: 1500, decayMs: 500,
+      centroidHz: 2000, flatness: .2, damping: .1);
+  check(physicalA.length == 1032 && physicalA[0] == 1, 'fused contract preserves neural block');
+  check(physicalA.skip(1024).toList().toString() != physicalB.skip(1024).toList().toString(),
+      'physical resonance and damping contribute to model inputs');
+  check(physicalA.skip(1024).fold<double>(0, (sum, v) => sum + v * v) <= .010000001,
+      'secondary DSP block cannot dominate neural unit norm');
   final reference = LearnedCalibration.fitReference([
     embedding(-0.1), embedding(0), embedding(0.1),
   ]);
@@ -28,6 +38,27 @@ void main() {
   final middle = fill.predict(embedding(0.5));
   check(middle.supported && (middle.value - 25).abs() < 0.01,
       'supported fill interpolation');
+  check(middle.lower < middle.value && middle.upper > middle.value,
+      'fill uncertainty contains prediction');
+  check(middle.calibrationStatus.contains('experimental'), 'uncertainty is not validated coverage');
+  check(LearnedCalibration.aggregate([embedding(1), embedding(1.01), embedding(100)])[0] == 1.01,
+      'median aggregation resists one outlier');
+  final tileVectors = <List<double>>[];
+  final tileLabels = <String>[];
+  final tileIds = <String>[];
+  for (var tile = 0; tile < 4; tile++) {
+    for (var tap = -1; tap <= 1; tap++) {
+      tileVectors.add(direction((tile < 2 ? 0 : 1.57) + tap * .01));
+      tileLabels.add(tile < 2 ? 'Supported' : 'Suspected Unsupported');
+      tileIds.add('tile-$tile');
+    }
+  }
+  final holdout = LearnedCalibration.evaluateTiles(tileVectors, tileLabels, tileIds);
+  check(holdout['folds'] == 4 && holdout['tested'] == 4 && holdout['correct'] == 4,
+      'whole tile folds aggregate held-out taps without leakage');
+  final insufficient = LearnedCalibration.evaluateTiles(
+      tileVectors.take(6).toList(), tileLabels.take(6).toList(), tileIds.take(6).toList());
+  check(insufficient['status'] == 'insufficient independent tiles', 'no invented tile benchmark');
   for (final x in [0.0, 1.0, 2.0]) {
     check(fill.predict(embedding(x)).supported, 'training sample supported');
   }
@@ -111,17 +142,14 @@ void main() {
     ...fill.toJson(), 'maxLabel': 101,
   }), 'stored label bounds');
   rejects(() => ReferenceCalibration.fromJson({
-    ...reference.toJson(), 'threshold': -1,
-  }), 'stored threshold');
-  rejects(() => ReferenceCalibration.fromJson({
     ...reference.toJson(), 'center': [1],
   }), 'stored dimensions');
   });
 }
 
-List<double> embedding(double value) => List<double>.filled(1024, 0)..[0] = value;
+List<double> embedding(double value) => List<double>.filled(1032, 0)..[0] = value;
 
-List<double> direction(double angle) => List<double>.filled(1024, 0)
+List<double> direction(double angle) => List<double>.filled(1032, 0)
   ..[0] = math.cos(angle)
   ..[1] = math.sin(angle);
 

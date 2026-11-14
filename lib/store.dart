@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:record/record.dart' hide AudioEncoder;
 import 'package:record/record.dart' as record show AudioEncoder;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'audio_encoder.dart';
+import 'tile_geometry.dart';
+import 'acoustic_engine.dart';
+import 'audio_measurement_session.dart';
 
 enum Module { slab, vessel, scope }
 
@@ -143,14 +148,18 @@ class DefectAnnotation {
       this.measurementSource,
       this.photoBase64,
       this.x,
-      this.y});
+      this.y,
+      this.planX,
+      this.planY,
+      this.tileId});
 
   static const maxPhotoBytes = 2 * 1024 * 1024;
   final String id, projectId, note;
   final int cell;
   final AnnotationStatus status;
   final String? measurementId, measurementSource, photoBase64;
-  final double? x, y;
+  final String? tileId;
+  final double? x, y, planX, planY;
   String get provenance => 'Human annotation';
 
   DefectAnnotation _linked(
@@ -165,7 +174,10 @@ class DefectAnnotation {
           measurementSource: measurementSource,
           photoBase64: photoBase64,
           x: x,
-          y: y);
+          y: y,
+          planX: planX,
+          planY: planY,
+          tileId: tileId);
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -178,6 +190,9 @@ class DefectAnnotation {
         'photoBase64': photoBase64,
         'x': x,
         'y': y,
+        'planX': planX,
+        'planY': planY,
+        'tileId': tileId,
         'provenance': provenance,
       };
 
@@ -192,7 +207,41 @@ class DefectAnnotation {
           measurementSource: value['measurementSource'] as String?,
           photoBase64: value['photoBase64'] as String?,
           x: (value['x'] as num?)?.toDouble(),
-          y: (value['y'] as num?)?.toDouble());
+          y: (value['y'] as num?)?.toDouble(),
+          planX: (value['planX'] as num?)?.toDouble(),
+          planY: (value['planY'] as num?)?.toDouble(),
+          tileId: value['tileId'] as String?);
+}
+
+/// An imported architectural image. Coordinates refer to its decoded pixels.
+class FloorPlan {
+  FloorPlan(
+      {required this.imageBase64,
+      required this.name,
+      required this.width,
+      required this.height,
+      this.tileLayout});
+  static const maxBytes = 2 * 1024 * 1024;
+  final String imageBase64, name;
+  final int width, height;
+  final TileLayout? tileLayout;
+  late final Uint8List bytes = base64Decode(imageBase64);
+
+  Map<String, dynamic> toJson() => {
+        'imageBase64': imageBase64,
+        'name': name,
+        'width': width,
+        'height': height,
+        'tileLayout': tileLayout?.toJson(),
+      };
+  factory FloorPlan.fromJson(Map<String, dynamic> value) => FloorPlan(
+        imageBase64: value['imageBase64'] as String,
+        name: value['name'] as String,
+        width: value['width'] as int,
+        height: value['height'] as int,
+        tileLayout: value['tileLayout'] == null ? null :
+            TileLayout.fromJson(Map<String, dynamic>.from(value['tileLayout'] as Map)),
+      );
 }
 
 class Project {
@@ -202,10 +251,16 @@ class Project {
       required this.room,
       required this.rows,
       required this.columns,
-      this.notes = ''});
+      this.notes = '',
+      this.building = '',
+      this.floor = '',
+      this.unit = '',
+      this.floorPlan});
   final String id, name, room;
   final int rows, columns;
   String notes;
+  String building, floor, unit;
+  FloorPlan? floorPlan;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -213,7 +268,11 @@ class Project {
         'room': room,
         'rows': rows,
         'columns': columns,
-        'notes': notes
+        'notes': notes,
+        'building': building,
+        'floor': floor,
+        'unit': unit,
+        'floorPlan': floorPlan?.toJson(),
       };
   factory Project.fromJson(Map<String, dynamic> value) => Project(
         id: value['id'] as String,
@@ -222,6 +281,13 @@ class Project {
         rows: value['rows'] as int,
         columns: value['columns'] as int,
         notes: value['notes'] as String? ?? '',
+        building: value['building'] as String? ?? '',
+        floor: value['floor'] as String? ?? '',
+        unit: value['unit'] as String? ?? '',
+        floorPlan: value['floorPlan'] == null
+            ? null
+            : FloorPlan.fromJson(
+                Map<String, dynamic>.from(value['floorPlan'] as Map)),
       );
 }
 
@@ -285,6 +351,8 @@ class ThudStore extends ChangeNotifier {
       final oldMeasurements = List<Measurement>.of(measurements);
       final oldAnnotations = List<DefectAnnotation>.of(annotations);
       final oldNotes = {for (final p in projects) p.id: p.notes};
+      final oldPlans = {for (final p in projects) p.id: p.floorPlan};
+      final oldLocations = {for (final p in projects) p.id: (p.building, p.floor, p.unit)};
       final oldReference = reference;
       final oldHaptics = haptics, oldSounds = sounds;
       try {
@@ -308,6 +376,11 @@ class ThudStore extends ChangeNotifier {
         annotations = oldAnnotations;
         for (final p in projects) {
           p.notes = oldNotes[p.id]!;
+          p.floorPlan = oldPlans[p.id];
+          final location = oldLocations[p.id]!;
+          p.building = location.$1;
+          p.floor = location.$2;
+          p.unit = location.$3;
         }
         reference = oldReference;
         haptics = oldHaptics;
@@ -346,6 +419,118 @@ class ThudStore extends ChangeNotifier {
         if (index < 0) throw Exception('This project is no longer available.');
         projects[index].notes = notes;
       });
+
+  Future<void> updateProjectLocation(Project project, {
+    required String building, required String floor, required String unit,
+  }) => _change(() {
+    if ([building, floor, unit].any((v) => v.length > 200)) {
+      throw Exception('Keep location fields under 200 characters.');
+    }
+    final target = projects.where((p) => p.id == project.id).firstOrNull;
+    if (target == null) throw Exception('This project is no longer available.');
+    target.building = building.trim();
+    target.floor = floor.trim();
+    target.unit = unit.trim();
+  });
+
+  Future<void> updateTileLayout(Project project, TileLayout layout,
+      {bool resetTileLinks = false}) => _change(() {
+    layout.validate();
+    final target = projects.where((p) => p.id == project.id).firstOrNull;
+    final plan = target?.floorPlan;
+    if (target == null || plan == null) throw Exception('Import a floor image first.');
+    final ids = layout.tiles.map((t) => t.id).toSet();
+    final removed = annotations.where((a) => a.projectId == target.id &&
+        a.tileId != null && !ids.contains(a.tileId)).toList();
+    if (removed.isNotEmpty && !resetTileLinks) {
+      throw Exception('Confirm unlinking findings on removed tiles before changing the layout.');
+    }
+    if (removed.isNotEmpty) {
+      final removedIds = removed.map((a) => a.id).toSet();
+      annotations = annotations.map((a) => !removedIds.contains(a.id) ? a :
+          DefectAnnotation(id: a.id, projectId: a.projectId, cell: a.cell,
+            status: a.status, note: a.note, measurementId: a.measurementId,
+            measurementSource: a.measurementSource, photoBase64: a.photoBase64,
+            x: a.x, y: a.y, planX: a.planX, planY: a.planY)).toList();
+    }
+    target.floorPlan = FloorPlan(imageBase64: plan.imageBase64, name: plan.name,
+        width: plan.width, height: plan.height, tileLayout: layout);
+  });
+
+  /// Validates real image bytes before atomically replacing the plan and pins.
+  /// Existing pins must be explicitly reset: a new image has a new coordinate space.
+  Future<void> updateFloorPlan(Project project,
+      {required Uint8List bytes,
+      required String name,
+      bool resetPins = false}) async {
+    if (bytes.isEmpty || bytes.length > FloorPlan.maxBytes) {
+      throw Exception('Use a JPEG, PNG or WebP plan below 2 MB.');
+    }
+    final jpeg = bytes.length >= 3 &&
+        bytes[0] == 255 &&
+        bytes[1] == 216 &&
+        bytes[2] == 255;
+    final png = bytes.length >= 8 &&
+        bytes[0] == 137 &&
+        bytes[1] == 80 &&
+        bytes[2] == 78 &&
+        bytes[3] == 71 &&
+        bytes[4] == 13 &&
+        bytes[5] == 10 &&
+        bytes[6] == 26 &&
+        bytes[7] == 10;
+    final webp = bytes.length >= 12 &&
+        ascii.decode(bytes.sublist(0, 4), allowInvalid: true) == 'RIFF' &&
+        ascii.decode(bytes.sublist(8, 12), allowInvalid: true) == 'WEBP';
+    if (!(jpeg || png || webp)) {
+      throw Exception('Use a JPEG, PNG or WebP architectural plan.');
+    }
+    final codec = await ui.instantiateImageCodec(bytes);
+    late final int width, height;
+    try {
+      final frame = await codec.getNextFrame();
+      width = frame.image.width;
+      height = frame.image.height;
+      frame.image.dispose();
+    } finally {
+      codec.dispose();
+    }
+    final plan = FloorPlan(
+        imageBase64: base64Encode(bytes),
+        name: name.trim().isEmpty ? 'Imported plan' : name.trim(),
+        width: width,
+        height: height);
+    await _change(() {
+      final target = projects.where((p) => p.id == project.id).firstOrNull;
+      if (target == null) {
+        throw Exception('This project is no longer available.');
+      }
+      final hasPins = annotations.any((a) => a.projectId == project.id &&
+          (a.planX != null || a.tileId != null));
+      if (hasPins && !resetPins) {
+        throw Exception(
+            'Confirm resetting existing plan pins before replacing the plan.');
+      }
+      target.floorPlan = plan;
+      if (hasPins) {
+        annotations = annotations
+            .map((a) => a.projectId != project.id
+                ? a
+                : DefectAnnotation(
+                    id: a.id,
+                    projectId: a.projectId,
+                    cell: a.cell,
+                    status: a.status,
+                    note: a.note,
+                    measurementId: a.measurementId,
+                    measurementSource: a.measurementSource,
+                    photoBase64: a.photoBase64,
+                    x: a.x,
+                    y: a.y))
+            .toList();
+      }
+    });
+  }
 
   Future<void> saveMeasurement(Measurement value,
           {String? projectId, int? cell}) =>
@@ -440,6 +625,22 @@ class ThudStore extends ChangeNotifier {
           throw Exception(
               'A photo pin needs an image and coordinates from 0 to 1.');
         }
+        if ((value.planX == null) != (value.planY == null) ||
+            (value.planX != null &&
+                (project.floorPlan == null ||
+                    !value.planX!.isFinite ||
+                    !value.planY!.isFinite ||
+                    value.planX! < 0 ||
+                    value.planX! > 1 ||
+                    value.planY! < 0 ||
+                    value.planY! > 1))) {
+          throw Exception(
+              'A plan pin needs an imported plan and coordinates from 0 to 1.');
+        }
+        if (value.tileId != null && !(project.floorPlan?.tileLayout?.tiles
+            .any((t) => t.id == value.tileId) ?? false)) {
+          throw Exception('Choose a tile in the current floor image.');
+        }
         if (measurement != null &&
             value.measurementId != null &&
             value.measurementId != measurement.id) {
@@ -493,6 +694,18 @@ class ThudStore extends ChangeNotifier {
   String reportText(Project p) {
     final out = StringBuffer(
         'THUD / Handover inspection\n${p.name}\nRoom: ${p.room}\nGrid: ${p.rows} × ${p.columns}\n\n${p.notes.isEmpty ? "" : "Notes: ${p.notes}\n\n"}');
+    out.writeln('Building: ${p.building} · Floor: ${p.floor} · Unit: ${p.unit}');
+    if (p.floorPlan case final plan?) {
+      out.writeln(
+          'Architectural plan: ${plan.name} (${plan.width} × ${plan.height} pixels).');
+      if (plan.tileLayout case final layout?) {
+        out.writeln('Visible mapped tiles: ${layout.tiles.length}');
+        for (final tile in layout.tiles) {
+          out.writeln('${tile.id}: row ${tile.row + 1}, column ${tile.column + 1}; '
+              'corners ${tile.polygon.map((p) => "(${p.x.toStringAsFixed(4)},${p.y.toStringAsFixed(4)})").join(" ")}');
+        }
+      }
+    }
     final records = forProject(p.id);
     if (records.isEmpty) out.writeln('No saved measurements.');
     for (final m in records) {
@@ -504,10 +717,16 @@ class ThudStore extends ChangeNotifier {
         out.writeln('Comparison: ${m.context['suspicion']}');
       }
       const fields = {
+        'nextAction': 'Recommended action',
         'fruitType': 'Fruit',
         'massGrams': 'Mass (g)',
         'referenceObject': 'Reference object',
         'estimatedFillPercent': 'Estimated fill (%)',
+        'fillLowerPercent': 'Estimated fill interval lower (%)',
+        'fillUpperPercent': 'Estimated fill interval upper (%)',
+        'fillCalibrationStatus': 'Fill calibration status',
+        'estimatedVolumeMl': 'Estimated volume (ml)',
+        'supportVerdict': 'Experimental tile support assessment',
         'referencePeakHz': 'Reference peak (Hz)',
         'referenceDecayMs': 'Reference ring time (ms)',
         'referenceHiiDb': 'Reference HII (dB)',
@@ -516,11 +735,32 @@ class ThudStore extends ChangeNotifier {
         'learnedThreshold': 'Fitted reference threshold',
         'modelStatus': 'Learned model status',
         'methodNote': 'Inference method',
+        'classifierMethod': 'Reference classifier',
+        'classifierLabel': 'Nearest reference label',
+        'classifierScore': 'Reference distance',
+        'classifierMargin': 'Reference margin',
+        'classifierStatus': 'Reference decision',
+        'referenceLabels': 'Labeled reference classes',
+        'captureMode': 'Capture mode',
+        'captureUncertainty': 'Capture-quality uncertainty index',
+        'tileHoldoutEvaluation': 'Independent tile holdout evaluation',
+        'aggregation': 'Repeated-recording aggregation',
+        'queryTapIds': 'Query recording IDs',
+        'referenceTapIds': 'Reference recording IDs',
       };
       for (final field in fields.entries) {
         if (m.context[field.key] case final value?) {
           out.writeln('${field.value}: $value');
         }
+      }
+      if (m.context['acousticAnalysis'] case final raw?) {
+        final acoustic = jsonDecode(raw) as Map;
+        out.writeln('Acoustics: centroid ${acoustic["centroidHz"]} Hz; '
+            'flatness ${acoustic["flatness"]}; damping ${acoustic["damping"]}; '
+            'capture uncertainty ${acoustic["uncertainty"]}; speech evidence ${acoustic["speechEvidence"]}.');
+      }
+      if (m.context.containsKey('fittedCalibration')) {
+        out.writeln('Fitted parameters and complete reference profiles retained in the local saved measurement.');
       }
       out.writeln(
           'Module: ${m.module.name} · Cell: ${m.cell == null ? "unassigned" : m.cell! + 1}');
@@ -530,13 +770,20 @@ class ThudStore extends ChangeNotifier {
           'Ring time: ${m.decayMs > 0 ? "${m.decayMs.toStringAsFixed(0)} ms" : "Retap"}');
       out.writeln(
           'RMS: ${m.rmsDb.toStringAsFixed(1)} dBFS · estimated SNR: ${m.snrDb.toStringAsFixed(1)} dB');
-      out.writeln('Signal: ${m.flags.isEmpty ? "Clear" : "Retap"}\n');
+      out.writeln('Signal flags: ${m.flags.isEmpty ? "None" : m.flags.join("; ")}\n');
     }
     out.writeln('\nInspection marks');
     final marks = annotationsForProject(p.id);
     if (marks.isEmpty) out.writeln('No human annotations.');
-    for (final a in marks) {
+    for (final (index, a) in marks.indexed) {
       out.writeln('${a.provenance} · Cell ${a.cell + 1} · ${a.status.name}');
+      if (a.tileId != null) out.writeln('Visual tile ID: ${a.tileId}');
+      if (a.planX != null && a.planY != null) {
+        out.writeln(
+            'Plan pin #${index + 1}: x=${a.planX!.toStringAsFixed(6)}, y=${a.planY!.toStringAsFixed(6)} (normalized plan coordinates).');
+      } else {
+        out.writeln('Not positioned on architectural plan.');
+      }
       out.writeln('Note: ${a.note.isEmpty ? "No note." : a.note}');
       if (a.measurementSource != null) {
         out.writeln('Linked source: ${a.measurementSource} '
@@ -577,6 +824,8 @@ Measurement analyzePcm(
   String source = 'Microphone · PCM16 / 48 kHz',
   String? id,
   DateTime? created,
+  bool operating = false,
+  AcousticAnalysis? acousticAnalysis,
 }) {
   const fftSize = 4096;
   if (sampleRate < 16000 || sampleRate > 192000) {
@@ -587,7 +836,7 @@ Measurement analyzePcm(
         'Recording too short. Capture at least 0.1 seconds of audio.');
   }
   var sum = 0.0, energy = 0.0, maximum = 0.0;
-  var peakIndex = 0, clipped = 0;
+  var peakIndex = 0;
   for (var i = 0; i < pcm.length; i++) {
     final x = pcm[i];
     if (!x.isFinite || x.abs() > 1.0001) {
@@ -600,7 +849,6 @@ Measurement analyzePcm(
       maximum = x.abs();
       peakIndex = i;
     }
-    if (x.abs() >= .999) clipped++;
   }
   final mean = sum / pcm.length;
   final acEnergy = math.max(0.0, energy / pcm.length - mean * mean);
@@ -608,50 +856,9 @@ Measurement analyzePcm(
     throw Exception(
         'No usable audio detected. Check the microphone and try another tap.');
   }
-  final flags = <String>[];
-  if (clipped > 0) flags.add('Clipping detected');
-  final window = math.max(1, (sampleRate * .01).round());
-  final envelope = <double>[];
-  for (var start = 0; start + window <= pcm.length; start += window) {
-    var e = 0.0;
-    for (var i = start; i < start + window; i++) {
-      final x = pcm[i] - mean;
-      e += x * x;
-    }
-    envelope.add(e / window);
-  }
-  final sorted = List<double>.of(envelope)..sort();
-  final quietCount = math.max(1, sorted.length ~/ 5);
-  var noise = 0.0;
-  for (var i = 0; i < quietCount; i++) {
-    noise += sorted[i];
-  }
-  noise = math.max(1e-12, noise / quietCount);
-  var envelopePeak = 0;
-  for (var i = 1; i < envelope.length; i++) {
-    if (envelope[i] > envelope[envelopePeak]) envelopePeak = i;
-  }
-  final signalPower = envelope[envelopePeak];
-  final snr = _db(math.max(1e-12, signalPower - noise) / noise)
-      .clamp(-100.0, 120.0)
-      .toDouble();
-  if (snr < 15) flags.add('Low SNR: repeat in a quieter environment');
-  var decayMs = 0.0;
-  final threshold = (signalPower - noise) / 100 + noise;
-  if (snr >= 23) {
-    for (var i = envelopePeak + 1; i + 2 < envelope.length; i++) {
-      if (envelope[i] <= threshold &&
-          envelope[i + 1] <= threshold &&
-          envelope[i + 2] <= threshold) {
-        decayMs = (i - envelopePeak) * window * 1000 / sampleRate;
-        break;
-      }
-    }
-  }
-  if (decayMs == 0) flags.add('20 dB decay not measurable');
-  if (pcm.length < sampleRate ~/ 4) {
-    flags.add('Short recording: decay estimate may be limited');
-  }
+  final analysis = acousticAnalysis ?? analyzeAcoustics(pcm,
+      sampleRate: sampleRate,
+      mode: operating ? AcousticMode.operating : AcousticMode.impact);
 
   final real = Float64List(fftSize), imag = Float64List(fftSize);
   final start = (peakIndex - fftSize ~/ 8).clamp(0, pcm.length - fftSize);
@@ -700,16 +907,22 @@ Measurement analyzePcm(
       source: source,
       created: time,
       module: module,
-      peakHz: (strongest + shift) * sampleRate / fftSize,
+      peakHz: analysis.aggregate['peakHz'] ?? (strongest + shift) * sampleRate / fftSize,
       hiiDb: _db(math.max(1e-12, lowBand) / math.max(1e-12, highBand))
           .clamp(-120.0, 120.0)
           .toDouble(),
-      decayMs: decayMs,
+      decayMs: operating ? 0 : analysis.decayMs,
       rmsDb: _db(acEnergy).clamp(-140.0, 0.0).toDouble(),
-      snrDb: snr,
+      snrDb: analysis.snrDb,
       waveform: List<double>.unmodifiable(_waveform(pcm, 256)),
       spectrum: List<double>.unmodifiable(spectrum),
-      flags: List<String>.unmodifiable(flags));
+      flags: List<String>.unmodifiable(analysis.qualityIssues),
+      context: {
+        'acousticAnalysis': jsonEncode(analysis.toJson()),
+        'captureMode': operating ? 'operating' : 'impact',
+        'captureUsable': '${analysis.usable}',
+        'captureUncertainty': '${analysis.uncertainty}',
+      });
 }
 
 double _db(double power) => 10 * math.log(math.max(1e-20, power)) / math.ln10;
@@ -814,6 +1027,10 @@ class CaptureService {
           throw Exception(
               'This device does not support PCM16 microphone streaming.');
         }
+        if (AcousticAudioSession.supported) {
+          await recorder.ios?.manageAudioSession(false);
+          await AcousticAudioSession.begin();
+        }
         await recorder.setOnConfigChanged((config) {
           if (config.sampleRate != _sampleRate ||
               config.numChannels != 1 ||
@@ -893,7 +1110,7 @@ class CaptureService {
     _pcm![_length++] = (raw >= 32768 ? raw - 65536 : raw) / 32768;
   }
 
-  Future<Measurement> stop(Module module) {
+  Future<Measurement> stop(Module module, {bool operating = false}) {
     final epoch = _epoch;
     return _serial(() async {
       if (_closing) throw Exception('The microphone service is closed.');
@@ -902,6 +1119,7 @@ class CaptureService {
       try {
         await _recorder!.stop();
         await _streamDone!.future.timeout(const Duration(seconds: 3));
+        await AcousticAudioSession.assertValid();
         if (_closing || epoch != _epoch) {
           throw Exception('Recording was cancelled.');
         }
@@ -917,8 +1135,7 @@ class CaptureService {
               'Recording exceeded 30 seconds. Record a shorter tap.');
         }
         final pcm = Float64List.sublistView(_pcm!, 0, _length);
-        final measurement = analyzePcm(pcm, module);
-        return measurement.withEmbedding(await _encoder.encode(pcm, _sampleRate));
+        return await _analyze(pcm, module, operating: operating);
       } catch (error) {
         throw Exception('Could not analyze microphone recording: $error');
       } finally {
@@ -929,7 +1146,7 @@ class CaptureService {
 
   /// Explicit demo source, never an inferred material or defect prediction.
   Future<Measurement> sample(Module module,
-          {bool resonant = false, double? fillFraction}) =>
+          {bool resonant = false, double? fillFraction, bool operating = false}) =>
       _serial(() async {
         if (_closing) throw Exception('The microphone service is closed.');
         if (fillFraction != null &&
@@ -976,15 +1193,35 @@ class CaptureService {
                         math.exp(-dt / .018) *
                         math.sin(2 * math.pi * 4200 * dt));
           }
+          if (operating) {
+            value = .16 * math.sin(2 * math.pi * base * t) +
+                .06 * math.sin(2 * math.pi * base * 2 * t) +
+                (random.nextDouble() * 2 - 1) * .004;
+          }
           // Quantize exactly as signed PCM16, including the quiet noise floor.
           pcm[i] = (value.clamp(-1.0, .999969) * 32768).round() / 32768;
         }
-        final measurement = analyzePcm(pcm, module,
+        return _analyze(pcm, module, operating: operating,
             source: fillFraction == null
-                ? 'Synthetic · deterministic ${module.name} ${resonant ? "long" : "short"}-decay PCM16 sample'
+                ? 'Synthetic · deterministic ${operating ? "operating" : module.name} ${resonant ? "long" : "short"}-decay PCM16 sample'
                 : 'Synthetic · known fill ${(fillFraction * 100).toStringAsFixed(1)}% · deterministic vessel PCM16 sample');
-        return measurement.withEmbedding(await _encoder.encode(pcm, _sampleRate));
       });
+
+  Future<Measurement> _analyze(List<double> pcm, Module module,
+      {bool operating = false,
+       String source = 'Microphone · PCM16 / 48 kHz'}) async {
+    final analysis = analyzeAcoustics(pcm, sampleRate: _sampleRate,
+        mode: operating ? AcousticMode.operating : AcousticMode.impact);
+    final centers = operating
+        ? List<int>.generate(math.max(1, pcm.length ~/ _sampleRate),
+            (i) => math.min(pcm.length - 1, i * _sampleRate + _sampleRate ~/ 2))
+        : analysis.impacts.where((i) => !i.duplicate).map((i) => i.onset).toList();
+    final encoding = await _encoder.encodeWithEvidence(pcm, _sampleRate,
+        impactSamples: centers.isEmpty ? null : centers);
+    return analyzePcm(pcm, module, operating: operating, source: source,
+        acousticAnalysis: analysis.withSpeechEvidence(encoding.speechEvidence))
+        .withEmbedding(encoding.embedding);
+  }
 
   Future<void> cancel() {
     _epoch++;
@@ -1011,6 +1248,7 @@ class CaptureService {
     _length = 0;
     _oddByte = null;
     _streamError = null;
+    await AcousticAudioSession.end();
   }
 
   Future<void> dispose() {

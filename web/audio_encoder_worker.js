@@ -13,9 +13,9 @@ async function load(modelUrl, runtimeBase) {
   const outputs = runner.getOutputs();
   if (inputs.length !== 1 || outputs.length !== 1 ||
       inputs[0].dataType !== 'float32' || inputs[0].shape !== '15600' ||
-      outputs[0].dataType !== 'float32' || outputs[0].shape !== '1024') {
+      outputs[0].dataType !== 'float32' || outputs[0].shape !== '1545') {
     runner.cleanUp();
-    throw new Error('YAMNet requires float32[15600] → float32[1024]');
+    throw new Error('YAMNet requires float32[15600] → float32[1545]');
   }
   return runner;
 }
@@ -31,8 +31,8 @@ self.onmessage = ({data: [id, modelUrl, samples, runtimeBase]}) => {
       runner.getInputs()[0].data().set(samples);
       if (!runner.infer()) throw new Error('YAMNet inference failed');
       const embedding = Array.from(runner.getOutputs()[0].data());
-      if (embedding.length !== 1024 || !embedding.every(Number.isFinite)) {
-        throw new Error('Invalid YAMNet embedding');
+      if (embedding.length !== 1545 || !embedding.every(Number.isFinite)) {
+        throw new Error('Invalid YAMNet embedding/event output');
       }
       self.postMessage([id, embedding, null]);
     } catch (error) {

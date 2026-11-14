@@ -20,8 +20,8 @@ class AudioEncoder {
           inputs.single.shape.length != 1 ||
           inputs.single.shape.single != audioEncoderWindowLength ||
           outputs.single.shape.length != 1 ||
-          outputs.single.shape.single != audioEmbeddingLength) {
-        throw StateError('YAMNet requires float32[15600] → float32[1024]');
+          outputs.single.shape.single != audioEncoderOutputLength) {
+        throw StateError('YAMNet requires float32[15600] → float32[1545]');
       }
       return interpreter;
     } catch (_) {
@@ -30,18 +30,23 @@ class AudioEncoder {
     }
   }
 
-  Future<List<double>> encode(List<double> pcm, int sampleRate) async {
+  Future<List<double>> encode(List<double> pcm, int sampleRate) async =>
+      (await encodeWithEvidence(pcm, sampleRate)).embedding;
+
+  Future<AudioEncoding> encodeWithEvidence(List<double> pcm, int sampleRate,
+      {List<int>? impactSamples}) => encodeAcousticRecording(
+        pcm, sampleRate, _infer, impactSamples: impactSamples);
+
+  Future<List<double>> _infer(Float32List window) async {
     if (_disposed) throw StateError('AudioEncoder has been disposed');
-    final window = audioEncoderWindow(pcm, sampleRate);
     final interpreter = await (_interpreter ??= _load());
     if (_disposed) throw StateError('AudioEncoder has been disposed');
     interpreter.getInputTensor(0).data = window.buffer.asUint8List();
     interpreter.invoke();
     final bytes = interpreter.getOutputTensor(0).data;
-    final embedding = Float32List.fromList(Float32List.view(
-      bytes.buffer, bytes.offsetInBytes, audioEmbeddingLength,
+    return Float32List.fromList(Float32List.view(
+      bytes.buffer, bytes.offsetInBytes, audioEncoderOutputLength,
     ));
-    return checkedAudioEmbedding(embedding);
   }
 
   Future<void> dispose() => _disposal ??= _dispose();

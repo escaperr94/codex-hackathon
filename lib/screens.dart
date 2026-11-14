@@ -15,6 +15,7 @@ import 'sensing_flow.dart';
 import 'sensing_result.dart';
 import 'defect_map.dart';
 import 'scope_view.dart';
+import 'acoustic_details.dart';
 
 typedef MeasureAction = void Function(
     Module module, String? projectId, int? cell);
@@ -122,6 +123,7 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
   Measurement? _result;
   String? _error;
   bool _busy = false, _recording = false, _saved = false;
+  bool _operating = false;
   @override
   void initState() {
     super.initState();
@@ -151,15 +153,18 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _chooseProfile(SensingIntent intent) async {
-    final selected = await Navigator.of(context).push<String>(sensingRoute<String>(context,
-        ReferenceLibraryScreen(intent: intent, store: widget.store)));
-    if (mounted && selected != null) setState(() => _profiles[intent] = selected);
+    final selected = await Navigator.of(context).push<String>(
+        sensingRoute<String>(context,
+            ReferenceLibraryScreen(intent: intent, store: widget.store)));
+    if (mounted && selected != null)
+      setState(() => _profiles[intent] = selected);
   }
 
-  Measurement _profiled(Measurement measurement) => measurement.withIntent(_intent.name).withContext({
-    ...measurement.context,
-    if (_profiles[_intent] case final name?) 'referenceObject': name,
-  });
+  Measurement _profiled(Measurement measurement) =>
+      measurement.withIntent(_intent.name).withContext({
+        ...measurement.context,
+        if (_profiles[_intent] case final name?) 'referenceObject': name,
+      });
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -232,7 +237,8 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
       _recording = false;
     });
     try {
-      final result = await _capture.stop(_module);
+      final result = await _capture.stop(_module,
+          operating: _intent == SensingIntent.devices && _operating);
       if (mounted) {
         setState(() => _result = _profiled(result));
         _feedback();
@@ -273,7 +279,8 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     try {
       final m = await _capture.sample(_module,
           resonant: resonant || _module == Module.vessel,
-          fillFraction: _module == Module.vessel ? .5 : null);
+          fillFraction: _module == Module.vessel ? .5 : null,
+          operating: _intent == SensingIntent.devices && _operating);
       if (mounted) {
         setState(() {
           _result = _profiled(m);
@@ -490,13 +497,33 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                                                           BorderRadius.circular(
                                                               4)))))),
                               ]),
-                          if (m == null && (intent == SensingIntent.slab || intent == SensingIntent.materials || intent == SensingIntent.devices))
+                          if (m == null &&
+                              (intent == SensingIntent.slab ||
+                                  intent == SensingIntent.materials ||
+                                  intent == SensingIntent.devices))
                             TextButton.icon(
-                              onPressed: _busy || _recording ? null : () => _chooseProfile(intent),
-                              style: TextButton.styleFrom(foregroundColor: Colors.white),
-                              icon: const Icon(Icons.library_books_outlined, size: 18),
-                              label: Text(_profiles[intent] ?? (intent == SensingIntent.slab ? 'Tile library' : 'Reference library'),
-                                  maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                onPressed: _busy || _recording
+                                    ? null
+                                    : () => _chooseProfile(intent),
+                                style: TextButton.styleFrom(
+                                    foregroundColor: Colors.white),
+                                icon: const Icon(Icons.library_books_outlined,
+                                    size: 18),
+                                label: Text(
+                                    _profiles[intent] ??
+                                        (intent == SensingIntent.slab
+                                            ? 'Tile library'
+                                            : 'Reference library'),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis)),
+                          if (m == null && intent == SensingIntent.devices)
+                            SwitchListTile.adaptive(
+                              title: const Text('Operating sound', style: TextStyle(color: Colors.white)),
+                              subtitle: Text(_operating ? 'Listen safely without touching moving or powered parts.' : 'Powered-off casing taps.',
+                                  style: const TextStyle(color: Colors.white70)),
+                              value: _operating,
+                              onChanged: _busy || _recording ? null : (value) => setState(() => _operating = value),
+                            ),
                           const SizedBox(height: 12),
                           AnimatedSwitcher(
                               duration:
@@ -679,24 +706,23 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('One clean tap',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                  Text(_intent == SensingIntent.devices && _operating
+                      ? 'Record normal operation' : 'One clean tap',
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   const SizedBox(height: 16),
                   Text(
                       _intent == SensingIntent.devices
-                          ? 'Power off and unplug. Gently tap the casing, away from screens and batteries. Hold your phone 10–15 cm away.'
+                          ? _operating
+                              ? 'Stay clear of powered/moving parts. Record at the same distance and operating speed as calibration; do not touch the machine.'
+                              : 'Power off and unplug. Gently tap the casing, away from screens and batteries. Hold your phone 10–15 cm away.'
                           : 'Hold your phone 10–15 cm away. Listen, tap once, then let it ring.',
                       style: _body),
                   TextButton(
                       onPressed: () {
                         Navigator.pop(context);
-                        _push(
-                            context,
-                            GuidedReferenceScreen(
-                                intent: _intent, store: widget.store));
+                        _chooseProfile(_intent);
                       },
-                      child: const Text('Set reference')),
+                      child: const Text('Reference library')),
                 ]),
           ));
 }
@@ -819,10 +845,8 @@ class _Evidence extends StatelessWidget {
       !m.decayMs.isFinite ||
       m.decayMs <= 0;
 
-  static String headline(Measurement m) {
-    if (needsRetry(m)) return 'Tap again';
-    return m.context['interpretation'] ?? 'Signature captured';
-  }
+  static String headline(Measurement m) =>
+      InspectionVerdict.from(m, intentOf(m)).title;
 
   static String displayLabel(Measurement m) {
     final label = m.label.trim();
@@ -871,6 +895,7 @@ class _Evidence extends StatelessWidget {
     final chips = <String>[
       if (_synthetic(m)) 'Demo recording',
       if (reference?.id == m.id) 'Current reference',
+      if (m.context['classifierStatus'] == 'matched') 'Learned reference',
       if (m.context['fruitType'] case final fruit? when fruit.trim().isNotEmpty)
         fruit,
       if (double.tryParse(m.context['massGrams'] ?? '') case final mass?
@@ -902,31 +927,40 @@ class _Evidence extends StatelessWidget {
                     height: 1.1,
                     letterSpacing: -.8,
                     fontWeight: FontWeight.w600)),
+            if (!retry) ...[
+              _small,
+              Text(InspectionVerdict.from(m, intent).advice, style: _body),
+            ],
             if (retry) ...[
               _small,
               Text(_retryReason, style: _body),
             ],
             if (!retry && readings.isNotEmpty) ...[
               _gap,
-              Wrap(spacing: 24, runSpacing: 16, children: [
-                for (final reading in readings)
-                  Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(reading.$1,
-                            style:
-                                const TextStyle(color: C.muted, fontSize: 12)),
-                        const SizedBox(height: 4),
-                        Text(reading.$2,
-                            style: TextStyle(
-                                color: intent.color,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                fontFeatures: const [
-                                  FontFeature.tabularFigures()
-                                ])),
-                      ]),
-              ]),
+              ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  title: const Text('Measurement details'),
+                  children: [
+                    Wrap(spacing: 24, runSpacing: 16, children: [
+                      for (final reading in readings)
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(reading.$1,
+                                  style: const TextStyle(
+                                      color: C.muted, fontSize: 12)),
+                              const SizedBox(height: 4),
+                              Text(reading.$2,
+                                  style: TextStyle(
+                                      color: intent.color,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      fontFeatures: const [
+                                        FontFeature.tabularFigures()
+                                      ])),
+                            ]),
+                    ])
+                  ]),
             ],
             if (chips.isNotEmpty) ...[
               _gap,
@@ -960,9 +994,14 @@ class LibraryScreen extends StatelessWidget {
             const PageHeading('Field library',
                 subtitle: 'Saved recordings, references and field guidance'),
             _gap,
-            _MenuTile(icon: Icons.library_books_outlined,
-                title: 'Tile & material database', subtitle: 'Choose a profile · import · teach',
-                onTap: () => _push(context, ReferenceLibraryScreen(intent: SensingIntent.slab, store: store))),
+            _MenuTile(
+                icon: Icons.library_books_outlined,
+                title: 'Tile & material database',
+                subtitle: 'Choose a profile · import · teach',
+                onTap: () => _push(
+                    context,
+                    ReferenceLibraryScreen(
+                        intent: SensingIntent.slab, store: store))),
             _small,
             _MenuTile(
                 icon: Icons.history_rounded,
@@ -988,8 +1027,8 @@ class LibraryScreen extends StatelessWidget {
             _small,
             _MenuTile(
                 icon: Icons.touch_app_outlined,
-                title: 'Teach a three-tap reference',
-                subtitle: 'Solid tile references and known vessel fill anchors',
+                title: 'Reference libraries',
+                subtitle: 'Tile · material · device · vessel',
                 onTap: () async {
                   final intent = await Navigator.of(context)
                       .push<SensingIntent>(sensingRoute<SensingIntent>(
@@ -998,8 +1037,9 @@ class LibraryScreen extends StatelessWidget {
                               initial: SensingIntent.slab,
                               haptics: store.haptics)));
                   if (intent != null && context.mounted) {
-                    _push(context,
-                        GuidedReferenceScreen(intent: intent, store: store));
+                    Navigator.of(context).push<String>(sensingRoute<String>(
+                        context,
+                        ReferenceLibraryScreen(intent: intent, store: store)));
                   }
                 }),
             _small,
@@ -1358,7 +1398,7 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       : p.notes,
                   style: _body)),
           _gap,
-          ActionButton('Findings & photos',
+          ActionButton('Defect map & floor plan',
               icon: Icons.location_on_outlined,
               onPressed: () => _push(
                   context,
@@ -1684,6 +1724,8 @@ class MeasurementScreen extends StatelessWidget {
             _Evidence(m: m, reference: store.reference),
             _small,
             SignalExplorer(measurement: m),
+            _small,
+            AcousticDetails(measurement: m, store: store),
             _gap,
             if (!retry && m.intent == 'slab' && linkedProject != null) ...[
               ActionButton('Handover report',
@@ -1751,6 +1793,8 @@ class _ReportScreenState extends State<ReportScreen> {
           theme: pw.ThemeData.withFont(base: regular, bold: semibold));
       final text = widget.store.reportText(widget.project);
       final marks = widget.store.annotationsForProject(widget.project.id);
+      final plan = widget.project.floorPlan;
+      final planImage = plan == null ? null : await floorPlanPdfImage(plan);
       final latestMarks = <int, DefectAnnotation>{};
       for (final mark in marks) {
         latestMarks.putIfAbsent(mark.cell, () => mark);
@@ -1776,9 +1820,24 @@ class _ReportScreenState extends State<ReportScreen> {
                         fontSize: 26, fontWeight: pw.FontWeight.bold)),
                 pw.SizedBox(height: 12),
                 pw.Text('Room: ${widget.project.room}'),
+                pw.Text('Building: ${widget.project.building} / Floor: ${widget.project.floor} / Unit: ${widget.project.unit}'),
                 pw.Text(
                     'Findings: ${marks.length} · Review: ${marks.where((m) => m.status == AnnotationStatus.review).length} · Defects: ${marks.where((m) => m.status == AnnotationStatus.defect).length} · Accepted: ${marks.where((m) => m.status == AnnotationStatus.accepted).length}'),
                 pw.SizedBox(height: 14),
+                if (plan != null && planImage != null) ...[
+                  pw.Text('Architectural plan / ${plan.name}',
+                      style: pw.TextStyle(
+                          fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(height: 8),
+                  floorPlanPdfMap(plan, planImage, marks),
+                  pw.Text(
+                      'Numbered human findings: review = amber, defect = red, accepted = green.',
+                      style: const pw.TextStyle(fontSize: 9)),
+                  pw.Text(
+                      '${marks.where((a) => a.planX == null).length} finding(s) have no plan location; see grid and finding details.',
+                      style: const pw.TextStyle(fontSize: 9)),
+                  pw.SizedBox(height: 14),
+                ],
                 ...text.split('\n').map((line) => pw.Padding(
                     padding: const pw.EdgeInsets.only(bottom: 5),
                     child: pw.Text(line,
@@ -1811,13 +1870,23 @@ class _ReportScreenState extends State<ReportScreen> {
                                 style: const pw.TextStyle(fontSize: 7))),
                     ]),
                 ]),
-                for (final mark in marks.where((a) => a.photoBase64 != null))
+                pw.SizedBox(height: 12),
+                for (var i = 0; i < marks.length; i++)
+                  pw.Padding(
+                      padding: const pw.EdgeInsets.only(bottom: 8),
+                      child: pw.Text(
+                          '#${i + 1} / ${_cellName(marks[i].cell, widget.project.columns)} / ${marks[i].status.name}'
+                          '${marks[i].tileId == null ? "" : " / tile ${marks[i].tileId}"}'
+                          '${marks[i].planX == null ? " / no plan location" : ""}\n${marks[i].note}',
+                          style: const pw.TextStyle(fontSize: 10))),
+                for (final (index, mark) in marks.indexed
+                    .where((entry) => entry.$2.photoBase64 != null))
                   pw.Column(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
                         pw.SizedBox(height: 16),
                         pw.Text(
-                            'Photo / ${_cellName(mark.cell, widget.project.columns)} / ${mark.status.name}',
+                            'Photo / #${index + 1} / ${_cellName(mark.cell, widget.project.columns)} / ${mark.status.name}',
                             style: const pw.TextStyle(fontSize: 10)),
                         pw.SizedBox(height: 8),
                         pw.Container(
@@ -1891,6 +1960,16 @@ class _ReportScreenState extends State<ReportScreen> {
                       DefectMapScreen(store: widget.store, project: p)),
                   child: const Text('Edit findings'))),
           _small,
+          if (p.floorPlan case final plan?) ...[
+            FloorPlanCanvas(plan: plan, marks: marks),
+            _small,
+            Text('${plan.name} · Review: amber · Defect: red · Accepted: green',
+                style: _body),
+            Text(
+                '${marks.where((a) => a.planX == null).length} finding(s) not positioned on plan.',
+                style: _body),
+            _small,
+          ],
           GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -1934,7 +2013,7 @@ class _ReportScreenState extends State<ReportScreen> {
               '$actual / ${p.rows * p.columns} microphone points · ${all.length} recordings',
               style: _body),
           _gap,
-          for (final mark in marks) ...[
+          for (final (index, mark) in marks.indexed) ...[
             Panel(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1944,13 +2023,11 @@ class _ReportScreenState extends State<ReportScreen> {
                         mark.status == AnnotationStatus.accepted
                             ? Icons.check_circle_outline_rounded
                             : Icons.location_on_outlined,
-                        color: mark.status == AnnotationStatus.accepted
-                            ? C.green
-                            : C.amber),
+                        color: floorPlanStatusColor(mark.status)),
                     const SizedBox(width: 8),
                     Expanded(
                         child: Text(
-                            '${_cellName(mark.cell, p.columns)} · ${mark.status.name}',
+                            '#${index + 1} · ${_cellName(mark.cell, p.columns)} · ${mark.status.name}',
                             style: _title)),
                   ]),
                   if (mark.note.isNotEmpty) ...[

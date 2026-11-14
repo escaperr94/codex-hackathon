@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
-const calibrationVersion = 'yamnet-calibration-v1';
-const _embeddingVersion = 'yamnet-waveform-embedding-f32-v1';
-const _dimensions = 1024;
+const calibrationVersion = 'yamnet-physical-calibration-events-v3';
+const _embeddingVersion = 'yamnet-waveform-embedding-events-v2';
+const _dimensions = 1032;
 
 class ReferencePrediction {
   final double distance;
@@ -15,8 +15,11 @@ class ReferencePrediction {
 class FillPrediction {
   final double value;
   final bool supported;
+  final double lower, upper;
+  final String calibrationStatus;
 
-  const FillPrediction(this.value, this.supported);
+  const FillPrediction(this.value, this.supported, this.lower, this.upper,
+      this.calibrationStatus);
 }
 
 class ClassPrediction {
@@ -27,8 +30,65 @@ class ClassPrediction {
   const ClassPrediction(this.label, this.supported, this.distance);
 }
 
-/// Fits only embedding-space models, not physical diagnoses.
+/// Fits fused neural/physical signatures, not validated physical diagnoses.
 class LearnedCalibration {
+  static List<double> features(List<double> embedding, {
+      required double peakHz, required double decayMs,
+      double? centroidHz, double? flatness, double? damping}) {
+    if (embedding.length != 1024 || embedding.any((v) => !v.isFinite) ||
+        !peakHz.isFinite || peakHz <= 0 || !decayMs.isFinite || decayMs < 0 ||
+        [centroidHz, flatness, damping].any((v) => v != null && (!v.isFinite || v < 0))) {
+      throw ArgumentError('Finite encoder and physical features are required.');
+    }
+    final norm = math.sqrt(embedding.fold<double>(0, (sum, v) => sum + v * v));
+    if (!norm.isFinite || norm <= 0) throw ArgumentError('Nonzero neural features required.');
+    double logScale(double value, double maximum) =>
+        (math.log(1 + value) / math.log(1 + maximum)).clamp(0.0, 1.0).toDouble();
+    // Secondary DSP block has at most 0.1 norm; neural similarity remains primary.
+    final physical = [logScale(peakHz, 24000), logScale(decayMs, 30000),
+      logScale(centroidHz ?? 0, 24000), (flatness ?? 0).clamp(0.0, 1.0).toDouble(),
+      logScale(damping ?? 0, 1), (peakHz / math.max(1.0, centroidHz ?? peakHz)).clamp(0.0, 1.0).toDouble(),
+      decayMs > 0 ? 1.0 : 0.0, centroidHz == null ? 0.0 : 1.0];
+    return [for (final v in embedding) v / norm,
+      for (final v in physical) v * .1 / math.sqrt(8)];
+  }
+
+  static List<double> aggregate(List<List<double>> embeddings) {
+    if (embeddings.isEmpty || !const [1024, _dimensions].contains(embeddings.first.length) ||
+        embeddings.any((e) => e.length != embeddings.first.length || e.any((v) => !v.isFinite))) {
+      throw ArgumentError('Matching finite query vectors required.');
+    }
+    return List.generate(embeddings.first.length, (i) {
+      final values = embeddings.map((e) => e[i]).toList()..sort();
+      final mid = values.length ~/ 2;
+      return values.length.isOdd ? values[mid] : (values[mid - 1] + values[mid]) / 2;
+    });
+  }
+
+  /// Every tap from a held-out physical tile stays out of its training fold.
+  static Map<String, dynamic> evaluateTiles(List<List<double>> embeddings,
+      List<String> labels, List<String> tileIds) {
+    if (embeddings.length != labels.length || labels.length != tileIds.length ||
+        tileIds.any((id) => id.trim().isEmpty)) {
+      throw ArgumentError('Matching nonempty tile identifiers are required.');
+    }
+    var tested = 0, accepted = 0, correct = 0, folds = 0;
+    for (final id in tileIds.toSet()) {
+      final train = [for (var i = 0; i < tileIds.length; i++) if (tileIds[i] != id) i];
+      final test = [for (var i = 0; i < tileIds.length; i++) if (tileIds[i] == id) i];
+      final counts = <String, int>{};
+      for (final i in train) { counts.update(labels[i], (n) => n + 1, ifAbsent: () => 1); }
+      if (counts.length < 2 || counts.values.any((n) => n < 3)) continue;
+      final model = fitClasses([for (final i in train) embeddings[i]], [for (final i in train) labels[i]]);
+      final prediction = model.predict(aggregate([for (final i in test) embeddings[i]]));
+      if (test.map((i) => labels[i]).toSet().length != 1) continue;
+      folds++; tested++;
+      if (prediction.supported) { accepted++; if (prediction.label == labels[test.first]) correct++; }
+    }
+    return {'method': 'leave-one-tile-out', 'folds': folds, 'tested': tested,
+      'accepted': accepted, 'correct': correct,
+      'status': folds >= 2 ? 'experimental' : 'insufficient independent tiles'};
+  }
   static ClassCalibration fitClasses(
     List<List<double>> embeddings,
     List<String> labels,
@@ -101,6 +161,16 @@ class LearnedCalibration {
       [for (final label in labels) label - meanLabel],
     );
     var supportRadius = _floor(center);
+    final levels = labels.toSet().toList()..sort();
+    var errorRadius = 0.0;
+    for (var i = 1; i < levels.length; i++) {
+      errorRadius = math.max(errorRadius, (levels[i] - levels[i - 1]) / 2);
+    }
+    for (var i = 0; i < samples.length; i++) {
+      var fitted = meanLabel;
+      for (var j = 0; j < samples.length; j++) { fitted += weights[j] * _dot(centered[i], centered[j]); }
+      errorRadius = math.max(errorRadius, (fitted - labels[i]).abs());
+    }
     for (var i = 0; i < samples.length; i++) {
       var nearest = double.infinity;
       for (var j = 0; j < samples.length; j++) {
@@ -119,6 +189,7 @@ class LearnedCalibration {
       labels.reduce(math.max),
       supportRadius,
       ridge,
+      errorRadius,
     );
   }
 }
@@ -161,9 +232,10 @@ class FillCalibration {
   final double _maxLabel;
   final double _supportRadius;
   final double _ridge;
+  final double _errorRadius;
 
   FillCalibration._(this._samples, this._center, this._weights, this._meanLabel,
-      this._minLabel, this._maxLabel, this._supportRadius, this._ridge);
+      this._minLabel, this._maxLabel, this._supportRadius, this._ridge, this._errorRadius);
 
   FillPrediction predict(List<double> embedding) {
     _validateEmbedding(embedding);
@@ -178,11 +250,12 @@ class FillCalibration {
     if (!raw.isFinite) {
       throw StateError('Fill prediction overflowed.');
     }
-    // A bounded display value is not evidence of support outside calibration.
-    return FillPrediction(
-      raw.clamp(_minLabel, _maxLabel).toDouble(),
-      nearest <= _supportRadius && raw >= _minLabel && raw <= _maxLabel,
-    );
+    // Empirical resolution/support envelope, not a validated confidence interval.
+    final value = raw.clamp(_minLabel, _maxLabel).toDouble();
+    final supported = nearest <= _supportRadius && raw >= _minLabel && raw <= _maxLabel;
+    final radius = math.min(100.0, _errorRadius + nearest / _supportRadius * (_maxLabel - _minLabel) / 2);
+    return FillPrediction(value, supported, math.max(0.0, value - radius),
+        math.min(100.0, value + radius), supported ? 'experimental calibrated range' : 'outside calibration');
   }
 
   Map<String, dynamic> toJson() => {
@@ -195,6 +268,7 @@ class FillCalibration {
         'maxLabel': _maxLabel,
         'supportRadius': _supportRadius,
         'ridge': _ridge,
+        'errorRadius': _errorRadius,
       };
 
   factory FillCalibration.fromJson(Map<String, dynamic> json) {
@@ -213,13 +287,14 @@ class FillCalibration {
     final maxLabel = _number(json['maxLabel']);
     final radius = _number(json['supportRadius']);
     final ridge = _number(json['ridge']);
+    final errorRadius = json['errorRadius'] == null ? maxLabel - minLabel : _number(json['errorRadius']);
     if (minLabel < 0 || maxLabel > 100 || minLabel >= maxLabel ||
         meanLabel < minLabel || meanLabel > maxLabel ||
-        radius < _floor(center) || ridge <= 0) {
+        radius < _floor(center) || ridge <= 0 || errorRadius < 0 || errorRadius > 100) {
       throw const FormatException('Invalid fitted fill parameters.');
     }
     return FillCalibration._(samples, center, weights, meanLabel, minLabel,
-        maxLabel, radius, ridge);
+        maxLabel, radius, ridge, errorRadius);
   }
 }
 
@@ -294,6 +369,7 @@ Map<String, dynamic> _provenance(String kind) => {
       'version': calibrationVersion,
       'embeddingVersion': _embeddingVersion,
       'dimensions': _dimensions,
+      'featureContract': 'unit-L2 neural1024 + bounded physical8 secondary block norm<=0.1',
       'kind': kind,
     };
 
@@ -317,7 +393,7 @@ List<List<double>> _samples(List<List<double>> embeddings) {
 
 void _validateEmbedding(List<double> embedding) {
   if (embedding.length != _dimensions || embedding.any((v) => !v.isFinite)) {
-    throw ArgumentError('Expected 1024 finite embedding values.');
+    throw ArgumentError('Expected 1032 finite calibrated feature values.');
   }
   // Reject finite inputs whose squared norm would overflow subsequent arithmetic.
   if (!_dot(embedding, embedding).isFinite) {
@@ -327,7 +403,7 @@ void _validateEmbedding(List<double> embedding) {
 
 List<double> _vector(dynamic value) {
   if (value is! List || value.length != _dimensions) {
-    throw const FormatException('Expected a 1024-dimensional vector.');
+    throw const FormatException('Expected a 1032-dimensional calibrated feature vector.');
   }
   final vector = [for (final v in value) _number(v)];
   if (!_dot(vector, vector).isFinite) {

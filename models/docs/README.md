@@ -14,6 +14,8 @@ Benchmark scripts formerly under `artifacts/dcase/` and `artifacts/sound-of-wate
 
 Start with [FINALIZATION.md](FINALIZATION.md) for current model choices, release paths, finite ablations and verification commands. [FRUIT_FINALIZATION.md](FRUIT_FINALIZATION.md), [CLASSIFIER_FINALIZATION.md](CLASSIFIER_FINALIZATION.md) and [RESEARCH_FINALIZATION.md](RESEARCH_FINALIZATION.md) retain task-specific contracts and limits. Historical synthetic tile/fill exports below are software diagnostics, not finalized physical-state models.
 
+For end-to-end Flutter app setup, automated checks, browser smoke testing, calibration workflows, tile-map testing and native-device limits, see [APP_TESTING.md](APP_TESTING.md).
+
 
 
 
