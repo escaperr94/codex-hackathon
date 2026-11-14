@@ -389,6 +389,20 @@ class ReferenceAnchor {
           : Map<String, String>.from(j['metadata'] as Map));
 }
 
+String referenceRecordingIssue(Measurement m) {
+  if (!m.hasEmbedding) {
+    return 'The audio was recorded, but the neural model did not return a usable embedding. Check the bundled model and try again.';
+  }
+  final issues = m.flags.where((flag) => flag.isNotEmpty).toList();
+  if (issues.isEmpty) {
+    return 'The tap was recorded, but no clean ring was detected. Tap once near the microphone, then hold still and let it ring.';
+  }
+  final reasons = issues
+      .map((flag) => flag.startsWith('Reject: ') ? flag.substring(8) : flag)
+      .join('; ');
+  return 'The tap was recorded but rejected for reference training: $reasons. Tap once near the microphone, then hold still and let it ring.';
+}
+
 class AnchorRepository {
   static const key = 'thud.anchors.v1';
   static Future<void> _pending = Future<void>.value();
@@ -538,6 +552,31 @@ class AnchorRepository {
     _pending = operation.then<void>((_) {}, onError: (Object _, StackTrace __) {});
     return operation;
   }
+}
+
+class _EmptyReferenceState extends StatelessWidget {
+  const _EmptyReferenceState({required this.empty, required this.onTeach});
+  final bool empty;
+  final VoidCallback? onTeach;
+
+  @override
+  Widget build(BuildContext context) => Panel(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Icon(Icons.library_add_outlined, color: C.muted, size: 22),
+          const SizedBox(height: 16),
+          Text(empty ? 'No reference yet' : 'No matching profiles',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+          const SizedBox(height: 8),
+          Text(
+              empty
+                  ? 'Teach three taps of the same object before checking a real recording. You can also switch on Demo references to explore the flow without a microphone.'
+                  : 'Change the search or teach another reference for this mode.',
+              style: const TextStyle(color: C.muted, height: 1.5)),
+          if (empty) ...[
+            const SizedBox(height: 20),
+            ActionButton('Teach reference', icon: Icons.mic_rounded, onPressed: onTeach),
+          ]
+        ]));
 }
 
 /// Local user recordings and imported references; selection returns the profile name.
@@ -741,13 +780,8 @@ class _ReferenceLibraryScreenState extends State<ReferenceLibraryScreen> {
           if (loading)
             const Center(child: CircularProgressIndicator())
           else if (names.isEmpty)
-            Padding(
-                padding: const EdgeInsets.symmetric(vertical: 28),
-                child: Text(
-                    current.isEmpty
-                        ? 'No references yet. Teach an object or import your database.'
-                        : 'No matching profiles.',
-                    style: const TextStyle(color: C.muted)))
+            _EmptyReferenceState(
+                empty: current.isEmpty, onTeach: writing ? null : _teach)
           else
             ...names.map((name) {
               final refs = groups[name]!;
@@ -792,8 +826,9 @@ class _ReferenceLibraryScreenState extends State<ReferenceLibraryScreen> {
                   onTap: usable ? () => Navigator.pop(context, name) : null);
             }),
           const SizedBox(height: 24),
-          ActionButton('Teach reference',
-              icon: Icons.mic_rounded, onPressed: writing ? null : _teach),
+          if (names.isNotEmpty)
+            ActionButton('Teach another reference',
+                icon: Icons.mic_rounded, onPressed: writing ? null : _teach),
           TextButton.icon(
               onPressed: writing ? null : _import,
               icon: const Icon(Icons.file_download_outlined),
@@ -894,7 +929,7 @@ class _GuidedReferenceScreenState extends State<GuidedReferenceScreen>
       if (!mounted) return;
       setState(() => recording = false);
       if (!m.hasEmbedding || !ReferenceAnchor.clean(m)) {
-        throw Exception('Clean neural audio encoding is required. Record again.');
+        throw Exception(referenceRecordingIssue(m));
       }
       setState(() {
         synthetic = demo;

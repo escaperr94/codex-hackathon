@@ -110,6 +110,23 @@ void main() {
     expect(result['modelStatus'], 'calibration required');
   });
 
+  test('reference rejection distinguishes model failure from acoustic rejection', () {
+    final encoded = tap('encoded', 1).withContext({'captureUsable': 'false'});
+    final rejected = Measurement(
+      id: encoded.id, label: encoded.label, source: encoded.source,
+      created: encoded.created, module: encoded.module, peakHz: encoded.peakHz,
+      hiiDb: encoded.hiiDb, decayMs: encoded.decayMs, rmsDb: encoded.rmsDb,
+      snrDb: encoded.snrDb, waveform: encoded.waveform, spectrum: encoded.spectrum,
+      flags: const ['Reject: low impact signal-to-noise ratio'],
+      embedding: encoded.embedding, encoderVersion: encoded.encoderVersion);
+    expect(referenceRecordingIssue(rejected), contains('rejected for reference training'));
+    final missing = Measurement(
+      id: 'missing', label: 'capture', source: 'Microphone', created: DateTime(2026),
+      module: Module.scope, peakHz: 800, hiiDb: 1, decayMs: 100, rmsDb: -10,
+      snrDb: 40, waveform: const [.1], spectrum: const [.2], flags: const []);
+    expect(referenceRecordingIssue(missing), contains('neural model did not return'));
+  });
+
   testWidgets('neural embeddings, not identical DSP metrics, determine result', (tester) async {
     await AnchorRepository.save(reference(SensingIntent.materials, 'sample', 1));
     final store = ThudStore();
