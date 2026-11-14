@@ -100,6 +100,7 @@ class ScopeScreen extends StatefulWidget {
       this.cell,
       this.onIntent,
       this.initialIntent,
+      this.onHandover,
       super.key});
   final ThudStore store;
   final Module initialModule;
@@ -108,6 +109,7 @@ class ScopeScreen extends StatefulWidget {
   final ValueChanged<Module> onModule;
   final ValueChanged<SensingIntent>? onIntent;
   final SensingIntent? initialIntent;
+  final VoidCallback? onHandover;
   @override
   State<ScopeScreen> createState() => _ScopeScreenState();
 }
@@ -134,6 +136,11 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
           Module.vessel => SensingIntent.vessel,
           Module.scope => SensingIntent.scope,
         };
+    final profile = widget.store.projects
+        .where((p) => p.id == widget.projectId)
+        .firstOrNull
+        ?.referenceProfile;
+    if (profile != null) _profiles[SensingIntent.slab] = profile;
     _modes = PageController(initialPage: _intent.index);
     WidgetsBinding.instance.addObserver(this);
   }
@@ -156,8 +163,15 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
     final selected = await Navigator.of(context).push<String>(
         sensingRoute<String>(context,
             ReferenceLibraryScreen(intent: intent, store: widget.store)));
-    if (mounted && selected != null)
-      setState(() => _profiles[intent] = selected);
+    if (!mounted || selected == null) return;
+    setState(() => _profiles[intent] = selected);
+    final project = widget.store.projects
+        .where((p) => p.id == widget.projectId)
+        .firstOrNull;
+    if (intent == SensingIntent.slab && project != null) {
+      await _perform(
+          context, () => widget.store.setProjectReference(project, selected));
+    }
   }
 
   Measurement _profiled(Measurement measurement) =>
@@ -218,8 +232,10 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
   String _captureError(String error) {
     final value = error.toLowerCase();
     if (value.contains('permission')) return 'Enable microphone access';
-    if (value.contains('no usable audio')) return 'No sound · check the microphone and tap again';
-    if (value.contains('too short')) return 'Tap too short · hold still and let it ring';
+    if (value.contains('no usable audio'))
+      return 'No sound · check the microphone and tap again';
+    if (value.contains('too short'))
+      return 'Tap too short · hold still and let it ring';
     if (value.contains('low impact signal-to-noise') ||
         value.contains('no isolated impact') ||
         value.contains('decay') ||
@@ -227,8 +243,10 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
         value.contains('inconsistent repeated')) {
       return 'Audio captured, but the tap was not clean enough · tap once, then let it ring';
     }
-    if (value.contains('yamnet') || value.contains('encoder') ||
-        value.contains('tflite') || value.contains('wasm')) {
+    if (value.contains('yamnet') ||
+        value.contains('encoder') ||
+        value.contains('tflite') ||
+        value.contains('wasm')) {
       return 'Neural audio model unavailable · $error';
     }
     if (value.contains('format') || value.contains('pcm16')) {
@@ -385,6 +403,8 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
             store: widget.store,
             project: destination,
             measurement: m,
+            initialCell:
+                widget.projectId == destination.id ? widget.cell : null,
             onReport: () => _push(context,
                 ReportScreen(store: widget.store, project: destination))));
   }
@@ -505,6 +525,8 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                                                           BorderRadius.circular(
                                                               4)))))),
                               ]),
+                          if (intent == SensingIntent.slab && !_recording)
+                            _handoverContext(),
                           if (m == null && intent != SensingIntent.scope)
                             TextButton.icon(
                                 onPressed: _busy || _recording
@@ -518,21 +540,34 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                                     _profiles[intent] ??
                                         switch (intent) {
                                           SensingIntent.slab => 'Tile library',
-                                          SensingIntent.vessel => 'Container references',
-                                          SensingIntent.fruit => 'Fruit references',
-                                          SensingIntent.devices => 'Device references',
-                                          SensingIntent.materials => 'Material references',
-                                          SensingIntent.scope => 'Reference library',
+                                          SensingIntent.vessel =>
+                                            'Container references',
+                                          SensingIntent.fruit =>
+                                            'Fruit references',
+                                          SensingIntent.devices =>
+                                            'Device references',
+                                          SensingIntent.materials =>
+                                            'Material references',
+                                          SensingIntent.scope =>
+                                            'Reference library',
                                         },
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis)),
                           if (m == null && intent == SensingIntent.devices)
                             SwitchListTile.adaptive(
-                              title: const Text('Operating sound', style: TextStyle(color: Colors.white)),
-                              subtitle: Text(_operating ? 'Listen safely without touching moving or powered parts.' : 'Powered-off casing taps.',
-                                  style: const TextStyle(color: Colors.white70)),
+                              title: const Text('Operating sound',
+                                  style: TextStyle(color: Colors.white)),
+                              subtitle: Text(
+                                  _operating
+                                      ? 'Listen safely without touching moving or powered parts.'
+                                      : 'Powered-off casing taps.',
+                                  style:
+                                      const TextStyle(color: Colors.white70)),
                               value: _operating,
-                              onChanged: _busy || _recording ? null : (value) => setState(() => _operating = value),
+                              onChanged: _busy || _recording
+                                  ? null
+                                  : (value) =>
+                                      setState(() => _operating = value),
                             ),
                           const SizedBox(height: 12),
                           AnimatedSwitcher(
@@ -665,7 +700,8 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                                                               Colors.white70)),
                                                 ]),
                                         ])),
-                          if (widget.projectId != null)
+                          if (widget.projectId != null &&
+                              intent != SensingIntent.slab)
                             Padding(
                                 padding: const EdgeInsets.only(top: 12),
                                 child: Text(
@@ -693,6 +729,48 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
         );
       });
 
+  Widget _handoverContext() {
+    final project = widget.store.projects
+        .where((p) => p.id == widget.projectId)
+        .firstOrNull;
+    if (project == null) {
+      return TextButton.icon(
+          style: TextButton.styleFrom(foregroundColor: Colors.white),
+          icon: const Icon(Icons.assignment_outlined, size: 18),
+          label: const Text('Start a room inspection'),
+          onPressed: _busy ? null : widget.onHandover);
+    }
+    return Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(top: 8, bottom: 4),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: .12),
+            borderRadius: BorderRadius.circular(16)),
+        child: Row(children: [
+          const Icon(Icons.apartment_rounded, color: Colors.white, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Text(project.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w700)),
+                Text(
+                    '${project.room} · ${widget.cell == null ? 'Choose a location when marking' : _cellName(widget.cell!, project.columns)}',
+                    style:
+                        const TextStyle(color: Colors.white70, fontSize: 12)),
+              ])),
+          IconButton(
+              tooltip: 'Open handover dossier',
+              onPressed: _busy ? null : widget.onHandover,
+              icon: const Icon(Icons.assignment_outlined, color: Colors.white)),
+        ]));
+  }
+
   Widget _sceneTransition(Widget child, Animation<double> animation) =>
       FadeTransition(
         opacity: animation,
@@ -716,9 +794,12 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_intent == SensingIntent.devices && _operating
-                      ? 'Record normal operation' : 'One clean tap',
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                  Text(
+                      _intent == SensingIntent.devices && _operating
+                          ? 'Record normal operation'
+                          : 'One clean tap',
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.w500)),
                   const SizedBox(height: 16),
                   Text(
                       _intent == SensingIntent.devices
@@ -1120,27 +1201,39 @@ class ProjectsScreen extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: store,
       builder: (_, __) => AppPage(children: [
-            PageHeading('Handover dossiers',
-                subtitle: 'Rooms · findings · reports',
+            PageHeading('Construction handover',
+                subtitle: 'Tap → mark → hand over',
                 trailing: IconButton(
-                    tooltip: 'Create project',
+                    tooltip: 'Create inspection',
                     onPressed: () => _create(context),
                     icon: const Icon(Icons.add_rounded,
                         color: C.muted, size: 20))),
             _gap,
             if (store.projects.isEmpty)
-              _Empty('Your first handover', 'Add a room to start.',
+              _Empty('Start with one room',
+                  'Create a room dossier, choose a reference, then tap each point. Mark your findings and photos before sharing a report.',
                   icon: Icons.grid_view_rounded,
-                  action: ActionButton('Create dossier',
+                  action: ActionButton('Create inspection',
                       icon: Icons.add_rounded,
                       onPressed: () => _create(context)))
             else ...[
+              const Text(
+                  'Reopen a room to inspect points, mark findings and prepare its handover report.',
+                  style: _body),
+              _small,
               for (final p in store.projects) ...[
                 _MenuTile(
                     icon: Icons.grid_view_rounded,
                     title: p.name,
-                    subtitle:
-                        '${p.room} · ${p.rows} × ${p.columns} grid · ${store.forProject(p.id).where((m) => m.cell != null).map((m) => m.cell).toSet().length} cells recorded',
+                    subtitle: [
+                      [
+                        if (p.building.isNotEmpty) p.building,
+                        if (p.floor.isNotEmpty) 'Floor ${p.floor}',
+                        if (p.unit.isNotEmpty) 'Unit ${p.unit}',
+                        p.room,
+                      ].join(' · '),
+                      '${store.forProject(p.id).where((m) => m.cell != null && m.cell! >= 0 && m.cell! < p.rows * p.columns && !_synthetic(m)).map((m) => m.cell).toSet().length}/${p.rows * p.columns} points recorded · ${store.annotationsForProject(p.id).length} human findings',
+                    ].join('\n'),
                     onTap: () => _push(
                         context,
                         ProjectScreen(
@@ -1148,7 +1241,7 @@ class ProjectsScreen extends StatelessWidget {
                 _small
               ],
               _small,
-              ActionButton('New dossier',
+              ActionButton('New inspection',
                   icon: Icons.add_rounded, onPressed: () => _create(context))
             ]
           ]));
@@ -1165,6 +1258,9 @@ class _NewProjectDialogState extends State<_NewProjectDialog> {
   final _form = GlobalKey<FormState>();
   final _name = TextEditingController(),
       _room = TextEditingController(),
+      _building = TextEditingController(),
+      _floor = TextEditingController(),
+      _unit = TextEditingController(),
       _rows = TextEditingController(text: '3'),
       _columns = TextEditingController(text: '3');
   bool _saving = false;
@@ -1173,6 +1269,9 @@ class _NewProjectDialogState extends State<_NewProjectDialog> {
   void dispose() {
     _name.dispose();
     _room.dispose();
+    _building.dispose();
+    _floor.dispose();
+    _unit.dispose();
     _rows.dispose();
     _columns.dispose();
     super.dispose();
@@ -1196,7 +1295,10 @@ class _NewProjectDialogState extends State<_NewProjectDialog> {
           _name.text.trim(),
           _room.text.trim(),
           int.parse(_rows.text.trim()),
-          int.parse(_columns.text.trim()));
+          int.parse(_columns.text.trim()),
+          building: _building.text.trim(),
+          floor: _floor.text.trim(),
+          unit: _unit.text.trim());
       if (mounted) Navigator.pop(context, p);
     } catch (e) {
       if (mounted) {
@@ -1210,7 +1312,7 @@ class _NewProjectDialogState extends State<_NewProjectDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-          title: const Text('New dossier'),
+          title: const Text('New room inspection'),
           content: SizedBox(
               width: 400,
               child: SingleChildScrollView(
@@ -1230,6 +1332,26 @@ class _NewProjectDialogState extends State<_NewProjectDialog> {
                                 labelText: 'Room or location'),
                             validator: _required,
                             maxLength: 100),
+                        TextFormField(
+                            controller: _building,
+                            decoration: const InputDecoration(
+                                labelText: 'Building (optional)'),
+                            maxLength: 200),
+                        Row(children: [
+                          Expanded(
+                              child: TextFormField(
+                                  controller: _floor,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Floor (optional)'),
+                                  maxLength: 200)),
+                          const SizedBox(width: 16),
+                          Expanded(
+                              child: TextFormField(
+                                  controller: _unit,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Unit (optional)'),
+                                  maxLength: 200)),
+                        ]),
                         _small,
                         Row(children: [
                           Expanded(
@@ -1278,6 +1400,7 @@ class ProjectScreen extends StatefulWidget {
 
 class _ProjectScreenState extends State<ProjectScreen> {
   int selected = 0;
+
   Future<void> _notes() async {
     final value = await showDialog<String>(
         context: context,
@@ -1288,33 +1411,146 @@ class _ProjectScreenState extends State<ProjectScreen> {
     }
   }
 
+  Future<void> _reference() async {
+    final profile = await Navigator.of(context).push<String>(
+        sensingRoute<String>(
+            context,
+            ReferenceLibraryScreen(
+                intent: SensingIntent.slab, store: widget.store)));
+    if (profile != null && mounted) {
+      await _perform(context,
+          () => widget.store.setProjectReference(widget.project, profile));
+    }
+  }
+
+  void _inspect() {
+    Navigator.of(context).pop();
+    widget.onMeasure(Module.slab, widget.project.id, selected);
+  }
+
+  void _report() => _push(
+      context, ReportScreen(store: widget.store, project: widget.project));
+
+  void _map(Measurement? measurement) => _push(
+      context,
+      DefectMapScreen(
+          store: widget.store,
+          project: widget.project,
+          initialCell: selected,
+          measurement: measurement,
+          onReport: _report));
+
+  String _statusName(AnnotationStatus status) => switch (status) {
+        AnnotationStatus.review => 'Needs review',
+        AnnotationStatus.defect => 'Marked defect',
+        AnnotationStatus.accepted => 'Accepted',
+      };
+
+  Color _statusColor(AnnotationStatus status) => switch (status) {
+        AnnotationStatus.review => C.amber,
+        AnnotationStatus.defect => C.red,
+        AnnotationStatus.accepted => C.green,
+      };
+
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
       animation: widget.store,
       builder: (_, __) {
         final p = widget.project;
+        final total = p.rows * p.columns;
         final all = widget.store.forProject(p.id).toList()
           ..sort((a, b) => b.created.compareTo(a.created));
         final latest = <int, Measurement>{};
+        final recorded = <int>{};
         for (final m in all) {
-          if (m.cell != null) latest.putIfAbsent(m.cell!, () => m);
+          final cell = m.cell;
+          if (cell != null && cell >= 0 && cell < total) {
+            latest.putIfAbsent(cell, () => m);
+            if (!_synthetic(m)) recorded.add(cell);
+          }
+        }
+        final marks = widget.store.annotationsForProject(p.id);
+        final cellMarks = <int, List<DefectAnnotation>>{};
+        final counts = {
+          for (final status in AnnotationStatus.values) status: 0
+        };
+        for (final mark in marks) {
+          counts[mark.status] = counts[mark.status]! + 1;
+          cellMarks.putIfAbsent(mark.cell, () => []).add(mark);
+        }
+        final statuses = <int, AnnotationStatus>{};
+        for (final entry in cellMarks.entries) {
+          statuses[entry.key] =
+              entry.value.any((m) => m.status == AnnotationStatus.defect)
+                  ? AnnotationStatus.defect
+                  : entry.value.any((m) => m.status == AnnotationStatus.review)
+                      ? AnnotationStatus.review
+                      : AnnotationStatus.accepted;
         }
         final active = latest[selected];
-        return _RoutePage(title: 'Project', children: [
+        final here = cellMarks[selected] ?? const <DefectAnnotation>[];
+        final history = all.where((m) => m.cell == selected).toList();
+        return _RoutePage(title: 'Room inspection', children: [
           PageHeading(p.name,
-              subtitle: '${p.room} · ${p.rows} rows × ${p.columns} columns'),
-          _gap,
+              subtitle: [
+                if (p.building.isNotEmpty) p.building,
+                if (p.floor.isNotEmpty) 'Floor ${p.floor}',
+                if (p.unit.isNotEmpty) 'Unit ${p.unit}',
+                p.room,
+              ].join(' · ')),
+          _small,
           Row(children: [
-            Metric('Recorded cells', '${latest.length} / ${p.rows * p.columns}',
-                accent: C.blue),
-            const SizedBox(width: 8),
-            Metric('Saved recordings', '${all.length}')
+            Metric('Needs review', '${counts[AnnotationStatus.review]}',
+                accent: C.amber),
+            Metric('Defects', '${counts[AnnotationStatus.defect]}',
+                accent: C.red),
+            Metric('Accepted', '${counts[AnnotationStatus.accepted]}',
+                accent: C.green),
           ]),
+          Text(
+              '${recorded.length}/$total points recorded · ${marks.length} human findings. Recordings are evidence, not handover approval.',
+              style: _body),
+          _small,
+          ExpansionTile(
+              tilePadding: EdgeInsets.zero,
+              title: const Text('Inspection checklist'),
+              subtitle: const Text('Reference → inspect → mark/photo → report',
+                  style: _body),
+              children: [
+                ListTile(
+                    leading:
+                        const Icon(Icons.library_music_outlined, color: C.blue),
+                    title: const Text('1 · Choose a reference'),
+                    subtitle: Text(p.referenceProfile == null
+                        ? 'Use known-sound material for comparison.'
+                        : 'Selected: ${p.referenceProfile}'),
+                    onTap: _reference),
+                ListTile(
+                    leading: const Icon(Icons.mic_rounded, color: C.blue),
+                    title: const Text('2 · Inspect the selected point'),
+                    subtitle: Text(
+                        'Tap at ${_cellName(selected, p.columns)} and review the result.'),
+                    onTap: _inspect),
+                ListTile(
+                    leading:
+                        const Icon(Icons.location_on_outlined, color: C.blue),
+                    title: const Text('3 · Mark and photograph'),
+                    subtitle: const Text(
+                        'Add your status, note and photo to the map.'),
+                    onTap: () => _map(active)),
+                ListTile(
+                    leading:
+                        const Icon(Icons.description_outlined, color: C.blue),
+                    title: const Text('4 · Prepare the handover report'),
+                    subtitle: const Text(
+                        'Review human findings and export the evidence.'),
+                    onTap: _report),
+              ]),
           _gap,
           const SectionTitle('Inspection grid'),
           _small,
           const Text(
-              'Select a cell to review its latest recording or capture another tap.',
+              'Choose a point. Colored dots show human marks; a recording alone does not mean accepted.',
               style: _body),
           _small,
           LayoutBuilder(builder: (_, constraints) {
@@ -1329,35 +1565,56 @@ class _ProjectScreenState extends State<ProjectScreen> {
                       crossAxisCount: p.columns,
                       crossAxisSpacing: 8,
                       mainAxisSpacing: 8),
-                  itemCount: p.rows * p.columns,
-                  itemBuilder: (_, i) => Semantics(
-                    label:
-                        '${_cellName(i, p.columns)}, ${latest.containsKey(i) ? 'recorded' : 'not recorded'}',
-                    selected: selected == i,
-                    child: Material(
-                      color: selected == i
-                          ? C.blue
-                          : latest.containsKey(i)
-                              ? C.bg
-                              : Colors.white,
-                      shape: RoundedRectangleBorder(
+                  itemCount: total,
+                  itemBuilder: (_, i) {
+                    final status = statuses[i];
+                    return Semantics(
+                      label:
+                          '${_cellName(i, p.columns)}, ${recorded.contains(i) ? 'recorded' : 'not recorded'}, ${status == null ? 'not human-marked' : _statusName(status)}',
+                      selected: selected == i,
+                      child: Material(
+                        color: selected == i
+                            ? C.blue
+                            : recorded.contains(i)
+                                ? C.bg
+                                : Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                                color: status != null
+                                    ? _statusColor(status)
+                                    : recorded.contains(i)
+                                        ? C.muted
+                                        : C.line)),
+                        child: InkWell(
                           borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(
-                              color: latest.containsKey(i) ? C.muted : C.line)),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(10),
-                        onTap: () => setState(() => selected = i),
-                        child: Center(
-                            child: Text(
-                                '${i ~/ p.columns + 1}:${i % p.columns + 1}',
-                                style: TextStyle(
-                                    fontFamily: 'monospace',
-                                    color: selected == i ? Colors.white : C.ink,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500))),
+                          onTap: () => setState(() => selected = i),
+                          child: Center(
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                Text(
+                                    '${i ~/ p.columns + 1}:${i % p.columns + 1}',
+                                    style: TextStyle(
+                                        fontFamily: 'monospace',
+                                        color: selected == i
+                                            ? Colors.white
+                                            : C.ink,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500)),
+                                if (status != null) ...[
+                                  const SizedBox(height: 4),
+                                  StatusDot(
+                                      color: selected == i
+                                          ? Colors.white
+                                          : _statusColor(status),
+                                      size: 6),
+                                ],
+                              ])),
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
             );
@@ -1371,31 +1628,67 @@ class _ProjectScreenState extends State<ProjectScreen> {
                 _small,
                 Text(
                     active == null
-                        ? 'No recording at this point'
-                        : '${_number(active.peakHz, 0)} Hz · latest peak',
+                        ? 'Start at this point'
+                        : _Evidence.headline(active),
                     style: _title),
                 _small,
                 Text(
                     active == null
-                        ? 'Capture a repeatable tap to begin a record for this cell.'
-                        : '${active.source}\n${_date(active.created)}',
+                        ? 'Choose a known-sound reference, then capture a repeatable tap. Add your own finding after reviewing the evidence.'
+                        : '${_synthetic(active) ? 'Demo recording · not inspection evidence' : 'Latest recording · ${active.source}'}\n${_date(active.created)}',
                     style: _body),
                 _small,
-                Wrap(spacing: 8, runSpacing: 8, children: [
-                  ActionButton('Measure this cell', icon: Icons.mic_rounded,
-                      onPressed: () {
-                    Navigator.of(context).pop();
-                    widget.onMeasure(Module.slab, p.id, selected);
-                  }),
+                Text(
+                    here.isEmpty
+                        ? 'Human status: not marked'
+                        : 'Human findings: ${here.map((m) => _statusName(m.status)).toSet().join(' · ')}',
+                    style: _body),
+                _small,
+                TextButton.icon(
+                    onPressed: _reference,
+                    icon: const Icon(Icons.library_music_outlined, size: 18),
+                    label: Text(p.referenceProfile == null
+                        ? 'First, choose a reference'
+                        : 'Reference: ${p.referenceProfile}')),
+                ActionButton(
+                    active == null ? 'Inspect this point' : 'Tap again',
+                    icon: Icons.mic_rounded,
+                    onPressed: _inspect),
+                _small,
+                Wrap(spacing: 8, runSpacing: 4, children: [
+                  TextButton.icon(
+                      onPressed: () => _map(active),
+                      icon: const Icon(Icons.location_on_outlined, size: 18),
+                      label: const Text('Map & photos')),
+                  TextButton.icon(
+                      onPressed: _report,
+                      icon: const Icon(Icons.description_outlined, size: 18),
+                      label: const Text('Report')),
                   if (active != null)
                     TextButton(
                         onPressed: () => _push(
                             context,
                             MeasurementScreen(
                                 store: widget.store, measurement: active)),
-                        child: const Text('View recording'))
-                ])
+                        child: const Text('View recording')),
+                ]),
               ])),
+          if (history.length > 1) ...[
+            _small,
+            ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                title: Text(
+                    'Previous recordings at this point (${history.length - 1})'),
+                children: [
+                  for (final m in history.skip(1))
+                    _MeasurementTile(
+                        m: m,
+                        onTap: () => _push(
+                            context,
+                            MeasurementScreen(
+                                store: widget.store, measurement: m))),
+                ]),
+          ],
           _gap,
           SectionTitle('Field notes',
               trailing: TextButton(
@@ -1404,26 +1697,9 @@ class _ProjectScreenState extends State<ProjectScreen> {
           Panel(
               child: Text(
                   p.notes.isEmpty
-                      ? 'No notes yet. Add material, tap method and site conditions to keep comparisons meaningful.'
+                      ? 'Add material, tap method and site conditions to keep comparisons meaningful.'
                       : p.notes,
                   style: _body)),
-          _gap,
-          ActionButton('Defect map & floor plan',
-              icon: Icons.location_on_outlined,
-              onPressed: () => _push(
-                  context,
-                  DefectMapScreen(
-                      store: widget.store,
-                      project: p,
-                      measurement: active,
-                      onReport: () => _push(context,
-                          ReportScreen(store: widget.store, project: p))))),
-          _small,
-          ActionButton('Handover report',
-              icon: Icons.description_outlined,
-              secondary: true,
-              onPressed: () => _push(
-                  context, ReportScreen(store: widget.store, project: p))),
           if (all.any((m) => m.cell == null)) ...[
             _gap,
             const SectionTitle('Unassigned recordings'),
@@ -1433,8 +1709,8 @@ class _ProjectScreenState extends State<ProjectScreen> {
                   m: m,
                   onTap: () => _push(context,
                       MeasurementScreen(store: widget.store, measurement: m))),
-              _small
-            ]
+              _small,
+            ],
           ],
         ]);
       });
@@ -1792,6 +2068,44 @@ class ReportScreen extends StatefulWidget {
 
 class _ReportScreenState extends State<ReportScreen> {
   bool _exporting = false;
+  static const _verification =
+      'Inspector verification required. Human marks are recorded observations, not automatic approval. This report is not a safety certificate.';
+
+  String _findingEvidence(DefectAnnotation mark, _HandoverSummary summary) {
+    final record = summary.linkedRecord(mark);
+    final evidence = <String>[
+      '${mark.provenance} · finding ID ${mark.id}',
+      'Inspector note: ${mark.note.trim().isEmpty ? "No note recorded." : mark.note}',
+      mark.photoBase64 == null
+          ? 'Photo: none attached.'
+          : 'Photo: attached to this finding${mark.x != null && mark.y != null ? "; image pin included" : ""}.',
+      if (mark.tileId != null) 'Visual tile: ${mark.tileId}',
+      mark.planX != null && mark.planY != null
+          ? 'Plan pin: x=${mark.planX!.toStringAsFixed(4)}, y=${mark.planY!.toStringAsFixed(4)} (normalized).'
+          : 'No architectural plan location recorded.',
+    ];
+    if (record == null) {
+      evidence.add(mark.measurementSource == null
+          ? 'No linked measurement; this is a human-only observation.'
+          : 'Linked measurement unavailable; retained source: ${mark.measurementSource}. No measurement verdict can be verified.');
+    } else {
+      final verdict =
+          InspectionVerdict.from(record, _Evidence.intentOf(record));
+      evidence.addAll([
+        'Linked recording: ${record.label} · ${record.id} · ${_date(record.created)}',
+        'Source: ${record.source}${_synthetic(record) ? " · SYNTHETIC / DEMO, not field inspection evidence" : ""}',
+        'Measurement verdict (not human status): ${verdict.title}',
+        'Measurement next action: ${verdict.advice}',
+        if (record.flags.isNotEmpty) 'Signal flags: ${record.flags.join("; ")}',
+        if (record.context['captureUncertainty'] case final uncertainty?)
+          'Capture-quality uncertainty index: $uncertainty (not a defect probability).',
+      ]);
+    }
+    evidence
+        .add('Inspector next action: ${_HandoverSummary.action(mark.status)}');
+    return evidence.join('\n');
+  }
+
   Future<void> _export() async {
     setState(() => _exporting = true);
     try {
@@ -1801,14 +2115,11 @@ class _ReportScreenState extends State<ReportScreen> {
           await rootBundle.load('assets/fonts/Nunito-SemiBold.ttf'));
       final document = pw.Document(
           theme: pw.ThemeData.withFont(base: regular, bold: semibold));
-      final text = widget.store.reportText(widget.project);
-      final marks = widget.store.annotationsForProject(widget.project.id);
+      final summary = _HandoverSummary(widget.store, widget.project);
+      final marks = summary.marks;
       final plan = widget.project.floorPlan;
       final planImage = plan == null ? null : await floorPlanPdfImage(plan);
-      final latestMarks = <int, DefectAnnotation>{};
-      for (final mark in marks) {
-        latestMarks.putIfAbsent(mark.cell, () => mark);
-      }
+      final latestMarks = summary.latestMarks;
       document.addPage(pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
           margin: const pw.EdgeInsets.all(40),
@@ -1829,10 +2140,36 @@ class _ReportScreenState extends State<ReportScreen> {
                     style: pw.TextStyle(
                         fontSize: 26, fontWeight: pw.FontWeight.bold)),
                 pw.SizedBox(height: 12),
-                pw.Text('Room: ${widget.project.room}'),
-                pw.Text('Building: ${widget.project.building} / Floor: ${widget.project.floor} / Unit: ${widget.project.unit}'),
-                pw.Text(
-                    'Findings: ${marks.length} · Review: ${marks.where((m) => m.status == AnnotationStatus.review).length} · Defects: ${marks.where((m) => m.status == AnnotationStatus.defect).length} · Accepted: ${marks.where((m) => m.status == AnnotationStatus.accepted).length}'),
+                pw.Text(summary.place),
+                pw.Text('Project ID: ${widget.project.id}'),
+                pw.SizedBox(height: 12),
+                pw.Text(summary.headline,
+                    style: pw.TextStyle(
+                        fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                pw.Text(summary.humanCounts),
+                pw.Text(summary.coverage),
+                pw.SizedBox(height: 8),
+                pw.Text('Next actions: ${summary.nextActions}'),
+                pw.SizedBox(height: 8),
+                pw.Text(_verification, style: const pw.TextStyle(fontSize: 9)),
+                if (summary.syntheticCount > 0)
+                  pw.Text(
+                      '${summary.syntheticCount} synthetic/demo recording(s) are not field inspection evidence.',
+                      style: const pw.TextStyle(fontSize: 9)),
+                pw.SizedBox(height: 14),
+                pw.Text('Human findings & evidence',
+                    style: pw.TextStyle(
+                        fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                if (marks.isEmpty)
+                  pw.Text(
+                      'No human findings recorded. No acceptance has been established.'),
+                for (final (index, mark) in marks.indexed)
+                  pw.Padding(
+                      padding: const pw.EdgeInsets.only(top: 8, bottom: 8),
+                      child: pw.Text(
+                          '#${index + 1} / ${_cellName(mark.cell, widget.project.columns)} / HUMAN ${mark.status.name}\n${_findingEvidence(mark, summary)}',
+                          style: const pw.TextStyle(
+                              fontSize: 10, lineSpacing: 3))),
                 pw.SizedBox(height: 14),
                 if (plan != null && planImage != null) ...[
                   pw.Text('Architectural plan / ${plan.name}',
@@ -1848,12 +2185,7 @@ class _ReportScreenState extends State<ReportScreen> {
                       style: const pw.TextStyle(fontSize: 9)),
                   pw.SizedBox(height: 14),
                 ],
-                ...text.split('\n').map((line) => pw.Padding(
-                    padding: const pw.EdgeInsets.only(bottom: 5),
-                    child: pw.Text(line,
-                        style:
-                            const pw.TextStyle(fontSize: 10, lineSpacing: 3)))),
-                pw.Text('Inspection map & findings',
+                pw.Text('Inspection map',
                     style: pw.TextStyle(
                         fontSize: 16, fontWeight: pw.FontWeight.bold)),
                 pw.SizedBox(height: 10),
@@ -1876,19 +2208,11 @@ class _ReportScreenState extends State<ReportScreen> {
                                   null => PdfColors.grey100,
                                 }),
                             child: pw.Text(
-                                'R${row + 1}:C${col + 1}\n${latestMarks[row * widget.project.columns + col]?.status.name ?? "unmarked"}',
+                                'R${row + 1}:C${col + 1}\n${latestMarks[row * widget.project.columns + col]?.status.name ?? summary.unmarkedLabel(row * widget.project.columns + col)}',
                                 style: const pw.TextStyle(fontSize: 7))),
                     ]),
                 ]),
                 pw.SizedBox(height: 12),
-                for (var i = 0; i < marks.length; i++)
-                  pw.Padding(
-                      padding: const pw.EdgeInsets.only(bottom: 8),
-                      child: pw.Text(
-                          '#${i + 1} / ${_cellName(marks[i].cell, widget.project.columns)} / ${marks[i].status.name}'
-                          '${marks[i].tileId == null ? "" : " / tile ${marks[i].tileId}"}'
-                          '${marks[i].planX == null ? " / no plan location" : ""}\n${marks[i].note}',
-                          style: const pw.TextStyle(fontSize: 10))),
                 for (final (index, mark) in marks.indexed
                     .where((entry) => entry.$2.photoBase64 != null))
                   pw.Column(
@@ -1921,6 +2245,31 @@ class _ReportScreenState extends State<ReportScreen> {
                         pw.Text(mark.note,
                             style: const pw.TextStyle(fontSize: 10)),
                       ]),
+                pw.SizedBox(height: 18),
+                pw.Text('Technical evidence appendix',
+                    style: pw.TextStyle(
+                        fontSize: 16, fontWeight: pw.FontWeight.bold)),
+                pw.Text(
+                    'Digital signal measurements support review; they do not certify construction quality.',
+                    style: const pw.TextStyle(fontSize: 9)),
+                if (widget.project.notes.trim().isNotEmpty)
+                  pw.Text('Project notes: ${widget.project.notes}'),
+                for (final record in summary.records)
+                  pw.Padding(
+                      padding: const pw.EdgeInsets.only(top: 10),
+                      child: pw.Text(
+                          '${record.id} / ${record.cell == null ? "unassigned" : _cellName(record.cell!, widget.project.columns)} / ${_date(record.created)}\n'
+                          'Source: ${record.source}${_synthetic(record) ? " / SYNTHETIC DEMO" : ""}\n'
+                          'Verdict: ${_Evidence.headline(record)}\n'
+                          'Peak: ${_number(record.peakHz)} Hz · HII: ${_number(record.hiiDb)} dB · Ring: ${_number(record.decayMs)} ms\n'
+                          'RMS: ${_number(record.rmsDb)} dBFS · Estimated SNR: ${_number(record.snrDb)} dB\n'
+                          'Signal flags: ${record.flags.isEmpty ? "None recorded" : record.flags.join("; ")}\n'
+                          '${record.context["captureUncertainty"] == null ? "" : "Capture-quality uncertainty index (not defect probability): ${record.context["captureUncertainty"]}\n"}'
+                          '${record.context["referenceTapIds"] == null ? "" : "Reference recording IDs: ${record.context["referenceTapIds"]}\n"}'
+                          '${record.context["queryTapIds"] == null ? "" : "Repeated query recording IDs: ${record.context["queryTapIds"]}\n"}'
+                          '${record.context["methodNote"] ?? ""}',
+                          style:
+                              const pw.TextStyle(fontSize: 9, lineSpacing: 3))),
               ]));
       final bytes = await document.save();
       await Printing.sharePdf(
@@ -1937,32 +2286,89 @@ class _ReportScreenState extends State<ReportScreen> {
       animation: widget.store,
       builder: (_, __) {
         final p = widget.project;
-        final all = widget.store.forProject(p.id).toList()
-          ..sort((a, b) => b.created.compareTo(a.created));
-        final latest = <int, Measurement>{};
-        for (final m in all) {
-          if (m.cell != null) latest.putIfAbsent(m.cell!, () => m);
-        }
-        final marks = widget.store.annotationsForProject(p.id);
-        final review =
-            marks.where((m) => m.status == AnnotationStatus.review).length;
-        final defects =
-            marks.where((m) => m.status == AnnotationStatus.defect).length;
-        final accepted =
-            marks.where((m) => m.status == AnnotationStatus.accepted).length;
-        final actual = latest.values.where((m) => !_synthetic(m)).length;
+        final summary = _HandoverSummary(widget.store, p);
+        final latest = summary.latest;
+        final marks = summary.marks;
         return _RoutePage(title: 'Handover report', children: [
-          PageHeading(p.name, subtitle: p.room),
+          PageHeading(p.name, subtitle: summary.place),
+          Text('Project ID: ${p.id}', style: _body),
+          _small,
+          Panel(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Text(summary.headline, style: _title),
+                _small,
+                Text(summary.coverage, style: _body),
+                _small,
+                Text('Next actions: ${summary.nextActions}', style: _body),
+                _small,
+                const Text(_verification, style: _body),
+                if (summary.syntheticCount > 0) ...[
+                  _small,
+                  Text(
+                      '${summary.syntheticCount} synthetic/demo recording(s) excluded from field coverage.',
+                      style: _body),
+                ],
+              ])),
           _gap,
           Row(children: [
-            Metric('Review', '$review', accent: C.amber),
-            Metric('Defects', '$defects', accent: C.red),
-            Metric('Accepted', '$accepted', accent: C.green),
+            Metric('Review', '${summary.review}', accent: C.amber),
+            Metric('Defects', '${summary.defects}', accent: C.red),
+            Metric('Accepted', '${summary.accepted}', accent: C.green),
           ]),
+          _small,
+          const Text(
+              'Counts are human findings, not automatic measurement decisions.',
+              style: _body),
           _small,
           ActionButton(_exporting ? 'Preparing…' : 'Export handover PDF',
               icon: Icons.ios_share_rounded,
               onPressed: _exporting ? null : _export),
+          _gap,
+          const SectionTitle('Human findings & next actions'),
+          _small,
+          if (marks.isEmpty)
+            const Text(
+                'No human findings recorded. Add inspector notes, photos and a status; no acceptance has been established.',
+                style: _body),
+          for (final (index, mark) in marks.indexed) ...[
+            Panel(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  Row(children: [
+                    Icon(
+                        mark.status == AnnotationStatus.accepted
+                            ? Icons.check_circle_outline_rounded
+                            : Icons.location_on_outlined,
+                        color: floorPlanStatusColor(mark.status)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                        child: Text(
+                            '#${index + 1} · ${_cellName(mark.cell, p.columns)} · Human ${mark.status.name}',
+                            style: _title)),
+                  ]),
+                  _small,
+                  Text(_findingEvidence(mark, summary), style: _body),
+                  if (mark.photoBase64 != null) ...[
+                    _small,
+                    Image.memory(base64Decode(mark.photoBase64!),
+                        height: 160, fit: BoxFit.contain),
+                  ],
+                  if (summary.linkedRecord(mark) case final record?) ...[
+                    _small,
+                    TextButton.icon(
+                        onPressed: () => _push(
+                            context,
+                            MeasurementScreen(
+                                store: widget.store, measurement: record)),
+                        icon: const Icon(Icons.graphic_eq_rounded),
+                        label: const Text('Open linked measurement')),
+                  ],
+                ])),
+            _small,
+          ],
           _gap,
           SectionTitle('Room map',
               trailing: TextButton(
@@ -1989,9 +2395,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   crossAxisSpacing: 6),
               itemCount: p.rows * p.columns,
               itemBuilder: (context, i) {
-                final cellMarks = marks.where((m) => m.cell == i);
-                final status =
-                    cellMarks.isEmpty ? null : cellMarks.first.status;
+                final status = summary.latestMarks[i]?.status;
                 final color = switch (status) {
                   AnnotationStatus.review => C.amber,
                   AnnotationStatus.defect => C.red,
@@ -2006,7 +2410,7 @@ class _ReportScreenState extends State<ReportScreen> {
                 };
                 return Semantics(
                     label:
-                        '${_cellName(i, p.columns)} ${status?.name ?? "Unmarked"}',
+                        '${_cellName(i, p.columns)} ${status?.name ?? summary.unmarkedLabel(i)}',
                     child: Container(
                         decoration: BoxDecoration(
                             color: color.withValues(alpha: .09),
@@ -2016,46 +2420,19 @@ class _ReportScreenState extends State<ReportScreen> {
                             children: [
                               Icon(icon, color: color, size: 24),
                               Text('${i + 1}', style: TextStyle(color: color)),
+                              Text(status?.name ?? summary.unmarkedLabel(i),
+                                  style: TextStyle(color: color, fontSize: 9)),
                             ])));
               }),
           _small,
           Text(
-              '$actual / ${p.rows * p.columns} microphone points · ${all.length} recordings',
+              '${summary.actualCells.length} / ${p.rows * p.columns} grid cells have non-synthetic recordings · ${summary.records.length} recordings total. Unmarked = recorded but no human status; uninspected = neither a human mark nor a non-synthetic recording.',
               style: _body),
           _gap,
-          for (final (index, mark) in marks.indexed) ...[
-            Panel(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Row(children: [
-                    Icon(
-                        mark.status == AnnotationStatus.accepted
-                            ? Icons.check_circle_outline_rounded
-                            : Icons.location_on_outlined,
-                        color: floorPlanStatusColor(mark.status)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                        child: Text(
-                            '#${index + 1} · ${_cellName(mark.cell, p.columns)} · ${mark.status.name}',
-                            style: _title)),
-                  ]),
-                  if (mark.note.isNotEmpty) ...[
-                    _small,
-                    Text(mark.note, style: _body)
-                  ],
-                  if (mark.photoBase64 != null) ...[
-                    _small,
-                    Image.memory(base64Decode(mark.photoBase64!),
-                        height: 160, fit: BoxFit.contain)
-                  ],
-                ])),
-            _small,
-          ],
           if (latest.isNotEmpty)
             ExpansionTile(
                 tilePadding: EdgeInsets.zero,
-                title: const Text('Measured results'),
+                title: const Text('Technical measurement evidence'),
                 children: [
                   for (final entry in latest.entries) ...[
                     Align(
@@ -2070,6 +2447,83 @@ class _ReportScreenState extends State<ReportScreen> {
           if (p.notes.isNotEmpty) ...[_gap, Text(p.notes, style: _body)],
         ]);
       });
+}
+
+class _HandoverSummary {
+  _HandoverSummary(ThudStore store, this.project)
+      : records = store.forProject(project.id).toList()
+          ..sort((a, b) => b.created.compareTo(a.created)),
+        marks = store.annotationsForProject(project.id) {
+    for (final record in records) {
+      final cell = record.cell;
+      if (cell != null && cell >= 0 && cell < total) {
+        latest.putIfAbsent(cell, () => record);
+        if (!_synthetic(record)) actualCells.add(cell);
+      }
+    }
+    for (final mark in marks) {
+      latestMarks.putIfAbsent(mark.cell, () => mark);
+    }
+  }
+
+  final Project project;
+  final List<Measurement> records;
+  final List<DefectAnnotation> marks;
+  final latest = <int, Measurement>{};
+  final latestMarks = <int, DefectAnnotation>{};
+  final actualCells = <int>{};
+  int get total => project.rows * project.columns;
+  int get review =>
+      marks.where((m) => m.status == AnnotationStatus.review).length;
+  int get defects =>
+      marks.where((m) => m.status == AnnotationStatus.defect).length;
+  int get accepted =>
+      marks.where((m) => m.status == AnnotationStatus.accepted).length;
+  int get syntheticCount => records.where(_synthetic).length;
+  int get unmarked =>
+      actualCells.where((cell) => !latestMarks.containsKey(cell)).length;
+  int get uninspected =>
+      total -
+      {
+        ...actualCells,
+        ...latestMarks.keys.where((cell) => cell >= 0 && cell < total),
+      }.length;
+  String get place => [
+        'Room: ${project.room.trim().isEmpty ? "Not recorded" : project.room}',
+        if (project.building.trim().isNotEmpty) 'Building: ${project.building}',
+        if (project.floor.trim().isNotEmpty) 'Floor: ${project.floor}',
+        if (project.unit.trim().isNotEmpty) 'Unit: ${project.unit}',
+      ].join(' · ');
+  String get headline => defects > 0 || review > 0
+      ? 'Open human findings — follow-up required'
+      : marks.isEmpty
+          ? 'Handover not yet reviewed'
+          : 'Human acceptance recorded — verification still required';
+  String get humanCounts =>
+      '${marks.length} human findings · $review review · $defects defects · $accepted accepted';
+  String get coverage =>
+      '${latestMarks.keys.where((cell) => cell >= 0 && cell < total).length} / $total grid cells human-marked · $unmarked recorded but unmarked · $uninspected uninspected';
+  String get nextActions => [
+        if (defects > 0)
+          'Resolve $defects human-marked defect(s) and re-inspect.',
+        if (review > 0) 'Verify $review review finding(s) on site.',
+        if (unmarked > 0) 'Assign human status to $unmarked recorded cell(s).',
+        if (uninspected > 0) 'Inspect $uninspected remaining cell(s).',
+        'Inspector to verify evidence and handover disposition.',
+      ].join(' ');
+  String unmarkedLabel(int cell) =>
+      actualCells.contains(cell) ? 'unmarked' : 'uninspected';
+  Measurement? linkedRecord(DefectAnnotation mark) => records
+      .where((m) => m.id == mark.measurementId && m.cell == mark.cell)
+      .firstOrNull;
+  static String action(AnnotationStatus status) => switch (status) {
+        AnnotationStatus.review =>
+          'Verify on site; add evidence and update the human status.',
+        AnnotationStatus.defect =>
+          'Arrange rectification and record a re-inspection before closure.',
+        AnnotationStatus.accepted =>
+          'Retain evidence of the human acceptance; inspector verification still required.',
+      };
 }
 
 class SettingsScreen extends StatelessWidget {

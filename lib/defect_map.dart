@@ -20,10 +20,12 @@ class DefectMapScreen extends StatefulWidget {
       required this.store,
       required this.project,
       this.measurement,
+      this.initialCell,
       this.onReport});
   final ThudStore store;
   final Project project;
   final Measurement? measurement;
+  final int? initialCell;
   final VoidCallback? onReport;
 
   @override
@@ -41,15 +43,31 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
   double? _x, _y, _planX, _planY;
   bool _busy = false, _showPlan = true;
   Object? _baseline;
-  Object get _draft =>
-      (_cell, _note.text, _status, _linkId, _photo, _x, _y, _planX, _planY, _tileId);
+  Object get _draft => (
+        _cell,
+        _note.text,
+        _status,
+        _linkId,
+        _photo,
+        _x,
+        _y,
+        _planX,
+        _planY,
+        _tileId
+      );
   bool get _dirty => _draft != _baseline;
 
   @override
   void initState() {
     super.initState();
     final m = widget.measurement;
-    if (m?.projectId == widget.project.id && m?.cell != null) _cell = m!.cell!;
+    final initialCell = widget.initialCell ??
+        (m?.projectId == widget.project.id ? m?.cell : null);
+    if (initialCell != null &&
+        initialCell >= 0 &&
+        initialCell < widget.project.rows * widget.project.columns) {
+      _cell = initialCell;
+    }
     _linkId = m?.id;
     _sourceSnapshot = m?.source;
     _baseline = _draft;
@@ -178,8 +196,11 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
     });
     try {
       final file = await _picker.pickImage(
-          source: source, maxWidth: 2048, maxHeight: 2048,
-          imageQuality: 88, requestFullMetadata: false);
+          source: source,
+          maxWidth: 2048,
+          maxHeight: 2048,
+          imageQuality: 88,
+          requestFullMetadata: false);
       if (file == null) return;
       if (await file.length() > FloorPlan.maxBytes) {
         throw Exception(
@@ -228,10 +249,15 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
   Future<void> _editTiles() async {
     if (!await _canDiscard() || !mounted) return;
     await _newMark(confirmed: true);
-    await Navigator.push(context, MaterialPageRoute<void>(builder: (_) =>
-        TileInspectionEditor(store: widget.store, project: widget.project)));
+    await Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+            builder: (_) => TileInspectionEditor(
+                store: widget.store, project: widget.project)));
     if (!mounted) return;
-    final ids = widget.project.floorPlan?.tileLayout?.tiles.map((t) => t.id).toSet() ?? <String>{};
+    final ids =
+        widget.project.floorPlan?.tileLayout?.tiles.map((t) => t.id).toSet() ??
+            <String>{};
     setState(() {
       if (!ids.contains(_tileId)) _tileId = null;
       _baseline = _draft;
@@ -242,26 +268,45 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
     final building = TextEditingController(text: widget.project.building);
     final floor = TextEditingController(text: widget.project.floor);
     final unit = TextEditingController(text: widget.project.unit);
-    final save = await showDialog<bool>(context: context, builder: (context) =>
-        AlertDialog(title: const Text('Indoor location'), content: Column(
-          mainAxisSize: MainAxisSize.min, children: [
-            Text('Project: ${widget.project.name} · Room: ${widget.project.room}'),
-            TextField(controller: building, decoration: const InputDecoration(labelText: 'Building')),
-            TextField(controller: floor, decoration: const InputDecoration(labelText: 'Floor')),
-            TextField(controller: unit, decoration: const InputDecoration(labelText: 'Apartment / unit')),
-          ]), actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-            TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Save')),
-          ]));
+    final save = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+                title: const Text('Indoor location'),
+                content: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text(
+                      'Project: ${widget.project.name} · Room: ${widget.project.room}'),
+                  TextField(
+                      controller: building,
+                      decoration: const InputDecoration(labelText: 'Building')),
+                  TextField(
+                      controller: floor,
+                      decoration: const InputDecoration(labelText: 'Floor')),
+                  TextField(
+                      controller: unit,
+                      decoration:
+                          const InputDecoration(labelText: 'Apartment / unit')),
+                ]),
+                actions: [
+                  TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancel')),
+                  TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Save')),
+                ]));
     if (save == true) {
       try {
         await widget.store.updateProjectLocation(widget.project,
-            building: building.text.trim(), floor: floor.text.trim(), unit: unit.text.trim());
+            building: building.text.trim(),
+            floor: floor.text.trim(),
+            unit: unit.text.trim());
       } catch (error) {
         if (mounted) setState(() => _error = 'Location was not saved. $error');
       }
     }
-    building.dispose(); floor.dispose(); unit.dispose();
+    building.dispose();
+    floor.dispose();
+    unit.dispose();
   }
 
   Future<void> _pick(ImageSource source) async {
@@ -374,7 +419,8 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
               final project = widget.project;
               final marks = widget.store.annotationsForProject(project.id);
               final selectedTile = project.floorPlan?.tileLayout?.tiles
-                  .where((tile) => tile.id == _tileId).firstOrNull;
+                  .where((tile) => tile.id == _tileId)
+                  .firstOrNull;
               final records = widget.store.forProject(project.id);
               final here = marks.where((a) => a.cell == _cell).toList();
               final choices = <String, Measurement>{
@@ -389,13 +435,18 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                     PageHeading(project.name,
                         subtitle:
                             '${project.room.isEmpty ? 'Inspection grid' : project.room} · ${project.rows} × ${project.columns}'),
-                    TextButton.icon(onPressed: _location,
+                    TextButton.icon(
+                        onPressed: _location,
                         icon: const Icon(Icons.location_on_outlined, size: 16),
-                        label: Text([project.building, project.floor, project.unit]
-                            .where((v) => v.isNotEmpty).join(' · ').isEmpty
+                        label: Text([
+                          project.building,
+                          project.floor,
+                          project.unit
+                        ].where((v) => v.isNotEmpty).join(' · ').isEmpty
                             ? 'Set building / floor / unit'
                             : [project.building, project.floor, project.unit]
-                                .where((v) => v.isNotEmpty).join(' · '))),
+                                .where((v) => v.isNotEmpty)
+                                .join(' · '))),
                     const SizedBox(height: 20),
                     Row(children: [
                       ChoiceChip(
@@ -417,12 +468,16 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                     ]),
                     const SizedBox(height: 12),
                     Wrap(spacing: 8, runSpacing: 8, children: [
-                      OutlinedButton.icon(onPressed: () => _importPlan(ImageSource.camera),
-                          icon: const Icon(Icons.camera_alt_outlined), label: const Text('Scan tiled floor')),
+                      OutlinedButton.icon(
+                          onPressed: () => _importPlan(ImageSource.camera),
+                          icon: const Icon(Icons.camera_alt_outlined),
+                          label: const Text('Scan tiled floor')),
                       if (project.floorPlan != null)
-                        OutlinedButton.icon(onPressed: _editTiles,
+                        OutlinedButton.icon(
+                            onPressed: _editTiles,
                             icon: const Icon(Icons.grid_on),
-                            label: Text('Tile map · ${project.floorPlan!.tileLayout?.tiles.length ?? 0} visible')),
+                            label: Text(
+                                'Tile map · ${project.floorPlan!.tileLayout?.tiles.length ?? 0} visible')),
                     ]),
                     const SizedBox(height: 12),
                     if (_showPlan && project.floorPlan == null)
@@ -472,12 +527,16 @@ class _DefectMapScreenState extends State<DefectMapScreen> {
                           'Review · amber   Defect · red   Accepted · green',
                           style: TextStyle(color: C.muted, fontSize: 12)),
                       if (_tileId != null)
-                        Text('Selected tile $_tileId · row ${(selectedTile?.row ?? 0) + 1}, column ${(selectedTile?.column ?? 0) + 1} · saved with this finding',
-                            style: const TextStyle(color: C.blue, fontSize: 12)),
+                        Text(
+                            'Selected tile $_tileId · row ${(selectedTile?.row ?? 0) + 1}, column ${(selectedTile?.column ?? 0) + 1} · saved with this finding',
+                            style:
+                                const TextStyle(color: C.blue, fontSize: 12)),
                       if (_planX != null)
                         TextButton(
-                            onPressed: () =>
-                                setState(() { _planX = _planY = null; _tileId = null; }),
+                            onPressed: () => setState(() {
+                                  _planX = _planY = null;
+                                  _tileId = null;
+                                }),
                             child: const Text('Clear this finding’s plan pin')),
                     ],
                     if (!_showPlan)

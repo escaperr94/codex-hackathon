@@ -48,8 +48,10 @@ class Measurement {
   final Map<String, String> context;
   final List<double> embedding;
   final String? encoderVersion;
-  bool get hasEmbedding => encoderVersion == embeddingVersion &&
-      embedding.length == 1024 && embedding.every((x) => x.isFinite);
+  bool get hasEmbedding =>
+      encoderVersion == embeddingVersion &&
+      embedding.length == 1024 &&
+      embedding.every((x) => x.isFinite);
 
   Measurement withEmbedding(List<double> values) => _assigned(projectId, cell,
       embedding: List.unmodifiable(values), encoderVersion: embeddingVersion);
@@ -102,15 +104,18 @@ class Measurement {
         cell: value['cell'] as int?,
         intent: value['intent'] as String?,
         embedding: List<double>.unmodifiable(
-            (value['embedding'] as List? ?? const []).map((e) => (e as num).toDouble())),
+            (value['embedding'] as List? ?? const [])
+                .map((e) => (e as num).toDouble())),
         encoderVersion: value['encoderVersion'] as String?,
         context: Map<String, String>.unmodifiable(
             (value['context'] as Map?)?.cast<String, String>() ?? const {}),
       );
 
   Measurement _assigned(String? projectId, int? cell,
-          {String? intent, Map<String, String>? context,
-          List<double>? embedding, String? encoderVersion}) =>
+          {String? intent,
+          Map<String, String>? context,
+          List<double>? embedding,
+          String? encoderVersion}) =>
       Measurement(
         id: id,
         label: label,
@@ -239,8 +244,10 @@ class FloorPlan {
         name: value['name'] as String,
         width: value['width'] as int,
         height: value['height'] as int,
-        tileLayout: value['tileLayout'] == null ? null :
-            TileLayout.fromJson(Map<String, dynamic>.from(value['tileLayout'] as Map)),
+        tileLayout: value['tileLayout'] == null
+            ? null
+            : TileLayout.fromJson(
+                Map<String, dynamic>.from(value['tileLayout'] as Map)),
       );
 }
 
@@ -255,11 +262,13 @@ class Project {
       this.building = '',
       this.floor = '',
       this.unit = '',
+      this.referenceProfile,
       this.floorPlan});
   final String id, name, room;
   final int rows, columns;
   String notes;
   String building, floor, unit;
+  String? referenceProfile;
   FloorPlan? floorPlan;
 
   Map<String, dynamic> toJson() => {
@@ -272,6 +281,7 @@ class Project {
         'building': building,
         'floor': floor,
         'unit': unit,
+        'referenceProfile': referenceProfile,
         'floorPlan': floorPlan?.toJson(),
       };
   factory Project.fromJson(Map<String, dynamic> value) => Project(
@@ -284,6 +294,7 @@ class Project {
         building: value['building'] as String? ?? '',
         floor: value['floor'] as String? ?? '',
         unit: value['unit'] as String? ?? '',
+        referenceProfile: value['referenceProfile'] as String?,
         floorPlan: value['floorPlan'] == null
             ? null
             : FloorPlan.fromJson(
@@ -352,7 +363,10 @@ class ThudStore extends ChangeNotifier {
       final oldAnnotations = List<DefectAnnotation>.of(annotations);
       final oldNotes = {for (final p in projects) p.id: p.notes};
       final oldPlans = {for (final p in projects) p.id: p.floorPlan};
-      final oldLocations = {for (final p in projects) p.id: (p.building, p.floor, p.unit)};
+      final oldLocations = {
+        for (final p in projects) p.id: (p.building, p.floor, p.unit)
+      };
+      final oldProfiles = {for (final p in projects) p.id: p.referenceProfile};
       final oldReference = reference;
       final oldHaptics = haptics, oldSounds = sounds;
       try {
@@ -377,6 +391,7 @@ class ThudStore extends ChangeNotifier {
         for (final p in projects) {
           p.notes = oldNotes[p.id]!;
           p.floorPlan = oldPlans[p.id];
+          p.referenceProfile = oldProfiles[p.id];
           final location = oldLocations[p.id]!;
           p.building = location.$1;
           p.floor = location.$2;
@@ -398,9 +413,13 @@ class ThudStore extends ChangeNotifier {
         if (sounds != null) this.sounds = sounds;
       });
 
-  Future<Project> addProject(String name, String room, int rows, int columns) =>
+  Future<Project> addProject(String name, String room, int rows, int columns,
+          {String building = '', String floor = '', String unit = ''}) =>
       _change(() {
         if (name.trim().isEmpty) throw Exception('Enter a project name.');
+        if ([building, floor, unit].any((v) => v.length > 200)) {
+          throw Exception('Keep location fields under 200 characters.');
+        }
         if (rows < 1 || columns < 1 || rows > 100 || columns > 100) {
           throw Exception('Choose between 1 and 100 rows and columns.');
         }
@@ -409,7 +428,10 @@ class ThudStore extends ChangeNotifier {
             name: name.trim(),
             room: room.trim(),
             rows: rows,
-            columns: columns);
+            columns: columns,
+            building: building.trim(),
+            floor: floor.trim(),
+            unit: unit.trim());
         projects.insert(0, value);
         return value;
       });
@@ -419,43 +441,82 @@ class ThudStore extends ChangeNotifier {
         if (index < 0) throw Exception('This project is no longer available.');
         projects[index].notes = notes;
       });
+  Future<void> setProjectReference(Project project, String profile) =>
+      _change(() {
+        if (profile.trim().isEmpty || profile.trim().length > 200) {
+          throw Exception(
+              'Choose a named reference profile under 200 characters.');
+        }
+        final target = projects.where((p) => p.id == project.id).firstOrNull;
+        if (target == null)
+          throw Exception('This project is no longer available.');
+        target.referenceProfile = profile.trim();
+      });
 
-  Future<void> updateProjectLocation(Project project, {
-    required String building, required String floor, required String unit,
-  }) => _change(() {
-    if ([building, floor, unit].any((v) => v.length > 200)) {
-      throw Exception('Keep location fields under 200 characters.');
-    }
-    final target = projects.where((p) => p.id == project.id).firstOrNull;
-    if (target == null) throw Exception('This project is no longer available.');
-    target.building = building.trim();
-    target.floor = floor.trim();
-    target.unit = unit.trim();
-  });
+  Future<void> updateProjectLocation(
+    Project project, {
+    required String building,
+    required String floor,
+    required String unit,
+  }) =>
+      _change(() {
+        if ([building, floor, unit].any((v) => v.length > 200)) {
+          throw Exception('Keep location fields under 200 characters.');
+        }
+        final target = projects.where((p) => p.id == project.id).firstOrNull;
+        if (target == null)
+          throw Exception('This project is no longer available.');
+        target.building = building.trim();
+        target.floor = floor.trim();
+        target.unit = unit.trim();
+      });
 
   Future<void> updateTileLayout(Project project, TileLayout layout,
-      {bool resetTileLinks = false}) => _change(() {
-    layout.validate();
-    final target = projects.where((p) => p.id == project.id).firstOrNull;
-    final plan = target?.floorPlan;
-    if (target == null || plan == null) throw Exception('Import a floor image first.');
-    final ids = layout.tiles.map((t) => t.id).toSet();
-    final removed = annotations.where((a) => a.projectId == target.id &&
-        a.tileId != null && !ids.contains(a.tileId)).toList();
-    if (removed.isNotEmpty && !resetTileLinks) {
-      throw Exception('Confirm unlinking findings on removed tiles before changing the layout.');
-    }
-    if (removed.isNotEmpty) {
-      final removedIds = removed.map((a) => a.id).toSet();
-      annotations = annotations.map((a) => !removedIds.contains(a.id) ? a :
-          DefectAnnotation(id: a.id, projectId: a.projectId, cell: a.cell,
-            status: a.status, note: a.note, measurementId: a.measurementId,
-            measurementSource: a.measurementSource, photoBase64: a.photoBase64,
-            x: a.x, y: a.y, planX: a.planX, planY: a.planY)).toList();
-    }
-    target.floorPlan = FloorPlan(imageBase64: plan.imageBase64, name: plan.name,
-        width: plan.width, height: plan.height, tileLayout: layout);
-  });
+          {bool resetTileLinks = false}) =>
+      _change(() {
+        layout.validate();
+        final target = projects.where((p) => p.id == project.id).firstOrNull;
+        final plan = target?.floorPlan;
+        if (target == null || plan == null)
+          throw Exception('Import a floor image first.');
+        final ids = layout.tiles.map((t) => t.id).toSet();
+        final removed = annotations
+            .where((a) =>
+                a.projectId == target.id &&
+                a.tileId != null &&
+                !ids.contains(a.tileId))
+            .toList();
+        if (removed.isNotEmpty && !resetTileLinks) {
+          throw Exception(
+              'Confirm unlinking findings on removed tiles before changing the layout.');
+        }
+        if (removed.isNotEmpty) {
+          final removedIds = removed.map((a) => a.id).toSet();
+          annotations = annotations
+              .map((a) => !removedIds.contains(a.id)
+                  ? a
+                  : DefectAnnotation(
+                      id: a.id,
+                      projectId: a.projectId,
+                      cell: a.cell,
+                      status: a.status,
+                      note: a.note,
+                      measurementId: a.measurementId,
+                      measurementSource: a.measurementSource,
+                      photoBase64: a.photoBase64,
+                      x: a.x,
+                      y: a.y,
+                      planX: a.planX,
+                      planY: a.planY))
+              .toList();
+        }
+        target.floorPlan = FloorPlan(
+            imageBase64: plan.imageBase64,
+            name: plan.name,
+            width: plan.width,
+            height: plan.height,
+            tileLayout: layout);
+      });
 
   /// Validates real image bytes before atomically replacing the plan and pins.
   /// Existing pins must be explicitly reset: a new image has a new coordinate space.
@@ -505,8 +566,8 @@ class ThudStore extends ChangeNotifier {
       if (target == null) {
         throw Exception('This project is no longer available.');
       }
-      final hasPins = annotations.any((a) => a.projectId == project.id &&
-          (a.planX != null || a.tileId != null));
+      final hasPins = annotations.any((a) =>
+          a.projectId == project.id && (a.planX != null || a.tileId != null));
       if (hasPins && !resetPins) {
         throw Exception(
             'Confirm resetting existing plan pins before replacing the plan.');
@@ -637,8 +698,10 @@ class ThudStore extends ChangeNotifier {
           throw Exception(
               'A plan pin needs an imported plan and coordinates from 0 to 1.');
         }
-        if (value.tileId != null && !(project.floorPlan?.tileLayout?.tiles
-            .any((t) => t.id == value.tileId) ?? false)) {
+        if (value.tileId != null &&
+            !(project.floorPlan?.tileLayout?.tiles
+                    .any((t) => t.id == value.tileId) ??
+                false)) {
           throw Exception('Choose a tile in the current floor image.');
         }
         if (measurement != null &&
@@ -694,14 +757,16 @@ class ThudStore extends ChangeNotifier {
   String reportText(Project p) {
     final out = StringBuffer(
         'THUD / Handover inspection\n${p.name}\nRoom: ${p.room}\nGrid: ${p.rows} × ${p.columns}\n\n${p.notes.isEmpty ? "" : "Notes: ${p.notes}\n\n"}');
-    out.writeln('Building: ${p.building} · Floor: ${p.floor} · Unit: ${p.unit}');
+    out.writeln(
+        'Building: ${p.building} · Floor: ${p.floor} · Unit: ${p.unit}');
     if (p.floorPlan case final plan?) {
       out.writeln(
           'Architectural plan: ${plan.name} (${plan.width} × ${plan.height} pixels).');
       if (plan.tileLayout case final layout?) {
         out.writeln('Visible mapped tiles: ${layout.tiles.length}');
         for (final tile in layout.tiles) {
-          out.writeln('${tile.id}: row ${tile.row + 1}, column ${tile.column + 1}; '
+          out.writeln(
+              '${tile.id}: row ${tile.row + 1}, column ${tile.column + 1}; '
               'corners ${tile.polygon.map((p) => "(${p.x.toStringAsFixed(4)},${p.y.toStringAsFixed(4)})").join(" ")}');
         }
       }
@@ -760,7 +825,8 @@ class ThudStore extends ChangeNotifier {
             'capture uncertainty ${acoustic["uncertainty"]}; speech evidence ${acoustic["speechEvidence"]}.');
       }
       if (m.context.containsKey('fittedCalibration')) {
-        out.writeln('Fitted parameters and complete reference profiles retained in the local saved measurement.');
+        out.writeln(
+            'Fitted parameters and complete reference profiles retained in the local saved measurement.');
       }
       out.writeln(
           'Module: ${m.module.name} · Cell: ${m.cell == null ? "unassigned" : m.cell! + 1}');
@@ -770,7 +836,8 @@ class ThudStore extends ChangeNotifier {
           'Ring time: ${m.decayMs > 0 ? "${m.decayMs.toStringAsFixed(0)} ms" : "Retap"}');
       out.writeln(
           'RMS: ${m.rmsDb.toStringAsFixed(1)} dBFS · estimated SNR: ${m.snrDb.toStringAsFixed(1)} dB');
-      out.writeln('Signal flags: ${m.flags.isEmpty ? "None" : m.flags.join("; ")}\n');
+      out.writeln(
+          'Signal flags: ${m.flags.isEmpty ? "None" : m.flags.join("; ")}\n');
     }
     out.writeln('\nInspection marks');
     final marks = annotationsForProject(p.id);
@@ -856,9 +923,10 @@ Measurement analyzePcm(
     throw Exception(
         'No usable audio detected. Check the microphone and try another tap.');
   }
-  final analysis = acousticAnalysis ?? analyzeAcoustics(pcm,
-      sampleRate: sampleRate,
-      mode: operating ? AcousticMode.operating : AcousticMode.impact);
+  final analysis = acousticAnalysis ??
+      analyzeAcoustics(pcm,
+          sampleRate: sampleRate,
+          mode: operating ? AcousticMode.operating : AcousticMode.impact);
 
   final real = Float64List(fftSize), imag = Float64List(fftSize);
   final start = (peakIndex - fftSize ~/ 8).clamp(0, pcm.length - fftSize);
@@ -907,7 +975,8 @@ Measurement analyzePcm(
       source: source,
       created: time,
       module: module,
-      peakHz: analysis.aggregate['peakHz'] ?? (strongest + shift) * sampleRate / fftSize,
+      peakHz: analysis.aggregate['peakHz'] ??
+          (strongest + shift) * sampleRate / fftSize,
       hiiDb: _db(math.max(1e-12, lowBand) / math.max(1e-12, highBand))
           .clamp(-120.0, 120.0)
           .toDouble(),
@@ -1146,7 +1215,9 @@ class CaptureService {
 
   /// Explicit demo source, never an inferred material or defect prediction.
   Future<Measurement> sample(Module module,
-          {bool resonant = false, double? fillFraction, bool operating = false}) =>
+          {bool resonant = false,
+          double? fillFraction,
+          bool operating = false}) =>
       _serial(() async {
         if (_closing) throw Exception('The microphone service is closed.');
         if (fillFraction != null &&
@@ -1201,7 +1272,8 @@ class CaptureService {
           // Quantize exactly as signed PCM16, including the quiet noise floor.
           pcm[i] = (value.clamp(-1.0, .999969) * 32768).round() / 32768;
         }
-        return _analyze(pcm, module, operating: operating,
+        return _analyze(pcm, module,
+            operating: operating,
             source: fillFraction == null
                 ? 'Synthetic · deterministic ${operating ? "operating" : module.name} ${resonant ? "long" : "short"}-decay PCM16 sample'
                 : 'Synthetic · known fill ${(fillFraction * 100).toStringAsFixed(1)}% · deterministic vessel PCM16 sample');
@@ -1209,17 +1281,24 @@ class CaptureService {
 
   Future<Measurement> _analyze(List<double> pcm, Module module,
       {bool operating = false,
-       String source = 'Microphone · PCM16 / 48 kHz'}) async {
-    final analysis = analyzeAcoustics(pcm, sampleRate: _sampleRate,
+      String source = 'Microphone · PCM16 / 48 kHz'}) async {
+    final analysis = analyzeAcoustics(pcm,
+        sampleRate: _sampleRate,
         mode: operating ? AcousticMode.operating : AcousticMode.impact);
     final centers = operating
         ? List<int>.generate(math.max(1, pcm.length ~/ _sampleRate),
             (i) => math.min(pcm.length - 1, i * _sampleRate + _sampleRate ~/ 2))
-        : analysis.impacts.where((i) => !i.duplicate).map((i) => i.onset).toList();
+        : analysis.impacts
+            .where((i) => !i.duplicate)
+            .map((i) => i.onset)
+            .toList();
     final encoding = await _encoder.encodeWithEvidence(pcm, _sampleRate,
         impactSamples: centers.isEmpty ? null : centers);
-    return analyzePcm(pcm, module, operating: operating, source: source,
-        acousticAnalysis: analysis.withSpeechEvidence(encoding.speechEvidence))
+    return analyzePcm(pcm, module,
+            operating: operating,
+            source: source,
+            acousticAnalysis:
+                analysis.withSpeechEvidence(encoding.speechEvidence))
         .withEmbedding(encoding.embedding);
   }
 
