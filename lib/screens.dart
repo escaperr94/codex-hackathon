@@ -218,13 +218,21 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
   String _captureError(String error) {
     final value = error.toLowerCase();
     if (value.contains('permission')) return 'Enable microphone access';
-    if (value.contains('no usable audio')) return 'No sound · tap again';
-    if (value.contains('too short')) return 'Tap too short';
-    if (value.contains('yamnet') || value.contains('encoder') || value.contains('tflite') || value.contains('wasm')) {
-      return 'Neural audio model failed · $error';
+    if (value.contains('no usable audio')) return 'No sound · check the microphone and tap again';
+    if (value.contains('too short')) return 'Tap too short · hold still and let it ring';
+    if (value.contains('low impact signal-to-noise') ||
+        value.contains('no isolated impact') ||
+        value.contains('decay') ||
+        value.contains('clipping') ||
+        value.contains('inconsistent repeated')) {
+      return 'Audio captured, but the tap was not clean enough · tap once, then let it ring';
+    }
+    if (value.contains('yamnet') || value.contains('encoder') ||
+        value.contains('tflite') || value.contains('wasm')) {
+      return 'Neural audio model unavailable · $error';
     }
     if (value.contains('format') || value.contains('pcm16')) {
-      return 'Reconnect microphone';
+      return 'Microphone format changed · reconnect the microphone';
     }
     return 'Recording failed · try again';
   }
@@ -497,10 +505,7 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                                                           BorderRadius.circular(
                                                               4)))))),
                               ]),
-                          if (m == null &&
-                              (intent == SensingIntent.slab ||
-                                  intent == SensingIntent.materials ||
-                                  intent == SensingIntent.devices))
+                          if (m == null && intent != SensingIntent.scope)
                             TextButton.icon(
                                 onPressed: _busy || _recording
                                     ? null
@@ -511,9 +516,14 @@ class _ScopeScreenState extends State<ScopeScreen> with WidgetsBindingObserver {
                                     size: 18),
                                 label: Text(
                                     _profiles[intent] ??
-                                        (intent == SensingIntent.slab
-                                            ? 'Tile library'
-                                            : 'Reference library'),
+                                        switch (intent) {
+                                          SensingIntent.slab => 'Tile library',
+                                          SensingIntent.vessel => 'Container references',
+                                          SensingIntent.fruit => 'Fruit references',
+                                          SensingIntent.devices => 'Device references',
+                                          SensingIntent.materials => 'Material references',
+                                          SensingIntent.scope => 'Reference library',
+                                        },
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis)),
                           if (m == null && intent == SensingIntent.devices)

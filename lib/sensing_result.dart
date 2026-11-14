@@ -43,14 +43,14 @@ class SensingInterpretation {
       List<Measurement> queries, List<ReferenceAnchor> references) {
     final result = <String, String>{
       'resultVersion': '4', 'interpretation': 'Insufficient evidence',
-      'nextAction': 'Choose clean neural references for the same object and setup. Signal-only references must be recorded again.',
+      'nextAction': 'Choose three clean references for the same object and setup. Signal-only references must be recorded again.',
       'resultCaution': 'true', 'modelStatus': 'calibration required',
       'classifierStatus': 'insufficient-evidence',
       'methodNote': 'YAMNet unit-normalized neural1024 + bounded resonance/decay/centroid/flatness/damping features (secondary block norm ≤0.1). Local task calibration; no validated physical diagnosis.',
     };
     if (queries.isEmpty || queries.any((m) => !ReferenceAnchor.clean(m) || !m.hasEmbedding)) {
       return {...result, 'modelStatus': 'invalid capture', 'interpretation': 'Record again',
-        'nextAction': 'Capture clean audio with the neural encoder available.'};
+        'nextAction': 'Capture a clean tap: record once, keep still, and let it ring. The neural encoder is required for comparison.'};
     }
     final first = queries.first;
     final demo = first.source.toLowerCase().contains('synthetic');
